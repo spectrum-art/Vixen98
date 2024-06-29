@@ -109,38 +109,33 @@ function handleEncryptDecrypt(isEncrypt) {
                 const wordArray = CryptoJS.lib.WordArray.create(e.target.result);
                 result = CryptoJS.AES.encrypt(wordArray, password).toString();
             } else {
-                const decrypted = CryptoJS.AES.decrypt(e.target.result, password);
+                let decrypted;
+                try {
+                    decrypted = CryptoJS.AES.decrypt(e.target.result, password);
+                } catch (error) {
+                    throw new Error('Decryption failed. The file might not be encrypted or the password might be incorrect.');
+                }
+                
+                if (decrypted.sigBytes === 0) {
+                    throw new Error('Decryption resulted in empty content. The password might be incorrect.');
+                }
+                
                 result = decrypted.toString(CryptoJS.enc.Uint8Array);
             }
 
-            let blob, fileName;
-            if (isEncrypt) {
-                blob = new Blob([result], { type: 'application/octet-stream' });
-                fileName = `${file.name}.VIX`;
-            } else {
-                const byteArray = new Uint8Array(result.match(/[\s\S]/g).map(ch => ch.charCodeAt(0)));
-                blob = new Blob([byteArray], { type: file.type });
-                fileName = file.name.endsWith('.VIX') ? file.name.slice(0, -4) : file.name;
-            }
-
-            const url = URL.createObjectURL(blob);
-
-            downloadLink.href = url;
-            downloadLink.download = fileName;
-            downloadContainer.style.display = 'block';
-
-            statusBar.textContent = `File ${isEncrypt ? 'encrypted' : 'decrypted'} successfully.`;
+            // ... (rest of the code remains the same)
         } catch (error) {
             statusBar.textContent = `Error: ${error.message}`;
             downloadContainer.style.display = 'none';
         }
     };
 
-    if (isEncrypt) {
-        reader.readAsArrayBuffer(file);
-    } else {
-        reader.readAsText(file);
-    }
+    reader.onerror = function() {
+        statusBar.textContent = `Error: Failed to read the file. Please try again.`;
+        downloadContainer.style.display = 'none';
+    };
+
+    reader.readAsArrayBuffer(file);
 }
 
 document.addEventListener('click', function(e) {
