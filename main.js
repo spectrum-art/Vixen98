@@ -56,13 +56,21 @@ function openWindow(icon) {
 function createEncryptionApp() {
     return `
         <div class="encryption-app">
-            <input type="file" id="fileInput" accept="*/*">
-            <input type="password" id="passwordInput" placeholder="Enter password">
-            <button id="encryptBtn">Encrypt</button>
-            <button id="decryptBtn">Decrypt</button>
-            <div id="statusBar"></div>
-            <div id="downloadContainer" style="display: none;">
-                <a id="downloadLink" download>Download File</a>
+            <div class="app-row">
+                <input type="file" id="fileInput" accept="*/*">
+            </div>
+            <div class="app-row">
+                <input type="password" id="passwordInput" placeholder="Enter password">
+            </div>
+            <div class="app-row">
+                <button id="encryptBtn">Encrypt</button>
+                <button id="decryptBtn">Decrypt</button>
+            </div>
+            <div class="app-row">
+                <div id="statusBar"></div>
+            </div>
+            <div class="app-row" id="downloadContainer" style="display: none;">
+                <a id="downloadLink" class="download-button">Download File</a>
             </div>
         </div>
     `;
@@ -98,20 +106,27 @@ function handleEncryptDecrypt(isEncrypt) {
         try {
             let result;
             if (isEncrypt) {
-                result = CryptoJS.AES.encrypt(e.target.result, password).toString();
+                const wordArray = CryptoJS.lib.WordArray.create(e.target.result);
+                result = CryptoJS.AES.encrypt(wordArray, password).toString();
             } else {
                 const decrypted = CryptoJS.AES.decrypt(e.target.result, password);
-                result = decrypted.toString(CryptoJS.enc.Utf8);
-                if (!result) {
-                    throw new Error('Decryption failed. Incorrect password or file is not encrypted.');
-                }
+                result = decrypted.toString(CryptoJS.enc.Uint8Array);
             }
 
-            const blob = new Blob([result], { type: 'application/octet-stream' });
+            let blob, fileName;
+            if (isEncrypt) {
+                blob = new Blob([result], { type: 'application/octet-stream' });
+                fileName = `${file.name}.VIX`;
+            } else {
+                const byteArray = new Uint8Array(result.match(/[\s\S]/g).map(ch => ch.charCodeAt(0)));
+                blob = new Blob([byteArray], { type: file.type });
+                fileName = file.name.endsWith('.VIX') ? file.name.slice(0, -4) : file.name;
+            }
+
             const url = URL.createObjectURL(blob);
 
             downloadLink.href = url;
-            downloadLink.download = `${file.name}.${isEncrypt ? 'encrypted' : 'decrypted'}`;
+            downloadLink.download = fileName;
             downloadContainer.style.display = 'block';
 
             statusBar.textContent = `File ${isEncrypt ? 'encrypted' : 'decrypted'} successfully.`;
@@ -121,7 +136,11 @@ function handleEncryptDecrypt(isEncrypt) {
         }
     };
 
-    reader.readAsText(file);
+    if (isEncrypt) {
+        reader.readAsArrayBuffer(file);
+    } else {
+        reader.readAsText(file);
+    }
 }
 
 document.addEventListener('click', function(e) {
