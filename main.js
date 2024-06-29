@@ -2,7 +2,8 @@ const desktopIcons = [
     { name: 'My Computer', icon: '💻' },
     { name: 'Recycle Bin', icon: '🗑️' },
     { name: 'My Documents', icon: '📁' },
-    { name: 'Internet Explorer', icon: '🌐' }
+    { name: 'Internet Explorer', icon: '🌐' },
+    { name: 'Encryption', icon: '🔒' }
 ];
 
 const iconGrid = document.getElementById('icon-grid');
