@@ -102,7 +102,7 @@ function handleEncryptDecrypt(isEncrypt) {
     }
 
     const reader = new FileReader();
-    reader.onload = function(e) {
+reader.onload = function(e) {
         try {
             let result;
             if (isEncrypt) {
@@ -123,7 +123,23 @@ function handleEncryptDecrypt(isEncrypt) {
                 result = decrypted.toString(CryptoJS.enc.Uint8Array);
             }
 
-            // ... (rest of the code remains the same)
+            let blob, fileName;
+            if (isEncrypt) {
+                blob = new Blob([result], { type: 'application/octet-stream' });
+                fileName = `${file.name}.VIX`;
+            } else {
+                const byteArray = new Uint8Array(result.match(/[\s\S]/g).map(ch => ch.charCodeAt(0)));
+                blob = new Blob([byteArray], { type: file.type });
+                fileName = file.name.endsWith('.VIX') ? file.name.slice(0, -4) : file.name;
+            }
+
+            const url = URL.createObjectURL(blob);
+
+            downloadLink.href = url;
+            downloadLink.download = fileName;
+            downloadContainer.style.display = 'block';
+
+            statusBar.textContent = `File ${isEncrypt ? 'encrypted' : 'decrypted'} successfully.`;
         } catch (error) {
             statusBar.textContent = `Error: ${error.message}`;
             downloadContainer.style.display = 'none';
@@ -137,14 +153,6 @@ function handleEncryptDecrypt(isEncrypt) {
 
     reader.readAsArrayBuffer(file);
 }
-
-document.addEventListener('click', function(e) {
-    if (e.target && e.target.id === 'encryptBtn') {
-        handleEncryptDecrypt(true);
-    } else if (e.target && e.target.id === 'decryptBtn') {
-        handleEncryptDecrypt(false);
-    }
-});
 
 function closeWindow(window, icon) {
     window.remove();
