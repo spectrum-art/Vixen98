@@ -66,7 +66,7 @@ function createEncryptionApp() {
             </div>
             <div class="app-row password-container">
                 <input type="password" id="passwordInput" placeholder="Enter password">
-                <button id="togglePassword">👁️</button>
+                <button id="togglePassword">👁️‍🗨️</button>
             </div>
             <div class="app-row">
                 <button id="encryptBtn">Encrypt</button>
@@ -78,9 +78,6 @@ function createEncryptionApp() {
             <div class="app-row" id="downloadContainer" style="display: none;">
                 <a id="downloadLink" class="download-button">Download File</a>
             </div>
-            <div class="app-row">
-                <button id="clearBtn">Clear</button>
-            </div>
         </div>
     `;
 }
@@ -88,12 +85,10 @@ function createEncryptionApp() {
 function setupEncryptionApp(window) {
     const encryptBtn = window.querySelector('#encryptBtn');
     const decryptBtn = window.querySelector('#decryptBtn');
-    const clearBtn = window.querySelector('#clearBtn');
     const togglePassword = window.querySelector('#togglePassword');
 
     encryptBtn.addEventListener('click', () => handleEncryptDecrypt(true));
     decryptBtn.addEventListener('click', () => handleEncryptDecrypt(false));
-    clearBtn.addEventListener('click', clearForm);
     togglePassword.addEventListener('click', togglePasswordVisibility);
 
     setupFileDrop(window);
@@ -168,13 +163,6 @@ function handleEncryptDecrypt(isEncrypt) {
     } else {
         reader.readAsText(file);
     }
-}
-
-function clearForm() {
-    document.getElementById('fileInput').value = '';
-    document.getElementById('passwordInput').value = '';
-    document.getElementById('statusBar').textContent = '';
-    document.getElementById('downloadContainer').style.display = 'none';
 }
 
 function togglePasswordVisibility() {
