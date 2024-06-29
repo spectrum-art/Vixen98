@@ -28,14 +28,20 @@ function openWindow(icon) {
     window.className = 'window';
     window.style.left = '25%';
     window.style.top = '25%';
+    
+    let content;
+    if (icon.name === 'Encryption') {
+        content = createEncryptionApp();
+    } else {
+        content = `Content for ${icon.name}`;
+    }
+    
     window.innerHTML = `
         <div class="window-header">
             <span class="window-title">${icon.name}</span>
             <span class="window-close">❌</span>
         </div>
-        <div class="window-content">
-            Content for ${icon.name}
-        </div>
+        <div class="window-content">${content}</div>
     `;
     
     const closeBtn = window.querySelector('.window-close');
@@ -46,6 +52,85 @@ function openWindow(icon) {
     
     makeDraggable(window);
 }
+
+function createEncryptionApp() {
+    return `
+        <div class="encryption-app">
+            <input type="file" id="fileInput" accept="*/*">
+            <input type="password" id="passwordInput" placeholder="Enter password">
+            <button id="encryptBtn">Encrypt</button>
+            <button id="decryptBtn">Decrypt</button>
+            <div id="statusBar"></div>
+            <div id="downloadContainer" style="display: none;">
+                <a id="downloadLink" download>Download File</a>
+            </div>
+        </div>
+    `;
+}
+
+function handleEncryptDecrypt(isEncrypt) {
+    const fileInput = document.getElementById('fileInput');
+    const passwordInput = document.getElementById('passwordInput');
+    const statusBar = document.getElementById('statusBar');
+    const downloadContainer = document.getElementById('downloadContainer');
+    const downloadLink = document.getElementById('downloadLink');
+
+    const file = fileInput.files[0];
+    const password = passwordInput.value;
+
+    if (!file) {
+        statusBar.textContent = 'Please select a file.';
+        return;
+    }
+
+    if (!password) {
+        statusBar.textContent = 'Please enter a password.';
+        return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+        statusBar.textContent = 'File size exceeds 10 MB limit.';
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            let result;
+            if (isEncrypt) {
+                result = CryptoJS.AES.encrypt(e.target.result, password).toString();
+            } else {
+                const decrypted = CryptoJS.AES.decrypt(e.target.result, password);
+                result = decrypted.toString(CryptoJS.enc.Utf8);
+                if (!result) {
+                    throw new Error('Decryption failed. Incorrect password or file is not encrypted.');
+                }
+            }
+
+            const blob = new Blob([result], { type: 'application/octet-stream' });
+            const url = URL.createObjectURL(blob);
+
+            downloadLink.href = url;
+            downloadLink.download = `${file.name}.${isEncrypt ? 'encrypted' : 'decrypted'}`;
+            downloadContainer.style.display = 'block';
+
+            statusBar.textContent = `File ${isEncrypt ? 'encrypted' : 'decrypted'} successfully.`;
+        } catch (error) {
+            statusBar.textContent = `Error: ${error.message}`;
+            downloadContainer.style.display = 'none';
+        }
+    };
+
+    reader.readAsText(file);
+}
+
+document.addEventListener('click', function(e) {
+    if (e.target && e.target.id === 'encryptBtn') {
+        handleEncryptDecrypt(true);
+    } else if (e.target && e.target.id === 'decryptBtn') {
+        handleEncryptDecrypt(false);
+    }
+});
 
 function closeWindow(window, icon) {
     window.remove();
