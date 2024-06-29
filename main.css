@@ -147,3 +147,23 @@ body, html {
     background-color: #000;
     margin-right: 5px;
 }
+
+.encryption-app {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.encryption-app input,
+.encryption-app button {
+    margin-bottom: 10px;
+}
+
+#statusBar {
+    min-height: 20px;
+    word-wrap: break-word;
+}
+
+#downloadContainer {
+    margin-top: 10px;
+}
