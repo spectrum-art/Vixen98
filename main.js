@@ -51,16 +51,22 @@ function openWindow(icon) {
     createTaskbarItem(icon, window);
     
     makeDraggable(window);
+
+    if (icon.name === 'Encryption') {
+        setupEncryptionApp(window);
+    }
 }
 
 function createEncryptionApp() {
     return `
         <div class="encryption-app">
-            <div class="app-row">
+            <div class="app-row file-drop-area">
                 <input type="file" id="fileInput" accept="*/*">
+                <p>Drag & drop a file or click to select</p>
             </div>
-            <div class="app-row">
+            <div class="app-row password-container">
                 <input type="password" id="passwordInput" placeholder="Enter password">
+                <button id="togglePassword">👁️</button>
             </div>
             <div class="app-row">
                 <button id="encryptBtn">Encrypt</button>
@@ -72,8 +78,25 @@ function createEncryptionApp() {
             <div class="app-row" id="downloadContainer" style="display: none;">
                 <a id="downloadLink" class="download-button">Download File</a>
             </div>
+            <div class="app-row">
+                <button id="clearBtn">Clear</button>
+            </div>
         </div>
     `;
+}
+
+function setupEncryptionApp(window) {
+    const encryptBtn = window.querySelector('#encryptBtn');
+    const decryptBtn = window.querySelector('#decryptBtn');
+    const clearBtn = window.querySelector('#clearBtn');
+    const togglePassword = window.querySelector('#togglePassword');
+
+    encryptBtn.addEventListener('click', () => handleEncryptDecrypt(true));
+    decryptBtn.addEventListener('click', () => handleEncryptDecrypt(false));
+    clearBtn.addEventListener('click', clearForm);
+    togglePassword.addEventListener('click', togglePasswordVisibility);
+
+    setupFileDrop(window);
 }
 
 function handleEncryptDecrypt(isEncrypt) {
@@ -102,35 +125,24 @@ function handleEncryptDecrypt(isEncrypt) {
     }
 
     const reader = new FileReader();
-reader.onload = function(e) {
+    reader.onload = function(e) {
         try {
-            let result;
+            let result, fileName, blob;
             if (isEncrypt) {
-                const wordArray = CryptoJS.lib.WordArray.create(e.target.result);
-                result = CryptoJS.AES.encrypt(wordArray, password).toString();
-            } else {
-                let decrypted;
-                try {
-                    decrypted = CryptoJS.AES.decrypt(e.target.result, password);
-                } catch (error) {
-                    throw new Error('Decryption failed. The file might not be encrypted or the password might be incorrect.');
-                }
-                
-                if (decrypted.sigBytes === 0) {
-                    throw new Error('Decryption resulted in empty content. The password might be incorrect.');
-                }
-                
-                result = decrypted.toString(CryptoJS.enc.Uint8Array);
-            }
-
-            let blob, fileName;
-            if (isEncrypt) {
+                const fileInfo = {
+                    name: file.name,
+                    type: file.type,
+                    data: Array.from(new Uint8Array(e.target.result))
+                };
+                result = CryptoJS.AES.encrypt(JSON.stringify(fileInfo), password).toString();
                 blob = new Blob([result], { type: 'application/octet-stream' });
                 fileName = `${file.name}.VIX`;
             } else {
-                const byteArray = new Uint8Array(result.match(/[\s\S]/g).map(ch => ch.charCodeAt(0)));
-                blob = new Blob([byteArray], { type: file.type });
-                fileName = file.name.endsWith('.VIX') ? file.name.slice(0, -4) : file.name;
+                const decrypted = CryptoJS.AES.decrypt(e.target.result, password);
+                const fileInfo = JSON.parse(decrypted.toString(CryptoJS.enc.Utf8));
+                result = new Uint8Array(fileInfo.data);
+                blob = new Blob([result], { type: fileInfo.type });
+                fileName = fileInfo.name;
             }
 
             const url = URL.createObjectURL(blob);
@@ -151,7 +163,62 @@ reader.onload = function(e) {
         downloadContainer.style.display = 'none';
     };
 
-    reader.readAsArrayBuffer(file);
+    if (isEncrypt) {
+        reader.readAsArrayBuffer(file);
+    } else {
+        reader.readAsText(file);
+    }
+}
+
+function clearForm() {
+    document.getElementById('fileInput').value = '';
+    document.getElementById('passwordInput').value = '';
+    document.getElementById('statusBar').textContent = '';
+    document.getElementById('downloadContainer').style.display = 'none';
+}
+
+function togglePasswordVisibility() {
+    const passwordInput = document.getElementById('passwordInput');
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
+}
+
+function setupFileDrop(window) {
+    const dropArea = window.querySelector('.file-drop-area');
+    const fileInput = window.querySelector('#fileInput');
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight() {
+        dropArea.classList.add('dragover');
+    }
+
+    function unhighlight() {
+        dropArea.classList.remove('dragover');
+    }
+
+    dropArea.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        fileInput.files = files;
+    }
 }
 
 function closeWindow(window, icon) {
