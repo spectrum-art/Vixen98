@@ -190,3 +190,29 @@ body, html {
 .download-button:hover {
     background-color: #006666;
 }
+
+.password-container {
+    position: relative;
+}
+
+#togglePassword {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.file-drop-area {
+    border: 2px dashed #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.file-drop-area.dragover {
+    background-color: #f0f0f0;
+}
