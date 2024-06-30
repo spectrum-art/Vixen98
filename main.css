@@ -213,7 +213,6 @@ body, html {
 }
 
 .download-button {
-    display: inline-block;
     padding: 5px 10px;
     background-color: #008080;
     color: white;
