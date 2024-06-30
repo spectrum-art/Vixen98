@@ -47,16 +47,19 @@ body, html {
 }
 
 .desktop-icon .icon {
-    width: 33%;
+    width: 100%;
     height: 33%;
-    background-color: #c3c3c3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2em;
 }
 
 .desktop-icon .label {
     color: white;
     text-align: center;
     margin-top: 5px;
-    font-size: 12px;
+    font-size: 14px;
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -68,11 +71,24 @@ body, html {
     background-color: #c3c3c3;
     display: flex;
     align-items: center;
-    padding: 2px;
+    padding: 1px;
+    border-top: 1px solid #ffffff;
+    border-left: 1px solid #ffffff;
+    border-right: 1px solid #808080;
+    border-bottom: 1px solid #808080;
 }
 
 #start-button {
-    margin-right: 10px;
+    height: calc(100% - 2px);
+    margin-right: 2px;
+    font-weight: bold;
+}
+
+#taskbar-separator {
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(to right, #808080, #ffffff);
+    margin: 0 2px;
 }
 
 #open-windows {
@@ -84,12 +100,15 @@ body, html {
 #system-tray {
     display: flex;
     align-items: center;
+    padding: 0 5px;
+    border-top: 1px solid #808080;
+    border-left: 1px solid #808080;
+    border-right: 1px solid #ffffff;
+    border-bottom: 1px solid #ffffff;
 }
 
 #calendar-icon, #volume-icon {
-    width: 16px;
-    height: 16px;
-    background-color: #000;
+    font-size: 16px;
     margin-right: 5px;
 }
 
@@ -101,7 +120,7 @@ body, html {
 .window {
     position: absolute;
     width: 50%;
-    height: 50%;
+    height: 42.5%; /* Reduced from 50% to about 85% of original size */
     background-color: #c3c3c3;
     border: 2px solid #000;
     display: flex;
@@ -160,8 +179,18 @@ body, html {
     justify-content: space-between;
 }
 
-#fileInput, #passwordInput {
+#fileInput {
     width: 100%;
+    padding: 5px;
+}
+
+.password-container {
+    width: 50%;
+    position: relative;
+}
+
+#passwordInput {
+    width: calc(100% - 30px);
     padding: 5px;
 }
 
@@ -175,6 +204,8 @@ body, html {
     padding: 5px;
     background-color: #f0f0f0;
     border: 1px solid #ccc;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .download-button {
@@ -191,10 +222,6 @@ body, html {
     background-color: #006666;
 }
 
-.password-container {
-    position: relative;
-}
-
 #togglePassword {
     position: absolute;
     right: 5px;
@@ -203,6 +230,10 @@ body, html {
     background: none;
     border: none;
     cursor: pointer;
+}
+
+#togglePassword.active {
+    color: #000080;
 }
 
 .file-drop-area {
