@@ -80,9 +80,6 @@ function createEncryptionApp() {
             <div class="app-row" id="downloadContainer" style="display: none">
                 <a id="downloadLink" class="download-button">Download File</a>
             </div>
-            <div class="app-row">
-                <button id="clearBtn">Clear</button>
-            </div>
         </div>
     `;
 }
