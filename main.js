@@ -64,9 +64,11 @@ function createEncryptionApp() {
                 <input type="file" id="fileInput" accept="*/*">
                 <p>Drag & drop a file or click to select</p>
             </div>
-            <div class="app-row password-container">
-                <input type="password" id="passwordInput" placeholder="Enter password">
-                <button id="togglePassword">👁️‍🗨️</button>
+            <div class="app-row">
+                <div class="password-container">
+                    <input type="password" id="passwordInput" placeholder="Enter password">
+                    <button id="togglePassword">👁️</button>
+                </div>
             </div>
             <div class="app-row">
                 <button id="encryptBtn">Encrypt</button>
@@ -77,6 +79,9 @@ function createEncryptionApp() {
             </div>
             <div class="app-row" id="downloadContainer" style="display: none;">
                 <a id="downloadLink" class="download-button">Download File</a>
+            </div>
+            <div class="app-row">
+                <button id="clearBtn">Clear</button>
             </div>
         </div>
     `;
@@ -167,8 +172,10 @@ function handleEncryptDecrypt(isEncrypt) {
 
 function togglePasswordVisibility() {
     const passwordInput = document.getElementById('passwordInput');
+    const toggleButton = document.getElementById('togglePassword');
     const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
     passwordInput.setAttribute('type', type);
+    toggleButton.classList.toggle('active');
 }
 
 function setupFileDrop(window) {
