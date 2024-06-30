@@ -121,7 +121,7 @@ body, html {
 .window {
     position: absolute;
     width: 50%;
-    height: 39%;
+    height: 35%;
     background-color: #c3c3c3;
     border: 2px solid #000;
     display: flex;
