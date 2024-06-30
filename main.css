@@ -100,7 +100,7 @@ body, html {
 #system-tray {
     display: flex;
     align-items: center;
-    padding: 10px 5px;
+    padding: 20% 5px;
     border-top: 1px solid #808080;
     border-left: 1px solid #808080;
     border-right: 1px solid #ffffff;
@@ -113,7 +113,8 @@ body, html {
 }
 
 #clock {
-    font-size: 12px;
+    font-size: 14px;
+    font-style: bold;
     margin-left: 5px;
 }
 
@@ -226,7 +227,7 @@ body, html {
     position: absolute;
     right: 5px;
     top: 50%;
-    transform: translateY(-25%);
+    transform: translateY(100%);
     background: none;
     border: none;
     cursor: pointer;
