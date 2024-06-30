@@ -121,7 +121,7 @@ body, html {
 .window {
     position: absolute;
     width: 50%;
-    height: 42.5%; /* Reduced from 50% to about 85% of original size */
+    height: 39%;
     background-color: #c3c3c3;
     border: 2px solid #000;
     display: flex;
