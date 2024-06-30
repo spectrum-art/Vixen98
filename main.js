@@ -77,7 +77,7 @@ function createEncryptionApp() {
             <div class="app-row">
                 <div id="statusBar"></div>
             </div>
-            <div class="app-row" id="downloadContainer" style="display: none;">
+            <div class="app-row" id="downloadContainer" style="display: none; align: center">
                 <a id="downloadLink" class="download-button">Download File</a>
             </div>
             <div class="app-row">
