@@ -77,7 +77,7 @@ function createEncryptionApp() {
             <div class="app-row">
                 <div id="statusBar"></div>
             </div>
-            <div class="app-row" id="downloadContainer">
+            <div class="app-row" id="downloadContainer" style="display: none">
                 <a id="downloadLink" class="download-button">Download File</a>
             </div>
             <div class="app-row">
@@ -149,7 +149,7 @@ function handleEncryptDecrypt(isEncrypt) {
 
             downloadLink.href = url;
             downloadLink.download = fileName;
-            downloadContainer.style.display = 'block';
+            downloadContainer.style.display = 'flex';
 
             statusBar.textContent = `File ${isEncrypt ? 'encrypted' : 'decrypted'} successfully.`;
         } catch (error) {
