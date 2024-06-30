@@ -177,7 +177,7 @@ body, html {
 
 .app-row {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
 }
 
 #fileInput {
@@ -188,7 +188,7 @@ body, html {
 .password-container {
     width: 50%;
     position: relative;
-    left: 20%;
+    right: 5.1%;
 }
 
 #passwordInput {
@@ -197,7 +197,9 @@ body, html {
 }
 
 #encryptBtn, #decryptBtn {
-    width: 48%;
+    width: 35%;
+    margin-left: 2%;
+    margin-right: 2%;
 }
 
 #statusBar {
