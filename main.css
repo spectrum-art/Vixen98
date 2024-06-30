@@ -225,9 +225,9 @@ body, html {
 
 #togglePassword {
     position: absolute;
-    right: 5px;
+    left: 5px;
     top: 50%;
-    transform: translateY(100%);
+    transform: translateY(-50%);
     background: none;
     border: none;
     cursor: pointer;
