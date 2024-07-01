@@ -88,7 +88,8 @@ body, html {
 }
 
 #start-button-img {
-    padding: 25px;
+    height: 70%
+    padding: 12px;
     box-sizing: border-box;
 }
 
