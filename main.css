@@ -92,8 +92,8 @@ body, html {
 }
 
 #taskbar-separator {
-    width: 1px;
-    height: 100%;
+    width: 2px;
+    height: 95%;
     background: linear-gradient(to right, #808080, #ffffff);
     margin: 0 2px;
 }
