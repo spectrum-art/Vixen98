@@ -1,4 +1,3 @@
-// main.js
 import { validatePassword, verifyToken } from './server.js';
 
 const desktopIcons = [
