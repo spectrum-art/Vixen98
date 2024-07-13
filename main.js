@@ -1,3 +1,6 @@
+// main.js
+import { validatePassword, verifyToken } from './server.js';
+
 const desktopIcons = [
     { name: 'My Computer', icon: '💻', accessLevel: 1 },
     { name: 'Recycle Bin', icon: '🗑️', accessLevel: 1 },
@@ -24,7 +27,8 @@ function createDesktopIcons() {
 }
 
 function openWindow(icon) {
-    const currentAccessLevel = parseInt(localStorage.getItem('accessLevel') || '1');
+    const token = localStorage.getItem('accessToken');
+    const currentAccessLevel = verifyToken(token);
 
     if (currentAccessLevel < icon.accessLevel) {
         alert('Unauthorized');
@@ -60,7 +64,7 @@ function openWindow(icon) {
     const closeBtn = window.querySelector('.window-close');
     closeBtn.addEventListener('click', () => closeWindow(window, icon));
     
-positionWindow(window);
+    positionWindow(window);
     desktop.appendChild(window);
     createTaskbarItem(icon, window);
     
@@ -69,51 +73,8 @@ positionWindow(window);
     if (icon.name === 'Encryption') {
         setupEncryptionApp(window);
     }
-}
 
-function bringToFront(window) {
-    const windows = document.querySelectorAll('.window');
-    let maxZIndex = 0;
-
-    windows.forEach(w => {
-        const zIndex = parseInt(w.style.zIndex || '0');
-        maxZIndex = Math.max(maxZIndex, zIndex);
-    });
-
-    window.style.zIndex = maxZIndex + 1;
-}
-
-function positionWindow(window) {
-    let left = 25;
-    let top = 25;
-    const step = 12;
-
-    while (isPositionOccupied(left, top)) {
-        left += step;
-        top += step;
-
-        if (left > desktop.clientWidth - window.clientWidth) {
-            left = 25;
-        }
-        if (top > desktop.clientHeight - window.clientHeight) {
-            top = 25;
-        }
-    }
-
-    window.style.left = `${left}%`;
-    window.style.top = `${top}%`;
-}
-
-function isPositionOccupied(left, top) {
-    const windows = document.querySelectorAll('.window');
-    for (let w of windows) {
-        const wLeft = parseInt(w.style.left);
-        const wTop = parseInt(w.style.top);
-        if (Math.abs(wLeft - left) < 10 && Math.abs(wTop - top) < 10) {
-            return true;
-        }
-    }
-    return false;
+    bringToFront(window);
 }
 
 function createEncryptionApp() {
@@ -289,7 +250,12 @@ function createTaskbarItem(icon, window) {
         <span>${icon.name}</span>
     `;
     taskbarItem.addEventListener('click', () => {
-        window.style.display = window.style.display === 'none' ? 'flex' : 'none';
+        if (window.style.display === 'none') {
+            window.style.display = 'flex';
+            bringToFront(window);
+        } else {
+            window.style.display = 'none';
+        }
     });
     openWindows.appendChild(taskbarItem);
 }
@@ -305,6 +271,7 @@ function makeDraggable(element) {
         pos4 = e.clientY;
         document.onmouseup = closeDragElement;
         document.onmousemove = elementDrag;
+        bringToFront(element);
     }
 
     function elementDrag(e) {
@@ -322,6 +289,57 @@ function makeDraggable(element) {
         document.onmouseup = null;
         document.onmousemove = null;
     }
+
+    element.addEventListener('mousedown', () => {
+        bringToFront(element);
+    });
+}
+
+function bringToFront(window) {
+    const windows = document.querySelectorAll('.window');
+    let maxZIndex = 0;
+
+    windows.forEach(w => {
+        const zIndex = parseInt(w.style.zIndex || '0');
+        maxZIndex = Math.max(maxZIndex, zIndex);
+        w.classList.remove('active');
+    });
+
+    window.style.zIndex = maxZIndex + 1;
+    window.classList.add('active');
+}
+
+function positionWindow(window) {
+    let left = 25;
+    let top = 25;
+    const step = 12;
+
+    while (isPositionOccupied(left, top)) {
+        left += step;
+        top += step;
+
+        if (left > desktop.clientWidth - window.clientWidth) {
+            left = 25;
+        }
+        if (top > desktop.clientHeight - window.clientHeight) {
+            top = 25;
+        }
+    }
+
+    window.style.left = `${left}%`;
+    window.style.top = `${top}%`;
+}
+
+function isPositionOccupied(left, top) {
+    const windows = document.querySelectorAll('.window');
+    for (let w of windows) {
+        const wLeft = parseInt(w.style.left);
+        const wTop = parseInt(w.style.top);
+        if (Math.abs(wLeft - left) < 10 && Math.abs(wTop - top) < 10) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function updateClock() {
@@ -335,23 +353,15 @@ updateClock();
 setInterval(updateClock, 1000);
 
 document.getElementById('start-button').addEventListener('click', () => {
-    const password = prompt('Enter password');
-    let accessLevel = 1;
-
-    if (password === 'babyshark') {
-        accessLevel = 2;
-    } else if (password === 'lazarus') {
-        accessLevel = 3;
-    }
-
+    const password = prompt('Enter password for access:');
     if (password) {
+        const token = validatePassword(password);
+        localStorage.setItem('accessToken', token);
+        const accessLevel = verifyToken(token);
         if (accessLevel > 1) {
-            alert(`Acccess level ${accessLevel} granted.`);
+            alert(`Access granted. Your access level is ${accessLevel}.`);
         } else {
-            alert('Invalid password.');
+            alert('Invalid password. Default access level 1 granted.');
         }
     }
-
-    // Store the access level in localStorage for later use
-    localStorage.setItem('accessLevel', accessLevel);
 });
