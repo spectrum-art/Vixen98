@@ -1,42 +1,31 @@
-const crypto = require('crypto-js');
+const SALT = "server";
 
-const SECRETS = {
-    passwordSecret: 'verySecretKey123',
-    tokenSecret: 'anotherSecretKey456'
-};
-
-const hashedPasswords = {
-    'babyshark': '3d7e3d93e43aff2e8790102d47832f24f3eebe631b5aa8e27cecc98af2c99f11',
-    'lazarus': '7fad6ea86e768759721a2aa8e3c36cf28b21fa9d1beecc68c8e809c053e08186'
-};
-
-const accessLevels = {
-    'babyshark': 2,
-    'lazarus': 3
+const accessLevelHashes = {
+    2: '1b055790275fe1228786d33b8897a3fa6fb26191c1eafe3b2074b096899a821d',
+    3: '98877553b2bed31cc19b5b3ae73c855831519154d83453cb897e120e062b21d3'
 };
 
 function validatePassword(password) {
-    const hashedPassword = crypto.SHA256(password + SECRETS.passwordSecret).toString();
-    for (let key in hashedPasswords) {
-        if (hashedPasswords[key] === hashedPassword) {
-            return generateToken(accessLevels[key]);
+    const hashedPassword = CryptoJS.SHA256(password + SALT).toString();
+    for (let accessLevel in accessLevelHashes) {
+        if (accessLevelHashes[accessLevel] === hashedPassword) {
+            return generateToken(parseInt(accessLevel));
         }
     }
-    return generateToken(1);
+    return generateToken(1);  // Default access level
 }
 
 function generateToken(accessLevel) {
     const payload = {
         accessLevel: accessLevel,
-        exp: Date.now() + 3600000 // 1 hour expiration
+        exp: Date.now() + 86400000
     };
-    const token = crypto.AES.encrypt(JSON.stringify(payload), SECRETS.tokenSecret).toString();
-    return token;
+    return CryptoJS.AES.encrypt(JSON.stringify(payload), SALT).toString();
 }
 
 function verifyToken(token) {
     try {
-        const decrypted = crypto.AES.decrypt(token, SECRETS.tokenSecret).toString(crypto.enc.Utf8);
+        const decrypted = CryptoJS.AES.decrypt(token, SALT).toString(CryptoJS.enc.Utf8);
         const payload = JSON.parse(decrypted);
         if (payload.exp > Date.now()) {
             return payload.accessLevel;
@@ -44,7 +33,7 @@ function verifyToken(token) {
     } catch (error) {
         console.error('Invalid token');
     }
-    return 1;
+    return 1; 
 }
 
-module.exports = { validatePassword, verifyToken };
+export { validatePassword, verifyToken };
