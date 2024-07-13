@@ -267,7 +267,7 @@ body, html {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    height: 100%;
+    height: 35%;
     padding: 20px;
 }
 
@@ -275,7 +275,7 @@ body, html {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100px;
+    width: 110px;
 }
 
 .my-documents-icons .icon {
