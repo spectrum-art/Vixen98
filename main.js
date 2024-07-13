@@ -311,7 +311,7 @@ function bringToFront(window) {
 function positionWindow(window) {
     let left = 25;
     let top = 25;
-    const step = 12;
+    const step = 5;
 
     while (isPositionOccupied(left, top)) {
         left += step;
