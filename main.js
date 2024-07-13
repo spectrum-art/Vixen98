@@ -352,15 +352,15 @@ updateClock();
 setInterval(updateClock, 1000);
 
 document.getElementById('start-button').addEventListener('click', () => {
-    const password = prompt('Enter password for access:');
+    const password = prompt('Enter password:');
     if (password) {
         const token = validatePassword(password);
         localStorage.setItem('accessToken', token);
         const accessLevel = verifyToken(token);
         if (accessLevel > 1) {
-            alert(`Access granted. Your access level is ${accessLevel}.`);
+            alert(`Access level ${accessLevel} granted.`);
         } else {
-            alert('Invalid password. Default access level 1 granted.');
+            alert('Invalid password.');
         }
     }
 });
