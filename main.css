@@ -262,3 +262,22 @@ body, html {
 .file-drop-area.dragover {
     background-color: #f0f0f0;
 }
+
+.my-documents-icons {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.map-window {
+    width: 90%;
+    height: 90%;
+    left: 5%;
+    top: 5%;
+}
+
+.map-window .window-content {
+    height: calc(100% - 30px);  /* Adjust based on your window header height */
+    padding: 0;
+}
