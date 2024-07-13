@@ -244,7 +244,7 @@ function setupFileDrop(window) {
     }
 }
 
-javascriptCopyfunction createMyDocumentsContent() {
+function createMyDocumentsContent() {
     return `
         <div class="my-documents-icons">
             ${myDocumentsIcons.map(icon => `
