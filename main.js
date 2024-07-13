@@ -1,3 +1,5 @@
+import { validatePassword, verifyToken } from './server.js';
+
 const desktopIcons = [
     { name: 'My Computer', icon: '💻', accessLevel: 1 },
     { name: 'Recycle Bin', icon: '🗑️', accessLevel: 1 },
@@ -351,7 +353,6 @@ setInterval(updateClock, 1000);
 
 document.getElementById('start-button').addEventListener('click', () => {
     const password = prompt('Enter password:');
-    import { validatePassword, verifyToken } from './server.js';
     if (password) {
         const token = validatePassword(password);
         localStorage.setItem('accessToken', token);
