@@ -1,9 +1,9 @@
 const desktopIcons = [
-    { name: 'My Computer', icon: '💻' },
-    { name: 'Recycle Bin', icon: '🗑️' },
-    { name: 'My Documents', icon: '📁' },
-    { name: 'Internet Explorer', icon: '🌐' },
-    { name: 'Encryption', icon: '🔒' }
+    { name: 'My Computer', icon: '💻', accessLevel: 1 },
+    { name: 'Recycle Bin', icon: '🗑️', accessLevel: 1 },
+    { name: 'My Documents', icon: '📁', accessLevel: 2 },
+    { name: 'Internet Explorer', icon: '🌐', accessLevel: 1 },
+    { name: 'Encryption', icon: '🔒', accessLevel: 2 }
 ];
 
 const iconGrid = document.getElementById('icon-grid');
@@ -24,10 +24,23 @@ function createDesktopIcons() {
 }
 
 function openWindow(icon) {
+    const currentAccessLevel = parseInt(localStorage.getItem('accessLevel') || '1');
+
+    if (currentAccessLevel < icon.accessLevel) {
+        alert('Unauthorized');
+        return;
+    }
+
+    // Check if the window is already open
+    const existingWindow = document.querySelector(`.window[data-app="${icon.name}"]`);
+    if (existingWindow) {
+        bringToFront(existingWindow);
+        return;
+    }
+
     const window = document.createElement('div');
     window.className = 'window';
-    window.style.left = '25%';
-    window.style.top = '25%';
+    window.setAttribute('data-app', icon.name);
     
     let content;
     if (icon.name === 'Encryption') {
@@ -47,6 +60,7 @@ function openWindow(icon) {
     const closeBtn = window.querySelector('.window-close');
     closeBtn.addEventListener('click', () => closeWindow(window, icon));
     
+positionWindow(window);
     desktop.appendChild(window);
     createTaskbarItem(icon, window);
     
@@ -55,6 +69,51 @@ function openWindow(icon) {
     if (icon.name === 'Encryption') {
         setupEncryptionApp(window);
     }
+}
+
+function bringToFront(window) {
+    const windows = document.querySelectorAll('.window');
+    let maxZIndex = 0;
+
+    windows.forEach(w => {
+        const zIndex = parseInt(w.style.zIndex || '0');
+        maxZIndex = Math.max(maxZIndex, zIndex);
+    });
+
+    window.style.zIndex = maxZIndex + 1;
+}
+
+function positionWindow(window) {
+    let left = 25;
+    let top = 25;
+    const step = 12;
+
+    while (isPositionOccupied(left, top)) {
+        left += step;
+        top += step;
+
+        if (left > desktop.clientWidth - window.clientWidth) {
+            left = 25;
+        }
+        if (top > desktop.clientHeight - window.clientHeight) {
+            top = 25;
+        }
+    }
+
+    window.style.left = `${left}%`;
+    window.style.top = `${top}%`;
+}
+
+function isPositionOccupied(left, top) {
+    const windows = document.querySelectorAll('.window');
+    for (let w of windows) {
+        const wLeft = parseInt(w.style.left);
+        const wTop = parseInt(w.style.top);
+        if (Math.abs(wLeft - left) < 10 && Math.abs(wTop - top) < 10) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function createEncryptionApp() {
@@ -276,5 +335,23 @@ updateClock();
 setInterval(updateClock, 1000);
 
 document.getElementById('start-button').addEventListener('click', () => {
-    alert('Start button clicked');
+    const password = prompt('Enter password');
+    let accessLevel = 1;
+
+    if (password === 'babyshark') {
+        accessLevel = 2;
+    } else if (password === 'lazarus') {
+        accessLevel = 3;
+    }
+
+    if (password) {
+        if (accessLevel > 1) {
+            alert(`Acccess level ${accessLevel} granted.`);
+        } else {
+            alert('Invalid password.');
+        }
+    }
+
+    // Store the access level in localStorage for later use
+    localStorage.setItem('accessLevel', accessLevel);
 });
