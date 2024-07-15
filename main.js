@@ -2,7 +2,7 @@ import { validatePassword, verifyToken } from './server.js';
 
 const desktopIcons = [
     { name: 'System', icon: '💻', accessLevel: 1 },
-    { name: 'Trash Can', icon: '🗑️', accessLevel: 1 },
+    { name: 'Trash', icon: '🗑️', accessLevel: 1 },
     { name: 'Documents', icon: '📁', accessLevel: 2 },
     { name: 'Internet', icon: '🌐', accessLevel: 1 },
     { name: 'Encryption', icon: '🔒', accessLevel: 2 }
