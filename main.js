@@ -337,6 +337,7 @@ function closeWindow(window, icon) {
             taskbarItem.remove();
         }
     }
+}
 
 function createTaskbarItem(icon, window) {
     const taskbarItem = document.createElement('div');
@@ -505,4 +506,3 @@ document.getElementById('start-button').addEventListener('click', () => {
         }
     }
 });
-}
