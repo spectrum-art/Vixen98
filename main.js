@@ -91,9 +91,13 @@ function openWindow(icon) {
 function createEncryptionApp() {
     return `
         <div class="encryption-app">
-            <div class="app-row file-drop-area">
-                <input type="file" id="fileInput" accept="*/*">
-                <p>Drag & drop a file or click to select</p>
+            <div class="file-drop-area">
+                <div class="file-input-wrapper">
+                    <input type="text" readonly placeholder="No file selected">
+                    <button id="browseButton">Browse...</button>
+                </div>
+                <input type="file" id="fileInput" accept="*/*" style="display: none;">
+                <p>Drag & drop a file here or click Browse to select</p>
             </div>
             <div class="app-row">
                 <div class="password-container">
@@ -119,6 +123,19 @@ function setupEncryptionApp(window) {
     const encryptBtn = window.querySelector('#encryptBtn');
     const decryptBtn = window.querySelector('#decryptBtn');
     const togglePassword = window.querySelector('#togglePassword');
+    const browseButton = window.querySelector('#browseButton');
+    const fileInput = window.querySelector('#fileInput');
+    const fileNameInput = window.querySelector('.file-input-wrapper input[type="text"]');
+
+    browseButton.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            fileNameInput.value = e.target.files[0].name;
+        } else {
+            fileNameInput.value = '';
+        }
+    });
 
     encryptBtn.addEventListener('click', () => handleEncryptDecrypt(true));
     decryptBtn.addEventListener('click', () => handleEncryptDecrypt(false));
@@ -292,10 +309,21 @@ function openCookieDeliveryMap() {
 }
 
 function closeWindow(window, icon) {
-    window.remove();
-    const taskbarItem = document.querySelector(`[data-icon="${icon.name}"]`);
-    if (taskbarItem) {
-        taskbarItem.remove();
+    if (icon.name !== 'null') {
+        window.classList.add('minimizing');
+        window.addEventListener('animationend', () => {
+            window.remove();
+            const taskbarItem = document.querySelector(`[data-icon="${icon.name}"]`);
+            if (taskbarItem) {
+                taskbarItem.remove();
+            }
+        });
+    } else {
+        window.remove();
+        const taskbarItem = document.querySelector(`[data-icon="${icon.name}"]`);
+        if (taskbarItem) {
+            taskbarItem.remove();
+        }
     }
 }
 
@@ -431,3 +459,38 @@ document.getElementById('start-button').addEventListener('click', () => {
         }
     }
 });
+
+function showErrorDialog(message) {
+    const dialogOverlay = document.createElement('div');
+    dialogOverlay.className = 'dialog-overlay';
+    
+    const dialogWindow = document.createElement('div');
+    dialogWindow.className = 'dialog-window';
+    
+    dialogWindow.innerHTML = `
+        <div class="dialog-header">
+            <span class="dialog-title">Error</span>
+            <span class="dialog-close">❌</span>
+        </div>
+        <div class="dialog-content">
+            <div class="dialog-icon">❗</div>
+            <div class="dialog-message">${message}</div>
+        </div>
+        <div class="dialog-buttons">
+            <button class="dialog-ok">OK</button>
+        </div>
+    `;
+    
+    dialogOverlay.appendChild(dialogWindow);
+    document.body.appendChild(dialogOverlay);
+    
+    const closeButton = dialogWindow.querySelector('.dialog-close');
+    const okButton = dialogWindow.querySelector('.dialog-ok');
+    
+    const closeDialog = () => {
+        document.body.removeChild(dialogOverlay);
+    };
+    
+    closeButton.addEventListener('click', closeDialog);
+    okButton.addEventListener('click', closeDialog);
+}
