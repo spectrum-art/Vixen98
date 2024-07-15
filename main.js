@@ -309,10 +309,12 @@ function openCookieDeliveryMap() {
 }
 
 function closeWindow(window, icon) {
-    if (icon.name !== 'null') {  
+    if (icon.name !== 'null') {
         window.style.transformOrigin = 'bottom left';
         window.classList.add('minimizing');
         
+        window.offsetWidth;
+
         const taskbarItem = document.querySelector(`[data-icon="${icon.name}"]`);
         if (taskbarItem) {
             const taskbarRect = taskbarItem.getBoundingClientRect();
@@ -321,7 +323,10 @@ function closeWindow(window, icon) {
             const translateX = taskbarRect.left - windowRect.left;
             const translateY = taskbarRect.top - windowRect.top;
             
-            window.style.transform = `translate(${translateX}px, ${translateY}px) scale(0.1)`;
+            setTimeout(() => {
+                window.style.transform = `translate(${translateX}px, ${translateY}px) scale(0.1)`;
+                window.style.opacity = '0';
+            }, 0);
         }
 
         window.addEventListener('transitionend', () => {
@@ -329,7 +334,7 @@ function closeWindow(window, icon) {
             if (taskbarItem) {
                 taskbarItem.remove();
             }
-        }, { once: true });  // Ensure the event listener is only called once
+        }, { once: true });
     } else {
         window.remove();
         const taskbarItem = document.querySelector(`[data-icon="${icon.name}"]`);
