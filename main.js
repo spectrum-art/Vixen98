@@ -308,11 +308,11 @@ function createTaskbarItem(icon, window) {
         <span>${icon.name}</span>
     `;
     taskbarItem.addEventListener('click', () => {
-        if (window.style.display === 'none') {
+        if (window.classList.contains('active')) {
+            window.style.display = window.style.display === 'none' ? 'flex' : 'none';
+        } else {
             window.style.display = 'flex';
             bringToFront(window);
-        } else {
-            window.style.display = 'none';
         }
     });
     openWindows.appendChild(taskbarItem);
@@ -361,10 +361,18 @@ function bringToFront(window) {
         const zIndex = parseInt(w.style.zIndex || '0');
         maxZIndex = Math.max(maxZIndex, zIndex);
         w.classList.remove('active');
+        const taskbarItem = document.querySelector(`[data-icon="${w.getAttribute('data-app')}"]`);
+        if (taskbarItem) {
+            taskbarItem.classList.remove('active');
+        }
     });
 
     window.style.zIndex = maxZIndex + 1;
     window.classList.add('active');
+    const taskbarItem = document.querySelector(`[data-icon="${window.getAttribute('data-app')}"]`);
+    if (taskbarItem) {
+        taskbarItem.classList.add('active');
+    }
 }
 
 function positionWindow(window) {
