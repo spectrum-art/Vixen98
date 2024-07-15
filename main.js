@@ -505,3 +505,4 @@ document.getElementById('start-button').addEventListener('click', () => {
         }
     }
 });
+}
