@@ -160,7 +160,6 @@ body, html {
 }
 
 .window.minimizing {
-    opacity: 0;
     pointer-events: none;
 }
 
