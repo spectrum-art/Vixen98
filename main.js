@@ -55,7 +55,7 @@ function openWindow(icon) {
     let content;
     if (icon.name === 'Encryption') {
         content = createEncryptionApp();
-    } else if (icon.name === 'My Documents') {
+    } else if (icon.name === 'Documents') {
         content = createMyDocumentsContent();
     } else {
         content = `Content for ${icon.name}`;
