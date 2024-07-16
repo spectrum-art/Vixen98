@@ -163,6 +163,10 @@ body, html {
     pointer-events: none;
 }
 
+.window-controls {
+    display: flex;
+}
+
 .window-header {
     background-color: #808080;
     color: #c0c0c0;
@@ -181,8 +185,9 @@ body, html {
     font-weight: bold;
 }
 
-.window-close {
+.window-minimize, .window-close {
     cursor: pointer;
+    margin-left: 5px;
 }
 
 .window-content {
