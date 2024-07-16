@@ -160,8 +160,12 @@ body, html {
     z-index: 2;
 }
 
-.window.minimizing {
+.window.minimizing, .window.unminimizing {
     pointer-events: none;
+}
+
+.window.unminimizing {
+    display: flex !important;
 }
 
 .window-controls {
