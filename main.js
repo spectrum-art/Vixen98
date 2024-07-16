@@ -98,6 +98,9 @@ function minimizeWindow(window, icon) {
     window.style.transformOrigin = 'bottom left';
     window.classList.add('minimizing');
     
+    window.dataset.originalLeft = window.style.left;
+    window.dataset.originalTop = window.style.top;
+    
     window.offsetWidth;
 
     const taskbarItem = document.querySelector(`[data-icon="${icon.name}"]`);
@@ -117,6 +120,38 @@ function minimizeWindow(window, icon) {
         window.style.transform = '';
         window.style.opacity = '';
         window.classList.remove('minimizing');
+    }, { once: true });
+}
+
+function unminimizeWindow(window, icon) {
+    window.style.display = 'flex';
+    window.style.transformOrigin = 'bottom left';
+    window.classList.add('unminimizing');
+    
+    window.offsetWidth;
+
+    const taskbarItem = document.querySelector(`[data-icon="${icon.name}"]`);
+    if (taskbarItem) {
+        const taskbarRect = taskbarItem.getBoundingClientRect();
+        const windowRect = window.getBoundingClientRect();
+        
+        const translateX = taskbarRect.left - windowRect.left;
+        const translateY = taskbarRect.top - windowRect.top;
+        
+        window.style.transform = `translate(${translateX}px, ${translateY}px) scale(0.1)`;
+        window.style.opacity = '0';
+        
+        window.offsetWidth;
+        
+        window.style.transform = '';
+        window.style.opacity = '1';
+        window.style.left = window.dataset.originalLeft;
+        window.style.top = window.dataset.originalTop;
+    }
+
+    window.addEventListener('transitionend', () => {
+        window.classList.remove('unminimizing');
+        bringToFront(window);
     }, { once: true });
 }
 
@@ -358,8 +393,7 @@ function createTaskbarItem(icon, window) {
     `;
     taskbarItem.addEventListener('click', () => {
         if (window.style.display === 'none') {
-            window.style.display = 'flex';
-            bringToFront(window);
+            unminimizeWindow(window, icon);
         } else if (window.classList.contains('active')) {
             minimizeWindow(window, icon);
         } else {
