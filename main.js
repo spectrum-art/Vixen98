@@ -64,12 +64,18 @@ function openWindow(icon) {
     window.innerHTML = `
         <div class="window-header">
             <span class="window-title">${icon.name}</span>
-            <span class="window-close">❌</span>
+            <div class="window-controls">
+                <span class="window-minimize">🗕</span>
+                <span class="window-close">❌</span>
+            </div>
         </div>
         <div class="window-content">${content}</div>
     `;
     
+    const minimizeBtn = window.querySelector('.window-minimize');
     const closeBtn = window.querySelector('.window-close');
+    
+    minimizeBtn.addEventListener('click', () => minimizeWindow(window, icon));
     closeBtn.addEventListener('click', () => closeWindow(window, icon));
     
     positionWindow(window);
@@ -86,6 +92,32 @@ function openWindow(icon) {
     }
 
     bringToFront(window);
+}
+
+function minimizeWindow(window, icon) {
+    window.style.transformOrigin = 'bottom left';
+    window.classList.add('minimizing');
+    
+    window.offsetWidth;
+
+    const taskbarItem = document.querySelector(`[data-icon="${icon.name}"]`);
+    if (taskbarItem) {
+        const taskbarRect = taskbarItem.getBoundingClientRect();
+        const windowRect = window.getBoundingClientRect();
+        
+        const translateX = taskbarRect.left - windowRect.left;
+        const translateY = taskbarRect.top - windowRect.top;
+        
+        window.style.transform = `translate(${translateX}px, ${translateY}px) scale(0.1)`;
+        window.style.opacity = '0';
+    }
+
+    window.addEventListener('transitionend', () => {
+        window.style.display = 'none';
+        window.style.transform = '';
+        window.style.opacity = '';
+        window.classList.remove('minimizing');
+    }, { once: true });
 }
 
 function createEncryptionApp() {
@@ -309,38 +341,10 @@ function openCookieDeliveryMap() {
 }
 
 function closeWindow(window, icon) {
-    if (icon.name !== 'null') {
-        window.style.transformOrigin = 'bottom left';
-        window.classList.add('minimizing');
-        
-        window.offsetWidth;
-
-        const taskbarItem = document.querySelector(`[data-icon="${icon.name}"]`);
-        if (taskbarItem) {
-            const taskbarRect = taskbarItem.getBoundingClientRect();
-            const windowRect = window.getBoundingClientRect();
-            
-            const translateX = taskbarRect.left - windowRect.left;
-            const translateY = taskbarRect.top - windowRect.top;
-            
-            setTimeout(() => {
-                window.style.transform = `translate(${translateX}px, ${translateY}px) scale(0.1)`;
-                window.style.opacity = '0';
-            }, 0);
-        }
-
-        window.addEventListener('transitionend', () => {
-            window.remove();
-            if (taskbarItem) {
-                taskbarItem.remove();
-            }
-        }, { once: true });
-    } else {
-        window.remove();
-        const taskbarItem = document.querySelector(`[data-icon="${icon.name}"]`);
-        if (taskbarItem) {
-            taskbarItem.remove();
-        }
+    window.remove();
+    const taskbarItem = document.querySelector(`[data-icon="${icon.name}"]`);
+    if (taskbarItem) {
+        taskbarItem.remove();
     }
 }
 
@@ -353,10 +357,12 @@ function createTaskbarItem(icon, window) {
         <span>${icon.name}</span>
     `;
     taskbarItem.addEventListener('click', () => {
-        if (window.classList.contains('active')) {
-            window.style.display = window.style.display === 'none' ? 'flex' : 'none';
-        } else {
+        if (window.style.display === 'none') {
             window.style.display = 'flex';
+            bringToFront(window);
+        } else if (window.classList.contains('active')) {
+            minimizeWindow(window, icon);
+        } else {
             bringToFront(window);
         }
     });
