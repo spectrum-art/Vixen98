@@ -1,5 +1,35 @@
 import { validatePassword, verifyToken } from './server.js';
 
+document.addEventListener('DOMContentLoaded', function() {
+    const splashScreen = document.getElementById('splash-screen');
+    const splashGif = document.getElementById('splash-gif');
+    
+    // Function to remove splash screen
+    function removeSplashScreen() {
+        splashScreen.classList.add('fade-out');
+        splashScreen.addEventListener('animationend', function() {
+            splashScreen.style.display = 'none';
+        });
+    }
+
+    // Check if the GIF has finished playing
+    if (splashGif.complete) {
+        removeSplashScreen();
+    } else {
+        splashGif.addEventListener('load', function() {
+            setTimeout(removeSplashScreen, 10000);
+        });
+    }
+});
+
+function removeSplashScreen() {
+    splashScreen.classList.add('fade-out');
+    splashScreen.addEventListener('animationend', function() {
+        splashScreen.style.display = 'none';
+        document.getElementById('desktop-container').classList.remove('hidden');
+    });
+}
+
 const desktopIcons = [
     { name: 'System', icon: '💻', accessLevel: 1 },
     { name: 'Trash', icon: '🗑️', accessLevel: 1 },
