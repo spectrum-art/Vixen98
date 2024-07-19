@@ -35,7 +35,7 @@ const desktopIcons = [
     { name: 'Trash', icon: '🗑️', accessLevel: 1 },
     { name: 'Documents', icon: '📁', accessLevel: 2 },
     { name: 'Internet', icon: '🌐', accessLevel: 1 },
-    { name: 'Encryption', icon: '🔒', accessLevel: 2 }
+    { name: 'Encryption', icon: '🔒', accessLevel: 1 }
 ];
 
 const myDocumentsIcons = [
