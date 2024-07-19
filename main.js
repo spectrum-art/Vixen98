@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
         removeSplashScreen();
     } else {
         splashGif.addEventListener('load', function() {
-            setTimeout(removeSplashScreen, 10000);
+            setTimeout(removeSplashScreen, 9000);
         });
     }
 });
