@@ -26,7 +26,7 @@ const desktopIcons = [
     { name: 'System', icon: '💻', accessLevel: 1 },
     { name: 'Trash', icon: '🗑️', accessLevel: 1 },
     { name: 'Documents', icon: '📁', accessLevel: 2 },
-    { name: 'Internet', icon: '🌐', accessLevel: 1 },
+    { name: 'Lemon List', icon: '🍋', accessLevel: 1 },
     { name: 'Encryption', icon: '🔒', accessLevel: 1 }
 ];
 
