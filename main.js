@@ -3,32 +3,24 @@ import { validatePassword, verifyToken } from './server.js';
 document.addEventListener('DOMContentLoaded', function() {
     const splashScreen = document.getElementById('splash-screen');
     const splashGif = document.getElementById('splash-gif');
+    const desktopContainer = document.getElementById('desktop-container');
     
-    // Function to remove splash screen
     function removeSplashScreen() {
         splashScreen.classList.add('fade-out');
         splashScreen.addEventListener('animationend', function() {
             splashScreen.style.display = 'none';
+            desktopContainer.classList.remove('hidden');
         });
     }
 
-    // Check if the GIF has finished playing
-    if (splashGif.complete) {
-        removeSplashScreen();
-    } else {
-        splashGif.addEventListener('load', function() {
-            setTimeout(removeSplashScreen, 10000);
-        });
+    function startSplashScreen() {
+        splashGif.src = splashGif.src + '?t=' + new Date().getTime();
+        
+        setTimeout(removeSplashScreen, 10000);
     }
+
+    startSplashScreen();
 });
-
-function removeSplashScreen() {
-    splashScreen.classList.add('fade-out');
-    splashScreen.addEventListener('animationend', function() {
-        splashScreen.style.display = 'none';
-        document.getElementById('desktop-container').classList.remove('hidden');
-    });
-}
 
 const desktopIcons = [
     { name: 'System', icon: '💻', accessLevel: 1 },
