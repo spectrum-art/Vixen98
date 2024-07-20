@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function startSplashScreen() {
         splashGif.src = splashGif.src + '?t=' + new Date().getTime();
         
-        setTimeout(removeSplashScreen, 10000);
+        setTimeout(removeSplashScreen, 9000);
     }
 
     startSplashScreen();
