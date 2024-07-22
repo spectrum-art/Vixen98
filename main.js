@@ -81,6 +81,7 @@ function openWindow(icon) {
         content = createMyDocumentsContent();
     } else if (icon.name === 'Lemon List') {
         content = createLemonListContent();
+        loadCSV();
     } else {
         content = `Content for ${icon.name}`;
     }
