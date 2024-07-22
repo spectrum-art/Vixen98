@@ -590,6 +590,21 @@ function createLemonListContent() {
     `;
 }
 
+const filterOptions = [
+    { emoji: '🚓', label: 'Law Enforcement' },
+    { emoji: '🚑', label: 'Los Santos Medical Group' },
+    { emoji: '⚖️', label: 'Lawyer/Paralegal' },
+    { emoji: '🏛️', label: 'Government Employee' },
+    { emoji: '🎵', label: 'Musician/Producer' },
+    { emoji: '🌽', label: 'Farmer' },
+    { emoji: '💵', label: 'Loans' },
+    { emoji: '🚗', label: 'Car Sales' },
+    { emoji: '🧰', label: 'Impound/Tow' },
+    { emoji: '🪑', label: 'Furniture Sales' },
+    { emoji: '🔧', label: 'Mechanic' },
+    { emoji: '🧺', label: 'Laundry' }
+];
+
 let listings = [];
 let currentPage = 1;
 let itemsPerPage = 0;
@@ -704,21 +719,6 @@ function debounce(func, wait) {
 }
 
 function initializeLemonList() {
-    const filterOptions = [
-        { emoji: '🚓', label: 'Law Enforcement' },
-        { emoji: '🚑', label: 'Los Santos Medical Group' },
-        { emoji: '⚖️', label: 'Lawyer/Paralegal' },
-        { emoji: '🏛️', label: 'Government Employee' },
-        { emoji: '🎵', label: 'Musician/Producer' },
-        { emoji: '🌽', label: 'Farmer' },
-        { emoji: '💵', label: 'Loans' },
-        { emoji: '🚗', label: 'Car Sales' },
-        { emoji: '🧰', label: 'Impound/Tow' },
-        { emoji: '🪑', label: 'Furniture Sales' },
-        { emoji: '🔧', label: 'Mechanic' },
-        { emoji: '🧺', label: 'Laundry' }
-    ];
-
     loadCSV();
 
     document.getElementById('search-bar').addEventListener('input', debounce(() => {
