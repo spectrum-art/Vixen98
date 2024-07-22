@@ -630,7 +630,7 @@ let currentPage = 1;
 let itemsPerPage = 0;
 const debounceTime = 300;
 
-function loadCSV() {
+Copyfunction loadCSV() {
     console.log('Starting to load CSV');
     fetch('vixenlemonlist.csv')
         .then(response => {
@@ -642,10 +642,13 @@ function loadCSV() {
             listings = parseCSV(data);
             console.log('Listings processed:', listings.length);
             setupFilters();
-            calculateItemsPerPage();
-            displayListings();
-            document.getElementById('loading-indicator').style.display = 'none';
-            document.getElementById('lemon-list-app').style.display = 'block';
+            
+            setTimeout(() => {
+                calculateItemsPerPage();
+                displayListings();
+                document.getElementById('loading-indicator').style.display = 'none';
+                document.getElementById('lemon-list-app').style.display = 'block';
+            }, 0);
         })
         .catch(error => {
             console.error('Error loading CSV:', error);
@@ -676,10 +679,18 @@ function setupFilters() {
 function calculateItemsPerPage() {
     const columnHeight = document.querySelector('.listing-column').clientHeight;
     const lineHeight = 20; // Adjust based on your font size and line height
-    itemsPerPage = Math.floor(columnHeight / lineHeight) * 2;
-    console.log('Calculated items per page:', itemsPerPage);
     console.log('Column height:', columnHeight);
     console.log('Line height:', lineHeight);
+    
+    if (columnHeight > 0) {
+        itemsPerPage = Math.floor(columnHeight / lineHeight) * 2;
+    } else {
+        // Fallback: assume a reasonable number if calculation fails
+        itemsPerPage = 20;
+        console.warn('Column height is 0, using fallback itemsPerPage:', itemsPerPage);
+    }
+    
+    console.log('Calculated items per page:', itemsPerPage);
 }
 
 function displayListings() {
@@ -744,9 +755,7 @@ function debounce(func, wait) {
     };
 }
 
-function initializeLemonList() {
-    loadCSV();
-
+function setupEventListeners() {
     document.getElementById('search-bar').addEventListener('input', debounce(() => {
         currentPage = 1;
         displayListings();
@@ -784,6 +793,16 @@ function initializeLemonList() {
         calculateItemsPerPage();
         displayListings();
     }, 250));
+}
+
+function initializeLemonList() {
+    loadCSV();
+
+    setTimeout(() => {
+        calculateItemsPerPage();
+        displayListings();
+        setupEventListeners();
+    }, 0);
 }
 
 createDesktopIcons();
