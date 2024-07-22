@@ -662,9 +662,29 @@ function loadCSV() {
 
 function parseCSV(csv) {
     return csv.split('\n').map(row => {
-        const [emoji, ...rest] = row.split(',');
-        return { emoji, text: rest.join(',').trim().padEnd(61, ' ').substring(0, 61) };
-    });
+        // Split the row, but keep the content within quotes together
+        const parts = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
+        
+        // Remove quotes from parts
+        const cleanParts = parts.map(part => part.replace(/^"|"$/g, '').trim());
+
+        let emoji = '';
+        let text = '';
+
+        if (cleanParts[0].length === 2 && /\p{Emoji}/u.test(cleanParts[0])) {
+            // If the first part is an emoji (2 characters long and passes emoji test)
+            emoji = cleanParts[0];
+            text = cleanParts.slice(1).join(' ');
+        } else {
+            // If no emoji, join all parts
+            text = cleanParts.join(' ');
+        }
+
+        // Ensure the text is exactly 61 characters long
+        text = text.padEnd(61, ' ').substring(0, 61);
+
+        return { emoji, text };
+    }).filter(item => item.text.trim().length > 0); // Remove any empty entries
 }
 
 function setupFilters() {
