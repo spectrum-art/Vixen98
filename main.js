@@ -662,16 +662,12 @@ function loadCSV() {
 
 function parseCSV(csv) {
     return csv.split('\n').map(row => {
-        // Split the row, but keep the content within quotes together
         const parts = row.match(/(".*?"|[^,]+)(?=\s*,|\s*$)/g) || [];
-        
-        // Remove quotes from parts and handle empty fields
         const cleanParts = parts.map(part => part.replace(/^"|"$/g, '').replace(/^,\s*/, ''));
 
         let emoji = '';
         let text = '';
 
-        // Check for emoji (including multi-character emojis)
         if (/^\p{Emoji}/u.test(cleanParts[0])) {
             emoji = cleanParts[0];
             text = cleanParts.slice(1);
@@ -679,7 +675,6 @@ function parseCSV(csv) {
             text = cleanParts;
         }
 
-        // Format the text parts
         if (text.length >= 3) {
             const lastName = text[0];
             const firstName = text[1];
@@ -689,8 +684,20 @@ function parseCSV(csv) {
             text = text.join(',');
         }
 
+        // Adjust the length to 61 characters
+        const currentLength = (emoji + text).length;
+        if (currentLength < 61) {
+            const diff = 61 - currentLength;
+            const hyphensToAdd = Math.floor(diff / 2);
+            text += ' -'.repeat(hyphensToAdd) + (diff % 2 === 1 ? ' ' : '');
+        } else if (currentLength > 61) {
+            const diff = currentLength - 61;
+            const hyphensToRemove = Math.ceil(diff / 2);
+            text = text.replace(/ -/g, '').replace(/ -/g, ' ').slice(0, 61 - emoji.length);
+        }
+
         return { emoji, text };
-    }).filter(item => item.text.length > 0); // Remove any empty entries
+    }).filter(item => item.text.length > 0);
 }
 
 function setupFilters() {
