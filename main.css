@@ -459,3 +459,92 @@ body, html {
 .hidden {
     display: none;
 }
+
+.window[data-app="Lemon List"] .window-content {
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 20px); /* Adjust based on your window header height */
+    background-color: transparent;
+}
+
+#loading-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    color: #000;
+}
+
+.search-filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    height: 12%;
+}
+
+#search-bar {
+    width: 30%;
+    padding: 5px;
+}
+
+#filter-checkboxes {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-gap: 5px;
+    width: 60%;
+}
+
+.filter-item {
+    display: flex;
+    align-items: center;
+}
+
+#clear-filters {
+    padding: 5px 10px;
+}
+
+.listings-container {
+    display: flex;
+    justify-content: space-between;
+    height: 84%;
+    padding: 0 5%;
+}
+
+.listing-column {
+    width: 39%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.listing {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.listing-emoji {
+    margin-right: 5px;
+    width: 20px;
+    text-align: center;
+}
+
+.listing-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 4%;
+    padding: 10px 0;
+}
+
+.pagination-container button {
+    margin: 0 10px;
+}
