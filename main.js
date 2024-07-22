@@ -115,6 +115,13 @@ function openWindow(icon) {
         setupMyDocumentsEventListeners(window);
     }
     if (icon.name === 'Lemon List') {
+        window.style.width = 'auto';
+        window.style.height = '90%';
+        window.style.backgroundImage = 'url("lemonlistbg.png")';
+        window.style.backgroundSize = 'auto 100%';
+        window.style.backgroundRepeat = 'no-repeat';
+        window.style.backgroundPosition = 'center';
+        window.style.fontFamily = '"Nanum Gothic Coding", monospace';
         initializeLemonList();
     }
     bringToFront(window);
@@ -562,29 +569,21 @@ function showErrorDialog(message) {
 
 function createLemonListContent() {
     return `
-        <div id="lemon-list-window" class="window">
-            <div class="window-header">
-                <span class="window-title">Lemon List</span>
-                <span class="window-close">❌</span>
+        <div id="loading-indicator">Loading...</div>
+        <div id="lemon-list-app" style="display: none;">
+            <div class="search-filter-container">
+                <input type="text" id="search-bar" placeholder="Search listings..." aria-label="Search listings">
+                <div id="filter-checkboxes"></div>
+                <button id="clear-filters">Clear All Filters</button>
             </div>
-            <div class="window-content">
-                <div id="loading-indicator">Loading...</div>
-                <div id="lemon-list-app" style="display: none;">
-                    <div class="search-filter-container">
-                        <input type="text" id="search-bar" placeholder="Search listings..." aria-label="Search listings">
-                        <div id="filter-checkboxes"></div>
-                        <button id="clear-filters">Clear All Filters</button>
-                    </div>
-                    <div class="listings-container">
-                        <div class="listing-column" id="left-column"></div>
-                        <div class="listing-column" id="right-column"></div>
-                    </div>
-                    <div class="pagination-container">
-                        <button id="prev-page" aria-label="Previous page">◀</button>
-                        <span id="page-indicator">Page 1 of 1</span>
-                        <button id="next-page" aria-label="Next page">▶</button>
-                    </div>
-                </div>
+            <div class="listings-container">
+                <div class="listing-column" id="left-column"></div>
+                <div class="listing-column" id="right-column"></div>
+            </div>
+            <div class="pagination-container">
+                <button id="prev-page" aria-label="Previous page">◀</button>
+                <span id="page-indicator">Page 1 of 1</span>
+                <button id="next-page" aria-label="Next page">▶</button>
             </div>
         </div>
     `;
