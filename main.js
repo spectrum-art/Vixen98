@@ -122,8 +122,25 @@ function openWindow(icon) {
         window.style.backgroundRepeat = 'no-repeat';
         window.style.backgroundPosition = 'center';
         window.style.fontFamily = '"Nanum Gothic Coding", monospace';
+        window.style.left = '50%';
+        window.style.top = '50%';
+        window.style.transform = 'translate(-50%, -50%)';
+        window.classList.add('lemon-list-window')
+
+        const img = new Image();
+        img.onload = function() {
+            const aspectRatio = this.width / this.height;
+            const windowHeight = window.offsetHeight;
+            const newWidth = windowHeight * aspectRatio;
+            window.style.width = `${newWidth}px`;
+            // Recenter after resizing
+            window.style.transform = 'translate(-50%, -50%)';
+        }
+        img.src = 'lemonlistbg.png';
+        
         initializeLemonList();
     }
+    
     bringToFront(window);
 }
 
