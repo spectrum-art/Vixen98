@@ -671,24 +671,22 @@ function parseCSV(csv) {
         let emoji = '';
         let text = '';
 
-        if (cleanParts[0].length === 2 && /\p{Emoji}/u.test(cleanParts[0])) {
-            // If the first part is an emoji (2 characters long and passes emoji test)
+        // Check for emoji (including multi-character emojis)
+        if (/^\p{Emoji}/u.test(cleanParts[0])) {
             emoji = cleanParts[0];
             text = cleanParts.slice(1);
         } else {
-            // If no emoji, use all parts
             text = cleanParts;
         }
 
         // Format the text parts
         if (text.length >= 3) {
-            // Remove extra commas and spaces
-            const lastName = text[0].trim();
-            const firstName = text[1].trim();
-            const rest = text.slice(2).join(' ').replace(/,\s*([^,]+)$/, ' $1').trim();
-            text = `${lastName} ${firstName} ${rest}`;
+            const lastName = text[0];
+            const firstName = text[1];
+            const rest = text.slice(2).join(',').replace(/,([^,]+)$/, ' $1');
+            text = `${lastName}${firstName}${rest}`;
         } else {
-            text = text.join(' ').trim();
+            text = text.join(',');
         }
 
         return { emoji, text };
