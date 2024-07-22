@@ -81,7 +81,6 @@ function openWindow(icon) {
         content = createMyDocumentsContent();
     } else if (icon.name === 'Lemon List') {
         content = createLemonListContent();
-        loadCSV();
     } else {
         content = `Content for ${icon.name}`;
     }
@@ -115,6 +114,8 @@ function openWindow(icon) {
     if (icon.name === 'My Documents') {
         setupMyDocumentsEventListeners(window);
     }
+    if (icon.name === 'Lemon List') {
+        loadCSV();
 
     bringToFront(window);
 }
