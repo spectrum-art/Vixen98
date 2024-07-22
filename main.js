@@ -116,7 +116,7 @@ function openWindow(icon) {
     }
     if (icon.name === 'Lemon List') {
         loadCSV();
-
+    }
     bringToFront(window);
 }
 
