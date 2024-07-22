@@ -533,19 +533,22 @@ body, html {
 .listing {
     display: flex;
     align-items: center;
+    font-family: 'Nanum Gothic Coding', monospace;
+    white-space: pre;
     margin-bottom: 5px;
 }
 
 .listing-emoji {
-    margin-right: 5px;
-    width: 20px;
+    width: 24px;
     text-align: center;
+    margin-right: 4px;
 }
 
 .listing-text {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    flex-grow: 1;
 }
 
 .pagination-container {
