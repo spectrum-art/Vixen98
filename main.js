@@ -749,7 +749,7 @@ function displayListings() {
         const listingElement = document.createElement('div');
         listingElement.className = 'listing';
         listingElement.innerHTML = `
-            <span class="listing-emoji">${listing.emoji}</span>
+            <span class="listing-emoji">${listing.emoji || '&nbsp;'}</span>
             <span class="listing-text">${listing.text}</span>
         `;
         if (index < itemsPerPage / 2) {
