@@ -630,7 +630,7 @@ let currentPage = 1;
 let itemsPerPage = 0;
 const debounceTime = 300;
 
-Copyfunction loadCSV() {
+function loadCSV() {
     console.log('Starting to load CSV');
     fetch('vixenlemonlist.csv')
         .then(response => {
