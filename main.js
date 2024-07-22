@@ -79,6 +79,8 @@ function openWindow(icon) {
         content = createEncryptionApp();
     } else if (icon.name === 'Documents') {
         content = createMyDocumentsContent();
+    } else if (icon.name === 'Lemon List') {
+        content = createLemonListContent();
     } else {
         content = `Content for ${icon.name}`;
     }
@@ -554,6 +556,198 @@ function showErrorDialog(message) {
     
     closeButton.addEventListener('click', closeDialog);
     okButton.addEventListener('click', closeDialog);
+}
+
+function createLemonListContent() {
+    return `
+        <div id="lemon-list-window" class="window">
+            <div class="window-header">
+                <span class="window-title">Lemon List</span>
+                <span class="window-close">❌</span>
+            </div>
+            <div class="window-content">
+                <div id="loading-indicator">Loading...</div>
+                <div id="lemon-list-app" style="display: none;">
+                    <div class="search-filter-container">
+                        <input type="text" id="search-bar" placeholder="Search listings..." aria-label="Search listings">
+                        <div id="filter-checkboxes"></div>
+                        <button id="clear-filters">Clear All Filters</button>
+                    </div>
+                    <div class="listings-container">
+                        <div class="listing-column" id="left-column"></div>
+                        <div class="listing-column" id="right-column"></div>
+                    </div>
+                    <div class="pagination-container">
+                        <button id="prev-page" aria-label="Previous page">◀</button>
+                        <span id="page-indicator">Page 1 of 1</span>
+                        <button id="next-page" aria-label="Next page">▶</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function initializeLemonList() {
+    const filterOptions = [
+        { emoji: '🚓', label: 'Law Enforcement' },
+        { emoji: '🚑', label: 'Los Santos Medical Group' },
+        { emoji: '⚖️', label: 'Lawyer/Paralegal' },
+        { emoji: '🏛️', label: 'Government Employee' },
+        { emoji: '🎵', label: 'Musician/Producer' },
+        { emoji: '🌽', label: 'Farmer' },
+        { emoji: '💵', label: 'Loans' },
+        { emoji: '🚗', label: 'Car Sales' },
+        { emoji: '🧰', label: 'Impound/Tow' },
+        { emoji: '🪑', label: 'Furniture Sales' },
+        { emoji: '🔧', label: 'Mechanic' },
+        { emoji: '🧺', label: 'Laundry' }
+    ];
+
+    let listings = [];
+    let currentPage = 1;
+    let itemsPerPage = 0;
+    const debounceTime = 300;
+
+    function loadCSV() {
+        fetch('vixenlemonlist.csv')
+            .then(response => response.text())
+            .then(data => {
+                listings = parseCSV(data);
+                setupFilters();
+                calculateItemsPerPage();
+                displayListings();
+                document.getElementById('loading-indicator').style.display = 'none';
+                document.getElementById('lemon-list-app').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error loading CSV:', error);
+                document.getElementById('loading-indicator').textContent = 'Error loading data';
+            });
+    }
+
+    function parseCSV(csv) {
+        return csv.split('\n').map(row => {
+            const [emoji, ...rest] = row.split(',');
+            return { emoji, text: rest.join(',').trim().padEnd(61, ' ').substring(0, 61) };
+        });
+    }
+
+    function setupFilters() {
+        const filterContainer = document.getElementById('filter-checkboxes');
+        filterOptions.forEach(option => {
+            const filterItem = document.createElement('div');
+            filterItem.className = 'filter-item';
+            filterItem.innerHTML = `
+                <input type="checkbox" id="filter-${option.emoji}" value="${option.emoji}">
+                <label for="filter-${option.emoji}" title="${option.label}">${option.emoji}</label>
+            `;
+            filterContainer.appendChild(filterItem);
+        });
+    }
+
+    function calculateItemsPerPage() {
+        const columnHeight = document.querySelector('.listing-column').clientHeight;
+        const lineHeight = 20; // Adjust based on your font size and line height
+        itemsPerPage = Math.floor(columnHeight / lineHeight) * 2;
+    }
+
+    function displayListings() {
+        const filteredListings = filterListings();
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const pageListings = filteredListings.slice(startIndex, endIndex);
+
+        const leftColumn = document.getElementById('left-column');
+        const rightColumn = document.getElementById('right-column');
+        leftColumn.innerHTML = '';
+        rightColumn.innerHTML = '';
+
+        pageListings.forEach((listing, index) => {
+            const listingElement = document.createElement('div');
+            listingElement.className = 'listing';
+            listingElement.innerHTML = `
+                <span class="listing-emoji">${listing.emoji}</span>
+                <span class="listing-text">${listing.text}</span>
+            `;
+            if (index < itemsPerPage / 2) {
+                leftColumn.appendChild(listingElement);
+            } else {
+                rightColumn.appendChild(listingElement);
+            }
+        });
+
+        updatePagination(filteredListings.length);
+    }
+
+    function filterListings() {
+        const searchTerm = document.getElementById('search-bar').value.toLowerCase();
+        const activeFilters = Array.from(document.querySelectorAll('#filter-checkboxes input:checked'))
+            .map(checkbox => checkbox.value);
+
+        return listings.filter(listing => {
+            const matchesSearch = listing.text.toLowerCase().includes(searchTerm);
+            const matchesFilter = activeFilters.length === 0 || activeFilters.includes(listing.emoji);
+            return matchesSearch && matchesFilter;
+        });
+    }
+
+    function updatePagination(totalItems) {
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+        document.getElementById('page-indicator').textContent = `Page ${currentPage} of ${totalPages}`;
+        document.getElementById('prev-page').disabled = currentPage === 1;
+        document.getElementById('next-page').disabled = currentPage === totalPages;
+    }
+
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    document.getElementById('search-bar').addEventListener('input', debounce(() => {
+        currentPage = 1;
+        displayListings();
+    }, debounceTime));
+
+    document.getElementById('filter-checkboxes').addEventListener('change', () => {
+        currentPage = 1;
+        displayListings();
+    });
+
+    document.getElementById('clear-filters').addEventListener('click', () => {
+        document.getElementById('search-bar').value = '';
+        document.querySelectorAll('#filter-checkboxes input').forEach(checkbox => checkbox.checked = false);
+        currentPage = 1;
+        displayListings();
+    });
+
+    document.getElementById('prev-page').addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            displayListings();
+        }
+    });
+
+    document.getElementById('next-page').addEventListener('click', () => {
+        const totalItems = filterListings().length;
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+        if (currentPage < totalPages) {
+            currentPage++;
+            displayListings();
+        }
+    });
+
+    window.addEventListener('resize', debounce(() => {
+        calculateItemsPerPage();
+        displayListings();
+    }, 250));
 }
 
 createDesktopIcons();
