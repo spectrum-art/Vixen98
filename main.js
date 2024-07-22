@@ -663,10 +663,10 @@ function loadCSV() {
 function parseCSV(csv) {
     return csv.split('\n').map(row => {
         // Split the row, but keep the content within quotes together
-        const parts = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
+        const parts = row.match(/(".*?"|[^,]+)(?=\s*,|\s*$)/g) || [];
         
-        // Remove quotes from parts, but don't trim
-        const cleanParts = parts.map(part => part.replace(/^"|"$/g, ''));
+        // Remove quotes from parts and handle empty fields
+        const cleanParts = parts.map(part => part.replace(/^"|"$/g, '').replace(/^,\s*/, ''));
 
         let emoji = '';
         let text = '';
@@ -682,10 +682,13 @@ function parseCSV(csv) {
 
         // Format the text parts
         if (text.length >= 3) {
-            // Remove the second comma after the first name
-            text = `${text[0]},${text[1]} ${text.slice(2).join(',')}`;
+            // Remove extra commas and spaces
+            const lastName = text[0].trim();
+            const firstName = text[1].trim();
+            const rest = text.slice(2).join(' ').replace(/,\s*([^,]+)$/, ' $1').trim();
+            text = `${lastName} ${firstName} ${rest}`;
         } else {
-            text = text.join(',');
+            text = text.join(' ').trim();
         }
 
         return { emoji, text };
