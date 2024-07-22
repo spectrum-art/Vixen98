@@ -665,8 +665,8 @@ function parseCSV(csv) {
         // Split the row, but keep the content within quotes together
         const parts = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
         
-        // Remove quotes from parts and trim whitespace
-        const cleanParts = parts.map(part => part.replace(/^"|"$/g, '').trim());
+        // Remove quotes from parts, but don't trim
+        const cleanParts = parts.map(part => part.replace(/^"|"$/g, ''));
 
         let emoji = '';
         let text = '';
@@ -682,16 +682,14 @@ function parseCSV(csv) {
 
         // Format the text parts
         if (text.length >= 3) {
-            text = `${text[0].trim()}, ${text[1].trim()} ${text.slice(2).join(' ').trim()}`;
+            // Remove the second comma after the first name
+            text = `${text[0]},${text[1]} ${text.slice(2).join(',')}`;
         } else {
-            text = text.join(' ').trim();
+            text = text.join(',');
         }
 
-        // Ensure the text is exactly 61 characters long
-        text = text.padEnd(61, ' ').substring(0, 61);
-
         return { emoji, text };
-    }).filter(item => item.text.trim().length > 0); // Remove any empty entries
+    }).filter(item => item.text.length > 0); // Remove any empty entries
 }
 
 function setupFilters() {
@@ -740,12 +738,9 @@ function calculateItemsPerPage() {
 
 function displayListings() {
     const filteredListings = filterListings();
-    console.log('Total filtered listings:', filteredListings.length);
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    console.log('Start index:', startIndex, 'End index:', endIndex);
     const pageListings = filteredListings.slice(startIndex, endIndex);
-    console.log('Listings for current page:', pageListings.length);
 
     const leftColumn = document.getElementById('left-column');
     const rightColumn = document.getElementById('right-column');
