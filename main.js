@@ -138,7 +138,11 @@ function openWindow(icon) {
         }
         img.src = 'lemonlistbg.png';
         
-        initializeLemonList();
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                initializeLemonList();
+            });
+        });
     }
     
     bringToFront(window);
@@ -591,15 +595,15 @@ function showErrorDialog(message) {
 function createLemonListContent() {
     return `
         <div id="loading-indicator">Loading...</div>
-        <div id="lemon-list-app" style="display: none;">
+        <div id="lemon-list-app" style="display: none; height: 100%;">
             <div class="search-filter-container">
                 <input type="text" id="search-bar" placeholder="Search listings..." aria-label="Search listings">
                 <div id="filter-checkboxes"></div>
                 <button id="clear-filters">Clear All Filters</button>
             </div>
-            <div class="listings-container">
-                <div class="listing-column" id="left-column"></div>
-                <div class="listing-column" id="right-column"></div>
+            <div class="listings-container" style="height: 84%; display: flex;">
+                <div class="listing-column" id="left-column" style="height: 100%;"></div>
+                <div class="listing-column" id="right-column" style="height: 100%;"></div>
             </div>
             <div class="pagination-container">
                 <button id="prev-page" aria-label="Previous page">◀</button>
@@ -677,16 +681,30 @@ function setupFilters() {
 }
 
 function calculateItemsPerPage() {
-    const columnHeight = document.querySelector('.listing-column').clientHeight;
+    const listingsContainer = document.querySelector('.listings-container');
+    const column = document.querySelector('.listing-column');
     const lineHeight = 20; // Adjust based on your font size and line height
-    console.log('Column height:', columnHeight);
-    console.log('Line height:', lineHeight);
-    
+
+    console.log('Listings container:', listingsContainer);
+    console.log('Listings container style:', listingsContainer.getAttribute('style'));
+    console.log('Listings container computed style:');
+    console.log(window.getComputedStyle(listingsContainer));
+
+    console.log('Column:', column);
+    console.log('Column style:', column.getAttribute('style'));
+    console.log('Column computed style:');
+    console.log(window.getComputedStyle(column));
+
+    const columnHeight = column.clientHeight;
+    console.log('Column client height:', columnHeight);
+    console.log('Column offset height:', column.offsetHeight);
+    console.log('Column scroll height:', column.scrollHeight);
+
     if (columnHeight > 0) {
         itemsPerPage = Math.floor(columnHeight / lineHeight) * 2;
     } else {
         // Fallback: assume a reasonable number if calculation fails
-        itemsPerPage = 20;
+        itemsPerPage = 60;
         console.warn('Column height is 0, using fallback itemsPerPage:', itemsPerPage);
     }
     
@@ -803,6 +821,11 @@ function initializeLemonList() {
         displayListings();
         setupEventListeners();
     }, 0);
+
+    window.addEventListener('resize', debounce(() => {
+        calculateItemsPerPage();
+        displayListings();
+    }, 250));
 }
 
 createDesktopIcons();
