@@ -545,10 +545,11 @@ body, html {
 }
 
 .listing-text {
-    white-space: nowrap;
+    white-space: pre;
     overflow: hidden;
     text-overflow: ellipsis;
     flex-grow: 1;
+    font-family: 'Nanum Gothic Coding', monospace;
 }
 
 .pagination-container {
