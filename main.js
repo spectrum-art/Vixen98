@@ -115,7 +115,7 @@ function openWindow(icon) {
         setupMyDocumentsEventListeners(window);
     }
     if (icon.name === 'Lemon List') {
-        loadCSV();
+        initializeLemonList();
     }
     bringToFront(window);
 }
@@ -590,6 +590,119 @@ function createLemonListContent() {
     `;
 }
 
+let listings = [];
+let currentPage = 1;
+let itemsPerPage = 0;
+const debounceTime = 300;
+
+function loadCSV() {
+    console.log('Starting to load CSV');
+    fetch('vixenlemonlist.csv')
+        .then(response => {
+            console.log('CSV fetched, starting to parse');
+            return response.text();
+        })
+        .then(data => {
+            console.log('CSV parsed, processing data');
+            listings = parseCSV(data);
+            console.log('Listings processed:', listings.length);
+            setupFilters();
+            calculateItemsPerPage();
+            displayListings();
+            document.getElementById('loading-indicator').style.display = 'none';
+            document.getElementById('lemon-list-app').style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Error loading CSV:', error);
+            document.getElementById('loading-indicator').textContent = 'Error loading data';
+        });
+}
+
+function parseCSV(csv) {
+    return csv.split('\n').map(row => {
+        const [emoji, ...rest] = row.split(',');
+        return { emoji, text: rest.join(',').trim().padEnd(61, ' ').substring(0, 61) };
+    });
+}
+
+function setupFilters() {
+    const filterContainer = document.getElementById('filter-checkboxes');
+    filterOptions.forEach(option => {
+        const filterItem = document.createElement('div');
+        filterItem.className = 'filter-item';
+        filterItem.innerHTML = `
+            <input type="checkbox" id="filter-${option.emoji}" value="${option.emoji}">
+            <label for="filter-${option.emoji}" title="${option.label}">${option.emoji}</label>
+        `;
+        filterContainer.appendChild(filterItem);
+    });
+}
+
+function calculateItemsPerPage() {
+    const columnHeight = document.querySelector('.listing-column').clientHeight;
+    const lineHeight = 20; // Adjust based on your font size and line height
+    itemsPerPage = Math.floor(columnHeight / lineHeight) * 2;
+}
+
+function displayListings() {
+    const filteredListings = filterListings();
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const pageListings = filteredListings.slice(startIndex, endIndex);
+
+    const leftColumn = document.getElementById('left-column');
+    const rightColumn = document.getElementById('right-column');
+    leftColumn.innerHTML = '';
+    rightColumn.innerHTML = '';
+
+    pageListings.forEach((listing, index) => {
+        const listingElement = document.createElement('div');
+        listingElement.className = 'listing';
+        listingElement.innerHTML = `
+            <span class="listing-emoji">${listing.emoji}</span>
+            <span class="listing-text">${listing.text}</span>
+        `;
+        if (index < itemsPerPage / 2) {
+            leftColumn.appendChild(listingElement);
+        } else {
+            rightColumn.appendChild(listingElement);
+        }
+    });
+
+    updatePagination(filteredListings.length);
+}
+
+function filterListings() {
+    const searchTerm = document.getElementById('search-bar').value.toLowerCase();
+    const activeFilters = Array.from(document.querySelectorAll('#filter-checkboxes input:checked'))
+        .map(checkbox => checkbox.value);
+
+    return listings.filter(listing => {
+        const matchesSearch = listing.text.toLowerCase().includes(searchTerm);
+        const matchesFilter = activeFilters.length === 0 || activeFilters.includes(listing.emoji);
+        return matchesSearch && matchesFilter;
+    });
+}
+
+function updatePagination(totalItems) {
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    document.getElementById('page-indicator').textContent = `Page ${currentPage} of ${totalPages}`;
+    document.getElementById('prev-page').disabled = currentPage === 1;
+    document.getElementById('next-page').disabled = currentPage === totalPages;
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
 function initializeLemonList() {
     const filterOptions = [
         { emoji: '🚓', label: 'Law Enforcement' },
@@ -606,112 +719,7 @@ function initializeLemonList() {
         { emoji: '🧺', label: 'Laundry' }
     ];
 
-    let listings = [];
-    let currentPage = 1;
-    let itemsPerPage = 0;
-    const debounceTime = 300;
-
-    function loadCSV() {
-        fetch('vixenlemonlist.csv')
-            .then(response => response.text())
-            .then(data => {
-                listings = parseCSV(data);
-                setupFilters();
-                calculateItemsPerPage();
-                displayListings();
-                document.getElementById('loading-indicator').style.display = 'none';
-                document.getElementById('lemon-list-app').style.display = 'block';
-            })
-            .catch(error => {
-                console.error('Error loading CSV:', error);
-                document.getElementById('loading-indicator').textContent = 'Error loading data';
-            });
-    }
-
-    function parseCSV(csv) {
-        return csv.split('\n').map(row => {
-            const [emoji, ...rest] = row.split(',');
-            return { emoji, text: rest.join(',').trim().padEnd(61, ' ').substring(0, 61) };
-        });
-    }
-
-    function setupFilters() {
-        const filterContainer = document.getElementById('filter-checkboxes');
-        filterOptions.forEach(option => {
-            const filterItem = document.createElement('div');
-            filterItem.className = 'filter-item';
-            filterItem.innerHTML = `
-                <input type="checkbox" id="filter-${option.emoji}" value="${option.emoji}">
-                <label for="filter-${option.emoji}" title="${option.label}">${option.emoji}</label>
-            `;
-            filterContainer.appendChild(filterItem);
-        });
-    }
-
-    function calculateItemsPerPage() {
-        const columnHeight = document.querySelector('.listing-column').clientHeight;
-        const lineHeight = 20; // Adjust based on your font size and line height
-        itemsPerPage = Math.floor(columnHeight / lineHeight) * 2;
-    }
-
-    function displayListings() {
-        const filteredListings = filterListings();
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        const pageListings = filteredListings.slice(startIndex, endIndex);
-
-        const leftColumn = document.getElementById('left-column');
-        const rightColumn = document.getElementById('right-column');
-        leftColumn.innerHTML = '';
-        rightColumn.innerHTML = '';
-
-        pageListings.forEach((listing, index) => {
-            const listingElement = document.createElement('div');
-            listingElement.className = 'listing';
-            listingElement.innerHTML = `
-                <span class="listing-emoji">${listing.emoji}</span>
-                <span class="listing-text">${listing.text}</span>
-            `;
-            if (index < itemsPerPage / 2) {
-                leftColumn.appendChild(listingElement);
-            } else {
-                rightColumn.appendChild(listingElement);
-            }
-        });
-
-        updatePagination(filteredListings.length);
-    }
-
-    function filterListings() {
-        const searchTerm = document.getElementById('search-bar').value.toLowerCase();
-        const activeFilters = Array.from(document.querySelectorAll('#filter-checkboxes input:checked'))
-            .map(checkbox => checkbox.value);
-
-        return listings.filter(listing => {
-            const matchesSearch = listing.text.toLowerCase().includes(searchTerm);
-            const matchesFilter = activeFilters.length === 0 || activeFilters.includes(listing.emoji);
-            return matchesSearch && matchesFilter;
-        });
-    }
-
-    function updatePagination(totalItems) {
-        const totalPages = Math.ceil(totalItems / itemsPerPage);
-        document.getElementById('page-indicator').textContent = `Page ${currentPage} of ${totalPages}`;
-        document.getElementById('prev-page').disabled = currentPage === 1;
-        document.getElementById('next-page').disabled = currentPage === totalPages;
-    }
-
-    function debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
+    loadCSV();
 
     document.getElementById('search-bar').addEventListener('input', debounce(() => {
         currentPage = 1;
