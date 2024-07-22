@@ -677,13 +677,19 @@ function calculateItemsPerPage() {
     const columnHeight = document.querySelector('.listing-column').clientHeight;
     const lineHeight = 20; // Adjust based on your font size and line height
     itemsPerPage = Math.floor(columnHeight / lineHeight) * 2;
+    console.log('Calculated items per page:', itemsPerPage);
+    console.log('Column height:', columnHeight);
+    console.log('Line height:', lineHeight);
 }
 
 function displayListings() {
     const filteredListings = filterListings();
+    console.log('Total filtered listings:', filteredListings.length);
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
+    console.log('Start index:', startIndex, 'End index:', endIndex);
     const pageListings = filteredListings.slice(startIndex, endIndex);
+    console.log('Listings for current page:', pageListings.length);
 
     const leftColumn = document.getElementById('left-column');
     const rightColumn = document.getElementById('right-column');
