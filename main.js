@@ -663,9 +663,9 @@ function loadCSV() {
 function parseCSV(csv) {
     return csv.split('\n').map(row => {
         // Split the row, but keep the content within quotes together
-        const parts = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
+        const parts = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
         
-        // Remove quotes from parts
+        // Remove quotes from parts and trim whitespace
         const cleanParts = parts.map(part => part.replace(/^"|"$/g, '').trim());
 
         let emoji = '';
@@ -674,11 +674,14 @@ function parseCSV(csv) {
         if (cleanParts[0].length === 2 && /\p{Emoji}/u.test(cleanParts[0])) {
             // If the first part is an emoji (2 characters long and passes emoji test)
             emoji = cleanParts[0];
-            text = cleanParts.slice(1).join(' ');
+            text = cleanParts.slice(1).join(','); // Join with comma to preserve original format
         } else {
             // If no emoji, join all parts
-            text = cleanParts.join(' ');
+            text = cleanParts.join(','); // Join with comma to preserve original format
         }
+
+        // Remove any double spaces, but preserve single spaces and hyphens
+        text = text.replace(/  +/g, ' ').trim();
 
         // Ensure the text is exactly 61 characters long
         text = text.padEnd(61, ' ').substring(0, 61);
