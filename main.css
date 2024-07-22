@@ -460,6 +460,16 @@ body, html {
     display: none;
 }
 
+.lemon-list-window {
+    position: absolute !important;
+    transform: translate(-50%, -50%);
+}
+
+.lemon-list-window .window-content {
+    height: calc(100% - 20px) !important; /* Adjust based on your window header height */
+    overflow: hidden;
+}
+
 .window[data-app="Lemon List"] .window-content {
     display: flex;
     flex-direction: column;
