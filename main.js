@@ -674,14 +674,18 @@ function parseCSV(csv) {
         if (cleanParts[0].length === 2 && /\p{Emoji}/u.test(cleanParts[0])) {
             // If the first part is an emoji (2 characters long and passes emoji test)
             emoji = cleanParts[0];
-            text = cleanParts.slice(1).join(','); // Join with comma to preserve original format
+            text = cleanParts.slice(1);
         } else {
-            // If no emoji, join all parts
-            text = cleanParts.join(','); // Join with comma to preserve original format
+            // If no emoji, use all parts
+            text = cleanParts;
         }
 
-        // Remove any double spaces, but preserve single spaces and hyphens
-        text = text.replace(/  +/g, ' ').trim();
+        // Format the text parts
+        if (text.length >= 3) {
+            text = `${text[0].trim()}, ${text[1].trim()} ${text.slice(2).join(' ').trim()}`;
+        } else {
+            text = text.join(' ').trim();
+        }
 
         // Ensure the text is exactly 61 characters long
         text = text.padEnd(61, ' ').substring(0, 61);
