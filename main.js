@@ -515,6 +515,10 @@ function positionWindow(window) {
     let top = 25;
     const step = 5;
 
+    if (window.classList.contains('lemon-list-window')) {
+        return;
+    }
+
     while (isPositionOccupied(left, top)) {
         left += step;
         top += step;
