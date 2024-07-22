@@ -467,7 +467,8 @@ body, html {
 
 .lemon-list-window .window-content {
     height: calc(100% - 20px) !important; /* Adjust based on your window header height */
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .window[data-app="Lemon List"] .window-content {
@@ -517,9 +518,9 @@ body, html {
 }
 
 .listings-container {
+    flex-grow: 1;
     display: flex;
     justify-content: space-between;
-    height: 84%;
     padding: 0 5%;
 }
 
