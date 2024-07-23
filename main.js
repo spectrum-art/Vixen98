@@ -711,6 +711,8 @@ function setupFilters() {
 
 function calculateItemsPerPage() {
     const column = document.querySelector('.listing-column');
+    if (!column) return; // Exit if the column doesn't exist
+
     const listing = document.createElement('div');
     listing.className = 'listing';
     listing.innerHTML = '<span class="listing-emoji">&nbsp;</span><span class="listing-text">X</span>';
@@ -724,7 +726,7 @@ function calculateItemsPerPage() {
     if (columnHeight > 0 && listingHeight > 0) {
         itemsPerPage = Math.floor(columnHeight / listingHeight) * 2; // Multiply by 2 for two columns
     } else {
-        itemsPerPage = 40; // Increased fallback value
+        itemsPerPage = 40; // Fallback value
     }
 
     console.log('Column height:', columnHeight, 'Listing height:', listingHeight, 'Items per page:', itemsPerPage);
@@ -732,17 +734,19 @@ function calculateItemsPerPage() {
 
 function adjustFontSize() {
     const column = document.querySelector('.listing-column');
+    if (!column) return; // Exit if the column doesn't exist
+
     const testListing = document.createElement('div');
     testListing.className = 'listing';
     testListing.innerHTML = '<span class="listing-emoji">🌽</span><span class="listing-text">'.padEnd(61, 'X') + '</span>';
     column.appendChild(testListing);
 
     const textElement = testListing.querySelector('.listing-text');
-    let fontSize = 2; // Start with a larger size
+    let fontSize = 16; // Start with 16px
     textElement.style.fontSize = `${fontSize}px`;
 
     while (textElement.scrollWidth > column.clientWidth - 28 && fontSize > 1) { // 28px for emoji and margin
-        fontSize -= 0.1;
+        fontSize -= 0.5;
         textElement.style.fontSize = `${fontSize}px`;
     }
 
@@ -861,14 +865,21 @@ function setupEventListeners() {
 
 function initializeLemonList() {
     loadCSV().then(() => {
-        adjustFontSize();
-        displayListings();
-        setupEventListeners();
+        document.getElementById('loading-indicator').style.display = 'none';
+        document.getElementById('lemon-list-app').style.display = 'block';
 
-        window.addEventListener('resize', debounce(() => {
-            adjustFontSize();
-            displayListings();
-        }, 250));
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                adjustFontSize();
+                displayListings();
+                setupEventListeners();
+
+                window.addEventListener('resize', debounce(() => {
+                    adjustFontSize();
+                    displayListings();
+                }, 250));
+            });
+        });
     });
 }
 
