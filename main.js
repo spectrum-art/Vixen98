@@ -678,23 +678,24 @@ function parseCSV(csv) {
         if (text.length >= 3) {
             const lastName = text[0];
             const firstName = text[1];
-            const rest = text.slice(2).join(',').replace(/,([^,]+)$/, ' $1');
-            text = `${lastName}${firstName}${rest}`;
+            const phoneNumber = text[text.length - 1].trim();
+            const middlePart = text.slice(2, -1).join(' ').replace(/,/g, '').trim();
+
+            // Construct the base text without hyphens
+            text = `${lastName}${firstName} ${phoneNumber}`;
+
+            // Calculate how many hyphen-space pairs we need
+            const hyphensNeeded = Math.max(0, 61 - text.length);
+            const hyphenPairs = ' -'.repeat(Math.floor(hyphensNeeded / 2));
+
+            // Construct the final text
+            text = `${lastName}${firstName}${hyphenPairs}${hyphensNeeded % 2 === 1 ? ' ' : ''}${phoneNumber}`;
         } else {
-            text = text.join(',');
+            text = text.join(' ');
         }
 
-        // Adjust the length to 61 characters
-        const currentLength = (emoji + text).length;
-        if (currentLength < 61) {
-            const diff = 61 - currentLength;
-            const hyphensToAdd = Math.floor(diff / 2);
-            text += ' -'.repeat(hyphensToAdd) + (diff % 2 === 1 ? ' ' : '');
-        } else if (currentLength > 61) {
-            const diff = currentLength - 61;
-            const hyphensToRemove = Math.ceil(diff / 2);
-            text = text.replace(/ -/g, '').replace(/ -/g, ' ').slice(0, 61 - emoji.length);
-        }
+        // Ensure the text is exactly 61 characters
+        text = text.padEnd(61, ' ').slice(0, 61);
 
         return { emoji, text };
     }).filter(item => item.text.length > 0);
