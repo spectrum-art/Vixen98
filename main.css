@@ -526,13 +526,6 @@ body, html {
     padding-left: 12%;
 }
 
-.listings-container {
-    flex-grow: 1;
-    display: flex;
-    justify-content: space-between;
-    padding: 0 5%;
-}
-
 .listing-column {
     width: 39%;
     height: 100%;
