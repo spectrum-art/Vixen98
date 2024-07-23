@@ -738,7 +738,7 @@ function adjustFontSize() {
 
     const testListing = document.createElement('div');
     testListing.className = 'listing';
-    testListing.innerHTML = '<span class="listing-emoji">🌽</span><span class="listing-text">' + 'X'.repeat(60) + '</span>';
+    testListing.innerHTML = '<span class="listing-emoji">🌽</span><span class="listing-text">' + 'X'.repeat(55) + '</span>';
     column.appendChild(testListing);
 
     const textElement = testListing.querySelector('.listing-text');
