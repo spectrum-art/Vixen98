@@ -738,7 +738,7 @@ function adjustFontSize() {
 
     const testListing = document.createElement('div');
     testListing.className = 'listing';
-    testListing.innerHTML = '<span class="listing-emoji">🌽</span><span class="listing-text">' + 'X'.repeat(55) + '</span>';
+    testListing.innerHTML = '<span class="listing-emoji">🌽</span><span class="listing-text">' + 'X'.repeat(60) + '</span>';
     column.appendChild(testListing);
 
     const textElement = testListing.querySelector('.listing-text');
@@ -752,7 +752,10 @@ function adjustFontSize() {
 
     column.removeChild(testListing);
 
-    // Apply the calculated font size to all listing-text elements
+    // Multiply the fontSize by 0.9 before applying
+    fontSize *= 0.9;
+
+    // Apply the calculated and adjusted font size to all listing-text elements
     document.querySelectorAll('.listing-text').forEach(el => {
         el.style.fontSize = `${fontSize}px`;
     });
