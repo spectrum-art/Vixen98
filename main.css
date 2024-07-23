@@ -578,3 +578,7 @@ body, html {
 .pagination-container button {
     margin: 0 10px;
 }
+
+.debug-border {
+    border: 1px solid red;
+}
