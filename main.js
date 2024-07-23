@@ -601,9 +601,9 @@ function createLemonListContent() {
                 <div id="filter-checkboxes"></div>
                 <button id="clear-filters">Clear All Filters</button>
             </div>
-            <div class="listings-container" style="height: 84%; display: flex;">
-                <div class="listing-column" id="left-column" style="height: 100%;"></div>
-                <div class="listing-column" id="right-column" style="height: 100%;"></div>
+            <div class="listings-container">
+                <div class="listing-column" id="left-column"></div>
+                <div class="listing-column" id="right-column"></div>
             </div>
             <div class="pagination-container">
                 <button id="prev-page" aria-label="Previous page">◀</button>
