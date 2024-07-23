@@ -635,29 +635,26 @@ let itemsPerPage = 0;
 const debounceTime = 300;
 
 function loadCSV() {
-    console.log('Starting to load CSV');
-    fetch('vixenlemonlist.csv')
-        .then(response => {
-            console.log('CSV fetched, starting to parse');
-            return response.text();
-        })
-        .then(data => {
-            console.log('CSV parsed, processing data');
-            listings = parseCSV(data);
-            console.log('Listings processed:', listings.length);
-            setupFilters();
-            
-            setTimeout(() => {
-                calculateItemsPerPage();
-                displayListings();
-                document.getElementById('loading-indicator').style.display = 'none';
-                document.getElementById('lemon-list-app').style.display = 'block';
-            }, 0);
-        })
-        .catch(error => {
-            console.error('Error loading CSV:', error);
-            document.getElementById('loading-indicator').textContent = 'Error loading data';
-        });
+    return new Promise((resolve, reject) => {
+        console.log('Starting to load CSV');
+        fetch('vixenlemonlist.csv')
+            .then(response => {
+                console.log('CSV fetched, starting to parse');
+                return response.text();
+            })
+            .then(data => {
+                console.log('CSV parsed, processing data');
+                listings = parseCSV(data);
+                console.log('Listings processed:', listings.length);
+                setupFilters();
+                resolve();
+            })
+            .catch(error => {
+                console.error('Error loading CSV:', error);
+                document.getElementById('loading-indicator').textContent = 'Error loading data';
+                reject(error);
+            });
+    });
 }
 
 function parseCSV(csv) {
@@ -863,18 +860,16 @@ function setupEventListeners() {
 }
 
 function initializeLemonList() {
-    loadCSV();
-
-    setTimeout(() => {
-        calculateItemsPerPage();
+    loadCSV().then(() => {
+        adjustFontSize();
         displayListings();
         setupEventListeners();
 
         window.addEventListener('resize', debounce(() => {
-            calculateItemsPerPage();
+            adjustFontSize();
             displayListings();
         }, 250));
-    }, 0);
+    });
 }
 
 createDesktopIcons();
