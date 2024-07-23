@@ -689,8 +689,18 @@ function parseCSV(csv) {
         // Insert hyphens between the name and phone number
         text = `${lastName}${firstName} ${'-'.repeat(hyphensNeeded)} ${phoneNumber}`;
 
-        // Ensure the text is exactly 60 characters
-        text = text.padEnd(60, ' ').slice(0, 60);
+        // Ensure the text is exactly 60 characters, but don't truncate the phone number
+        if (text.length > 60) {
+            const excess = text.length - 60;
+            const hyphenIndex = text.lastIndexOf('-');
+            if (hyphenIndex !== -1) {
+                text = text.substring(0, hyphenIndex - excess) + text.substring(hyphenIndex);
+            }
+        } else {
+            text = text.padEnd(60, ' ');
+        }
+
+        console.log('Parsed text:', text, 'Length:', text.length); // Debug log
 
         return { emoji, text };
     }).filter(item => item.text.length > 0);
