@@ -662,30 +662,35 @@ function loadCSV() {
 
 function parseCSV(csv) {
     return csv.split('\n').map(row => {
-        const parts = row.split(',').map(part => part.trim());
+        // Split the row by commas, but keep content within quotes together
+        const parts = row.match(/(".*?"|[^,]+)(?=\s*,|\s*$)/g) || [];
         
+        // Remove quotes and trim whitespace
+        const cleanParts = parts.map(part => part.replace(/^"|"$/g, '').trim());
+
         let emoji = '';
         let lastName = '';
         let firstName = '';
         let phoneNumber = '';
 
-        if (/^\p{Emoji}/u.test(parts[0])) {
-            [emoji, lastName, firstName, phoneNumber] = parts;
+        // Assign parts based on whether an emoji is present
+        if (/^\p{Emoji}/u.test(cleanParts[0])) {
+            [emoji, lastName, firstName, phoneNumber] = cleanParts;
         } else {
-            [lastName, firstName, phoneNumber] = parts;
+            [lastName, firstName, phoneNumber] = cleanParts;
         }
 
         // Ensure lastName ends with a comma and a space
-        lastName = lastName.endsWith(', ') ? lastName : lastName + ', ';
+        lastName = lastName.endsWith(',') ? lastName + ' ' : lastName + ', ';
 
-        // Join the parts with two spaces between firstName and phoneNumber
-        let text = `${lastName}${firstName}  ${phoneNumber}`;
+        // Construct the base text
+        let text = `${lastName}${firstName} ${phoneNumber}`;
 
         // Calculate how many hyphens we need
         const hyphensNeeded = Math.max(0, 60 - text.length);
 
-        // Insert hyphens between the two spaces
-        text = text.replace('  ', `  ${'-'.repeat(hyphensNeeded)}  `);
+        // Insert hyphens between the name and phone number
+        text = `${lastName}${firstName} ${'-'.repeat(hyphensNeeded)} ${phoneNumber}`;
 
         // Ensure the text is exactly 60 characters
         text = text.padEnd(60, ' ').slice(0, 60);
