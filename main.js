@@ -734,18 +734,18 @@ function calculateItemsPerPage() {
 
 function adjustFontSize() {
     const column = document.querySelector('.listing-column');
-    if (!column) return; // Exit if the column doesn't exist
+    if (!column) return;
 
     const testListing = document.createElement('div');
     testListing.className = 'listing';
-    testListing.innerHTML = '<span class="listing-emoji">🌽</span><span class="listing-text">'.padEnd(61, 'X') + '</span>';
+    testListing.innerHTML = '<span class="listing-emoji">🌽</span><span class="listing-text">' + 'X'.repeat(60) + '</span>';
     column.appendChild(testListing);
 
     const textElement = testListing.querySelector('.listing-text');
     let fontSize = 16; // Start with 16px
     textElement.style.fontSize = `${fontSize}px`;
 
-    while (textElement.scrollWidth > column.clientWidth - 28 && fontSize > 1) { // 28px for emoji and margin
+    while ((textElement.scrollWidth > column.clientWidth - 28 || textElement.scrollHeight > textElement.clientHeight) && fontSize > 1) {
         fontSize -= 0.5;
         textElement.style.fontSize = `${fontSize}px`;
     }
@@ -784,7 +784,7 @@ function displayListings() {
         listingElement.className = 'listing';
         listingElement.innerHTML = `
             <span class="listing-emoji">${listing.emoji || ''}</span>
-            <span class="listing-text">${listing.text}</span>
+            <span class="listing-text debug-border">${listing.text}</span>
         `;
         if (index < itemsPerPage / 2) {
             leftColumn.appendChild(listingElement);
