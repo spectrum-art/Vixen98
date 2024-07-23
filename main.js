@@ -868,12 +868,12 @@ function initializeLemonList() {
         calculateItemsPerPage();
         displayListings();
         setupEventListeners();
-    }, 0);
 
-    window.addEventListener('resize', debounce(() => {
-        calculateItemsPerPage();
-        displayListings();
-    }, 250));
+        window.addEventListener('resize', debounce(() => {
+            calculateItemsPerPage();
+            displayListings();
+        }, 250));
+    }, 0);
 }
 
 createDesktopIcons();
