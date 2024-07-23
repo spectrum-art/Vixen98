@@ -526,21 +526,11 @@ body, html {
     padding-left: 12%;
 }
 
-.listing-column {
-    width: 45%;
-    height: 100%;
-    margin-right: 5%;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
-
 .listing {
     display: flex;
     align-items: flex-start;
     font-family: 'Nanum Gothic Coding', monospace;
-    white-space: pre;
-    margin-bottom: 5px;
+    margin-bottom: 2px;
     width: 100%;
 }
 
@@ -552,11 +542,20 @@ body, html {
 }
 
 .listing-text {
-    white-space: pre;
-    overflow: hidden;
-    text-overflow: ellipsis;
     flex-grow: 1;
+    white-space: pre;
+    overflow: visible;
+    width: calc(100% - 28px);
     font-size: 1vw;
+}
+
+.listing-column {
+    width: 45%;
+    height: 100%;
+    margin-right: 5%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .pagination-container {
