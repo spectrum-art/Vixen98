@@ -787,6 +787,7 @@ function displayListings() {
         }
     });
 
+    adjustFontSize();
     updatePagination(filteredListings.length);
 }
 
