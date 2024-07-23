@@ -659,10 +659,7 @@ function loadCSV() {
 
 function parseCSV(csv) {
     return csv.split('\n').map(row => {
-        // Split the row by commas, but keep content within quotes together
         const parts = row.match(/(".*?"|[^,]+)(?=\s*,|\s*$)/g) || [];
-        
-        // Remove quotes and trim whitespace
         const cleanParts = parts.map(part => part.replace(/^"|"$/g, '').trim());
 
         let emoji = '';
@@ -670,34 +667,27 @@ function parseCSV(csv) {
         let firstName = '';
         let phoneNumber = '';
 
-        // Assign parts based on whether an emoji is present
         if (/^\p{Emoji}/u.test(cleanParts[0])) {
             [emoji, lastName, firstName, phoneNumber] = cleanParts;
         } else {
             [lastName, firstName, phoneNumber] = cleanParts;
         }
 
-        // Ensure lastName ends with a comma and a space
         lastName = lastName.endsWith(',') ? lastName + ' ' : lastName + ', ';
 
-        // Construct the base text
+        // Construct the base text without hyphens first
         let text = `${lastName}${firstName} ${phoneNumber}`;
 
-        // Calculate how many hyphens we need
-        const hyphensNeeded = Math.max(0, 60 - text.length);
-
+        // Calculate remaining space for hyphens
+        const remainingSpace = 60 - text.length;
+        
         // Insert hyphens between the name and phone number
-        text = `${lastName}${firstName} ${'-'.repeat(hyphensNeeded)} ${phoneNumber}`;
-
-        // Ensure the text is exactly 60 characters, but don't truncate the phone number
-        if (text.length > 60) {
-            const excess = text.length - 60;
-            const hyphenIndex = text.lastIndexOf('-');
-            if (hyphenIndex !== -1) {
-                text = text.substring(0, hyphenIndex - excess) + text.substring(hyphenIndex);
-            }
+        if (remainingSpace > 0) {
+            const hyphens = '-'.repeat(remainingSpace);
+            text = `${lastName}${firstName} ${hyphens} ${phoneNumber}`;
         } else {
-            text = text.padEnd(60, ' ');
+            // If no space for hyphens, just ensure the text is 60 characters
+            text = text.padEnd(60, ' ').slice(0, 60);
         }
 
         console.log('Parsed text:', text, 'Length:', text.length); // Debug log
@@ -755,7 +745,7 @@ function adjustFontSize() {
     let fontSize = 16; // Start with 16px
     textElement.style.fontSize = `${fontSize}px`;
 
-    while ((textElement.scrollWidth > column.clientWidth - 28 || textElement.scrollHeight > textElement.clientHeight) && fontSize > 1) {
+    while (textElement.scrollWidth > column.clientWidth - 28 && fontSize > 1) {
         fontSize -= 0.5;
         textElement.style.fontSize = `${fontSize}px`;
     }
@@ -768,9 +758,6 @@ function adjustFontSize() {
     });
 
     console.log('Adjusted font size:', fontSize, 'px');
-
-    // Recalculate items per page after adjusting font size
-    calculateItemsPerPage();
 }
 
 function displayListings() {
