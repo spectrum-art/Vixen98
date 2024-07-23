@@ -521,13 +521,13 @@ body, html {
     display: flex;
     justify-content: flex-start;
     align-items: flex-end;
-    height: 84%;
+    height: 74%;
     margin-bottom: 4%;
     padding-left: 12%;
 }
 
 .listing-column {
-    width: 39%;
+    width: 45%;
     height: 100%;
     margin-right: 5%;
     overflow: hidden;
