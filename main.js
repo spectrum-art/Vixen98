@@ -727,39 +727,39 @@ function calculateItemsPerPage() {
     if (columnHeight > 0 && listingHeight > 0) {
         itemsPerPage = Math.floor(columnHeight / listingHeight) * 2; // Multiply by 2 for two columns
     } else {
-        itemsPerPage = 20; // Fallback value
+        itemsPerPage = 40; // Increased fallback value
     }
 
     console.log('Column height:', columnHeight, 'Listing height:', listingHeight, 'Items per page:', itemsPerPage);
-
-    // Adjust font size to fit 60 characters
-    adjustFontSize();
 }
 
 function adjustFontSize() {
     const column = document.querySelector('.listing-column');
     const testListing = document.createElement('div');
     testListing.className = 'listing';
-    testListing.innerHTML = '<span class="listing-emoji">&nbsp;</span><span class="listing-text">'.padEnd(65, 'X') + '</span>';
+    testListing.innerHTML = '<span class="listing-emoji">🌽</span><span class="listing-text">'.padEnd(61, 'X') + '</span>';
     column.appendChild(testListing);
 
     const textElement = testListing.querySelector('.listing-text');
-    let fontSize = 1; // Start with 1vw
-    textElement.style.fontSize = `${fontSize}vw`;
+    let fontSize = 2; // Start with a larger size
+    textElement.style.fontSize = `${fontSize}px`;
 
-    while (textElement.scrollWidth > column.clientWidth && fontSize > 0.1) {
+    while (textElement.scrollWidth > column.clientWidth - 28 && fontSize > 1) { // 28px for emoji and margin
         fontSize -= 0.1;
-        textElement.style.fontSize = `${fontSize}vw`;
+        textElement.style.fontSize = `${fontSize}px`;
     }
 
     column.removeChild(testListing);
 
     // Apply the calculated font size to all listing-text elements
     document.querySelectorAll('.listing-text').forEach(el => {
-        el.style.fontSize = `${fontSize}vw`;
+        el.style.fontSize = `${fontSize}px`;
     });
 
-    console.log('Adjusted font size:', fontSize, 'vw');
+    console.log('Adjusted font size:', fontSize, 'px');
+
+    // Recalculate items per page after adjusting font size
+    calculateItemsPerPage();
 }
 
 function displayListings() {
