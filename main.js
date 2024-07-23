@@ -725,6 +725,7 @@ function calculateItemsPerPage() {
 
     if (columnHeight > 0 && listingHeight > 0) {
         itemsPerPage = Math.floor(columnHeight / listingHeight) * 2; // Multiply by 2 for two columns
+        itemsPerPage -= 14;
     } else {
         itemsPerPage = 40; // Fallback value
     }
