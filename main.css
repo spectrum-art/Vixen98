@@ -531,17 +531,21 @@ body, html {
     height: 100%;
     margin-right: 5%;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .listing {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     font-family: 'Nanum Gothic Coding', monospace;
     white-space: pre;
     margin-bottom: 5px;
+    width: 100%;
 }
 
 .listing-emoji {
+    flex-shrink: 0;
     width: 24px;
     text-align: center;
     margin-right: 4px;
@@ -552,7 +556,7 @@ body, html {
     overflow: hidden;
     text-overflow: ellipsis;
     flex-grow: 1;
-    font-family: 'Nanum Gothic Coding', monospace;
+    font-size: 1vw;
 }
 
 .pagination-container {
