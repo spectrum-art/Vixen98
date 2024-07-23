@@ -679,15 +679,15 @@ function parseCSV(csv) {
         let text = `${lastName}${firstName} ${phoneNumber}`;
 
         // Calculate remaining space for hyphens
-        const remainingSpace = 60 - text.length;
+        const remainingSpace = 55 - text.length;
         
         // Insert hyphens between the name and phone number
         if (remainingSpace > 0) {
             const hyphens = '-'.repeat(remainingSpace);
             text = `${lastName}${firstName} ${hyphens} ${phoneNumber}`;
         } else {
-            // If no space for hyphens, just ensure the text is 60 characters
-            text = text.padEnd(60, ' ').slice(0, 60);
+            // If no space for hyphens, just ensure the text is 55 characters
+            text = text.padEnd(55, ' ').slice(0, 55);
         }
 
         console.log('Parsed text:', text, 'Length:', text.length); // Debug log
@@ -738,7 +738,7 @@ function adjustFontSize() {
 
     const testListing = document.createElement('div');
     testListing.className = 'listing';
-    testListing.innerHTML = '<span class="listing-emoji">🌽</span><span class="listing-text">' + 'X'.repeat(60) + '</span>';
+    testListing.innerHTML = '<span class="listing-emoji">🌽</span><span class="listing-text">' + 'X'.repeat(55) + '</span>';
     column.appendChild(testListing);
 
     const textElement = testListing.querySelector('.listing-text');
