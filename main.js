@@ -764,6 +764,11 @@ function adjustFontSize() {
 }
 
 function displayListings() {
+    if (itemsPerPage === 0) {
+        console.log('Items per page not calculated yet');
+        return;
+    }
+
     const filteredListings = filterListings();
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
@@ -778,7 +783,7 @@ function displayListings() {
         const listingElement = document.createElement('div');
         listingElement.className = 'listing';
         listingElement.innerHTML = `
-            <span class="listing-emoji">${listing.emoji || '&nbsp;'}</span>
+            <span class="listing-emoji">${listing.emoji || ''}</span>
             <span class="listing-text">${listing.text}</span>
         `;
         if (index < itemsPerPage / 2) {
@@ -788,7 +793,6 @@ function displayListings() {
         }
     });
 
-    adjustFontSize();
     updatePagination(filteredListings.length);
 }
 
