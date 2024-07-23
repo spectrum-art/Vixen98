@@ -662,40 +662,33 @@ function loadCSV() {
 
 function parseCSV(csv) {
     return csv.split('\n').map(row => {
-        const parts = row.match(/(".*?"|[^,]+)(?=\s*,|\s*$)/g) || [];
-        const cleanParts = parts.map(part => part.replace(/^"|"$/g, '').replace(/^,\s*/, ''));
-
+        const parts = row.split(',').map(part => part.trim());
+        
         let emoji = '';
-        let text = '';
+        let lastName = '';
+        let firstName = '';
+        let phoneNumber = '';
 
-        if (/^\p{Emoji}/u.test(cleanParts[0])) {
-            emoji = cleanParts[0];
-            text = cleanParts.slice(1);
+        if (/^\p{Emoji}/u.test(parts[0])) {
+            [emoji, lastName, firstName, phoneNumber] = parts;
         } else {
-            text = cleanParts;
+            [lastName, firstName, phoneNumber] = parts;
         }
 
-        if (text.length >= 3) {
-            const lastName = text[0];
-            const firstName = text[1];
-            const phoneNumber = text[text.length - 1].trim();
-            const middlePart = text.slice(2, -1).join(' ').replace(/,/g, '').trim();
+        // Ensure lastName ends with a comma and a space
+        lastName = lastName.endsWith(', ') ? lastName : lastName + ', ';
 
-            // Construct the base text without hyphens
-            text = `${lastName}${firstName} ${phoneNumber}`;
+        // Join the parts with two spaces between firstName and phoneNumber
+        let text = `${lastName}${firstName}  ${phoneNumber}`;
 
-            // Calculate how many hyphen-space pairs we need
-            const hyphensNeeded = Math.max(0, 61 - text.length);
-            const hyphenPairs = ' -'.repeat(Math.floor(hyphensNeeded / 2));
+        // Calculate how many hyphens we need
+        const hyphensNeeded = Math.max(0, 60 - text.length);
 
-            // Construct the final text
-            text = `${lastName}${firstName}${hyphenPairs}${hyphensNeeded % 2 === 1 ? ' ' : ''}${phoneNumber}`;
-        } else {
-            text = text.join(' ');
-        }
+        // Insert hyphens between the two spaces
+        text = text.replace('  ', `  ${'-'.repeat(hyphensNeeded)}  `);
 
-        // Ensure the text is exactly 61 characters
-        text = text.padEnd(61, ' ').slice(0, 61);
+        // Ensure the text is exactly 60 characters
+        text = text.padEnd(60, ' ').slice(0, 60);
 
         return { emoji, text };
     }).filter(item => item.text.length > 0);
