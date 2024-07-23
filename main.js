@@ -713,34 +713,53 @@ function setupFilters() {
 }
 
 function calculateItemsPerPage() {
-    const listingsContainer = document.querySelector('.listings-container');
     const column = document.querySelector('.listing-column');
-    const lineHeight = 20; // Adjust based on your font size and line height
-
-    console.log('Listings container:', listingsContainer);
-    console.log('Listings container style:', listingsContainer.getAttribute('style'));
-    console.log('Listings container computed style:');
-    console.log(window.getComputedStyle(listingsContainer));
-
-    console.log('Column:', column);
-    console.log('Column style:', column.getAttribute('style'));
-    console.log('Column computed style:');
-    console.log(window.getComputedStyle(column));
+    const listing = document.createElement('div');
+    listing.className = 'listing';
+    listing.innerHTML = '<span class="listing-emoji">&nbsp;</span><span class="listing-text">X</span>';
+    column.appendChild(listing);
 
     const columnHeight = column.clientHeight;
-    console.log('Column client height:', columnHeight);
-    console.log('Column offset height:', column.offsetHeight);
-    console.log('Column scroll height:', column.scrollHeight);
+    const listingHeight = listing.offsetHeight;
 
-    if (columnHeight > 0) {
-        itemsPerPage = Math.floor(columnHeight / lineHeight) * 2;
+    column.removeChild(listing);
+
+    if (columnHeight > 0 && listingHeight > 0) {
+        itemsPerPage = Math.floor(columnHeight / listingHeight) * 2; // Multiply by 2 for two columns
     } else {
-        // Fallback: assume a reasonable number if calculation fails
-        itemsPerPage = 60;
-        console.warn('Column height is 0, using fallback itemsPerPage:', itemsPerPage);
+        itemsPerPage = 20; // Fallback value
     }
-    
-    console.log('Calculated items per page:', itemsPerPage);
+
+    console.log('Column height:', columnHeight, 'Listing height:', listingHeight, 'Items per page:', itemsPerPage);
+
+    // Adjust font size to fit 60 characters
+    adjustFontSize();
+}
+
+function adjustFontSize() {
+    const column = document.querySelector('.listing-column');
+    const testListing = document.createElement('div');
+    testListing.className = 'listing';
+    testListing.innerHTML = '<span class="listing-emoji">&nbsp;</span><span class="listing-text">'.padEnd(65, 'X') + '</span>';
+    column.appendChild(testListing);
+
+    const textElement = testListing.querySelector('.listing-text');
+    let fontSize = 1; // Start with 1vw
+    textElement.style.fontSize = `${fontSize}vw`;
+
+    while (textElement.scrollWidth > column.clientWidth && fontSize > 0.1) {
+        fontSize -= 0.1;
+        textElement.style.fontSize = `${fontSize}vw`;
+    }
+
+    column.removeChild(testListing);
+
+    // Apply the calculated font size to all listing-text elements
+    document.querySelectorAll('.listing-text').forEach(el => {
+        el.style.fontSize = `${fontSize}vw`;
+    });
+
+    console.log('Adjusted font size:', fontSize, 'vw');
 }
 
 function displayListings() {
