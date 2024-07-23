@@ -758,6 +758,8 @@ function adjustFontSize() {
     });
 
     console.log('Adjusted font size:', fontSize, 'px');
+    
+    calculateItemsPerPage();
 }
 
 function displayListings() {
