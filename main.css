@@ -518,7 +518,7 @@ body, html {
 }
 
 .listing-column {
-    width: 39%;
+    width: 45%;
     height: 100%;
     margin-right: 5%;
     overflow: visible;
@@ -559,15 +559,6 @@ body, html {
     width: calc(100% - 28px);
     box-sizing: border-box;
     font-size: 1vw;
-}
-
-.listing-column {
-    width: 45%;
-    height: 100%;
-    margin-right: 5%;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
 }
 
 .pagination-container {
