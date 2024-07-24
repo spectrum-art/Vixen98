@@ -143,6 +143,11 @@ function openWindow(icon) {
                 initializeLemonList();
             });
         });
+
+        setTimeout(() => {
+            adjustFontSize();
+            displayListings();
+        }, 0);
     }
     
     bringToFront(window);
