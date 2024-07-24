@@ -558,7 +558,6 @@ body, html {
     text-overflow: clip;
     width: calc(100% - 28px);
     box-sizing: border-box;
-    font-size: 1vw;
 }
 
 .pagination-container {
