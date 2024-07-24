@@ -734,12 +734,18 @@ function calculateItemsPerPage() {
 }
 
 function adjustFontSize() {
-    const column = document.querySelector('.listing-column');
+    const lemonListWindow = document.querySelector('.window[data-app="Lemon List"]');
+    if (!lemonListWindow) return;
+
+    const listingsContainer = lemonListWindow.querySelector('.listings-container');
+    if (!listingsContainer) return;
+
+    const column = listingsContainer.querySelector('.listing-column');
     if (!column) return;
 
     const testListing = document.createElement('div');
     testListing.className = 'listing';
-    testListing.innerHTML = '<span class="listing-emoji">🌽</span><span class="listing-text">' + 'X'.repeat(55) + '</span>';
+    testListing.innerHTML = '<span class="listing-emoji">🌽</span><span class="listing-text">' + 'X'.repeat(60) + '</span>';
     column.appendChild(testListing);
 
     const textElement = testListing.querySelector('.listing-text');
@@ -756,14 +762,12 @@ function adjustFontSize() {
     // Multiply the fontSize by 0.9 before applying
     fontSize *= 0.9;
 
-    // Apply the calculated and adjusted font size to all listing-text elements
-    document.querySelectorAll('.listing-text').forEach(el => {
+    // Apply the calculated and adjusted font size to all listing-text elements within the Lemon List window
+    lemonListWindow.querySelectorAll('.listing-text').forEach(el => {
         el.style.fontSize = `${fontSize}px`;
     });
 
     console.log('Adjusted font size:', fontSize, 'px');
-    
-    calculateItemsPerPage();
 }
 
 function displayListings() {
