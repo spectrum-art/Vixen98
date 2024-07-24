@@ -1,5 +1,4 @@
 import { validatePassword, verifyToken } from './server.js';
-
 document.addEventListener('DOMContentLoaded', function() {
     const splashScreen = document.getElementById('splash-screen');
     const splashGif = document.getElementById('splash-gif');
@@ -12,16 +11,13 @@ document.addEventListener('DOMContentLoaded', function() {
             desktopContainer.classList.remove('hidden');
         });
     }
-
     function startSplashScreen() {
         splashGif.src = splashGif.src + '?t=' + new Date().getTime();
         
         setTimeout(removeSplashScreen, 8500);
     }
-
     startSplashScreen();
 });
-
 const desktopIcons = [
     { name: 'System', icon: '💻', accessLevel: 1 },
     { name: 'Trash', icon: '🗑️', accessLevel: 1 },
@@ -29,18 +25,15 @@ const desktopIcons = [
     { name: 'Lemon List', icon: '🍋', accessLevel: 1 },
     { name: 'Encryption', icon: '🔒', accessLevel: 1 }
 ];
-
 const myDocumentsIcons = [
     { name: 'Cookie Delivery Map', icon: '🗺️' },
     { name: 'Cookie Batch Log', icon: '🍪' },
     { name: 'Underground Map', icon: '🐀' },
     { name: 'Placeholder', icon: '📄' }
 ];
-
 const iconGrid = document.getElementById('icon-grid');
 const openWindows = document.getElementById('open-windows');
 const desktop = document.getElementById('desktop');
-
 function createDesktopIcons() {
     desktopIcons.forEach(icon => {
         const iconElement = document.createElement('div');
@@ -53,23 +46,19 @@ function createDesktopIcons() {
         iconGrid.appendChild(iconElement);
     });
 }
-
 function openWindow(icon) {
     const token = localStorage.getItem('accessToken');
     const currentAccessLevel = verifyToken(token);
-
     if (currentAccessLevel < icon.accessLevel) {
         alert('Unauthorized');
         return;
     }
-
     // Check if the window is already open
     const existingWindow = document.querySelector(`.window[data-app="${icon.name}"]`);
     if (existingWindow) {
         bringToFront(existingWindow);
         return;
     }
-
     const window = document.createElement('div');
     window.className = 'window';
     window.setAttribute('data-app', icon.name);
@@ -107,7 +96,6 @@ function openWindow(icon) {
     createTaskbarItem(icon, window);
     
     makeDraggable(window);
-
     if (icon.name === 'Encryption') {
         setupEncryptionApp(window);
     }
@@ -126,7 +114,6 @@ function openWindow(icon) {
         window.style.top = '50%';
         window.style.transform = 'translate(-50%, -50%)';
         window.classList.add('lemon-list-window')
-
         const img = new Image();
         img.onload = function() {
             const aspectRatio = this.width / this.height;
@@ -138,12 +125,15 @@ function openWindow(icon) {
         }
         img.src = 'lemonlistbg.png';
         
-        initializeLemonList();
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                initializeLemonList();
+            });
+        });
     }
     
     bringToFront(window);
 }
-
 function minimizeWindow(window, icon) {
     window.style.transformOrigin = 'bottom left';
     window.classList.add('minimizing');
@@ -152,7 +142,6 @@ function minimizeWindow(window, icon) {
     window.dataset.originalTop = window.style.top;
     
     window.offsetWidth;
-
     const taskbarItem = document.querySelector(`[data-icon="${icon.name}"]`);
     if (taskbarItem) {
         const taskbarRect = taskbarItem.getBoundingClientRect();
@@ -164,7 +153,6 @@ function minimizeWindow(window, icon) {
         window.style.transform = `translate(${translateX}px, ${translateY}px) scale(0.1)`;
         window.style.opacity = '0';
     }
-
     window.addEventListener('transitionend', () => {
         window.style.display = 'none';
         window.style.transform = '';
@@ -172,14 +160,12 @@ function minimizeWindow(window, icon) {
         window.classList.remove('minimizing');
     }, { once: true });
 }
-
 function unminimizeWindow(window, icon) {
     window.style.display = 'flex';
     window.style.transformOrigin = 'bottom left';
     window.classList.add('unminimizing');
     
     window.offsetWidth;
-
     const taskbarItem = document.querySelector(`[data-icon="${icon.name}"]`);
     if (taskbarItem) {
         const taskbarRect = taskbarItem.getBoundingClientRect();
@@ -198,13 +184,11 @@ function unminimizeWindow(window, icon) {
         window.style.left = window.dataset.originalLeft;
         window.style.top = window.dataset.originalTop;
     }
-
     window.addEventListener('transitionend', () => {
         window.classList.remove('unminimizing');
         bringToFront(window);
     }, { once: true });
 }
-
 function createEncryptionApp() {
     return `
         <div class="encryption-app">
@@ -235,7 +219,6 @@ function createEncryptionApp() {
         </div>
     `;
 }
-
 function setupEncryptionApp(window) {
     const encryptBtn = window.querySelector('#encryptBtn');
     const decryptBtn = window.querySelector('#decryptBtn');
@@ -243,9 +226,7 @@ function setupEncryptionApp(window) {
     const browseButton = window.querySelector('#browseButton');
     const fileInput = window.querySelector('#fileInput');
     const fileNameInput = window.querySelector('.file-input-wrapper input[type="text"]');
-
     browseButton.addEventListener('click', () => fileInput.click());
-
     fileInput.addEventListener('change', (e) => {
         if (e.target.files.length > 0) {
             fileNameInput.value = e.target.files[0].name;
@@ -253,39 +234,31 @@ function setupEncryptionApp(window) {
             fileNameInput.value = '';
         }
     });
-
     encryptBtn.addEventListener('click', () => handleEncryptDecrypt(true));
     decryptBtn.addEventListener('click', () => handleEncryptDecrypt(false));
     togglePassword.addEventListener('click', togglePasswordVisibility);
-
     setupFileDrop(window);
 }
-
 function handleEncryptDecrypt(isEncrypt) {
     const fileInput = document.getElementById('fileInput');
     const passwordInput = document.getElementById('passwordInput');
     const statusBar = document.getElementById('statusBar');
     const downloadContainer = document.getElementById('downloadContainer');
     const downloadLink = document.getElementById('downloadLink');
-
     const file = fileInput.files[0];
     const password = passwordInput.value;
-
     if (!file) {
         statusBar.textContent = 'Please select a file.';
         return;
     }
-
     if (!password) {
         statusBar.textContent = 'Please enter a password.';
         return;
     }
-
     if (file.size > 10 * 1024 * 1024) {
         statusBar.textContent = 'File size exceeds 10 MB limit.';
         return;
     }
-
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
@@ -306,32 +279,26 @@ function handleEncryptDecrypt(isEncrypt) {
                 blob = new Blob([result], { type: fileInfo.type });
                 fileName = fileInfo.name;
             }
-
             const url = URL.createObjectURL(blob);
-
             downloadLink.href = url;
             downloadLink.download = fileName;
             downloadContainer.style.display = 'flex';
-
             statusBar.textContent = `File ${isEncrypt ? 'encrypted' : 'decrypted'} successfully.`;
         } catch (error) {
             statusBar.textContent = `Error: ${error.message}`;
             downloadContainer.style.display = 'none';
         }
     };
-
     reader.onerror = function() {
         statusBar.textContent = `Error: Failed to read the file. Please try again.`;
         downloadContainer.style.display = 'none';
     };
-
     if (isEncrypt) {
         reader.readAsArrayBuffer(file);
     } else {
         reader.readAsText(file);
     }
 }
-
 function togglePasswordVisibility() {
     const passwordInput = document.getElementById('passwordInput');
     const toggleButton = document.getElementById('togglePassword');
@@ -339,45 +306,35 @@ function togglePasswordVisibility() {
     passwordInput.setAttribute('type', type);
     toggleButton.classList.toggle('active');
 }
-
 function setupFileDrop(window) {
     const dropArea = window.querySelector('.file-drop-area');
     const fileInput = window.querySelector('#fileInput');
-
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
         dropArea.addEventListener(eventName, preventDefaults, false);
     });
-
     function preventDefaults(e) {
         e.preventDefault();
         e.stopPropagation();
     }
-
     ['dragenter', 'dragover'].forEach(eventName => {
         dropArea.addEventListener(eventName, highlight, false);
     });
-
     ['dragleave', 'drop'].forEach(eventName => {
         dropArea.addEventListener(eventName, unhighlight, false);
     });
-
     function highlight() {
         dropArea.classList.add('dragover');
     }
-
     function unhighlight() {
         dropArea.classList.remove('dragover');
     }
-
     dropArea.addEventListener('drop', handleDrop, false);
-
     function handleDrop(e) {
         const dt = e.dataTransfer;
         const files = dt.files;
         fileInput.files = files;
     }
 }
-
 function createMyDocumentsContent() {
     return `
         <div class="my-documents-icons">
@@ -390,7 +347,6 @@ function createMyDocumentsContent() {
         </div>
     `;
 }
-
 function setupMyDocumentsEventListeners(window) {
     const icons = window.querySelectorAll('.desktop-icon');
     icons.forEach(icon => {
@@ -403,7 +359,6 @@ function setupMyDocumentsEventListeners(window) {
         });
     });
 }
-
 function openCookieDeliveryMap() {
     const mapWindow = document.createElement('div');
     mapWindow.className = 'window map-window';
@@ -424,7 +379,6 @@ function openCookieDeliveryMap() {
     makeDraggable(mapWindow);
     bringToFront(mapWindow);
 }
-
 function closeWindow(window, icon) {
     window.remove();
     const taskbarItem = document.querySelector(`[data-icon="${icon.name}"]`);
@@ -432,7 +386,6 @@ function closeWindow(window, icon) {
         taskbarItem.remove();
     }
 }
-
 function createTaskbarItem(icon, window) {
     const taskbarItem = document.createElement('div');
     taskbarItem.className = 'taskbar-item';
@@ -452,11 +405,9 @@ function createTaskbarItem(icon, window) {
     });
     openWindows.appendChild(taskbarItem);
 }
-
 function makeDraggable(element) {
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
     element.querySelector('.window-header').onmousedown = dragMouseDown;
-
     function dragMouseDown(e) {
         e = e || window.event;
         e.preventDefault();
@@ -466,7 +417,6 @@ function makeDraggable(element) {
         document.onmousemove = elementDrag;
         bringToFront(element);
     }
-
     function elementDrag(e) {
         e = e || window.event;
         e.preventDefault();
@@ -477,21 +427,17 @@ function makeDraggable(element) {
         element.style.top = (element.offsetTop - pos2) + "px";
         element.style.left = (element.offsetLeft - pos1) + "px";
     }
-
     function closeDragElement() {
         document.onmouseup = null;
         document.onmousemove = null;
     }
-
     element.addEventListener('mousedown', () => {
         bringToFront(element);
     });
 }
-
 function bringToFront(window) {
     const windows = document.querySelectorAll('.window');
     let maxZIndex = 0;
-
     windows.forEach(w => {
         const zIndex = parseInt(w.style.zIndex || '0');
         maxZIndex = Math.max(maxZIndex, zIndex);
@@ -501,7 +447,6 @@ function bringToFront(window) {
             taskbarItem.classList.remove('active');
         }
     });
-
     window.style.zIndex = maxZIndex + 1;
     window.classList.add('active');
     const taskbarItem = document.querySelector(`[data-icon="${window.getAttribute('data-app')}"]`);
@@ -509,20 +454,16 @@ function bringToFront(window) {
         taskbarItem.classList.add('active');
     }
 }
-
 function positionWindow(window) {
     let left = 25;
     let top = 25;
     const step = 5;
-
     if (window.classList.contains('lemon-list-window')) {
         return;
     }
-
     while (isPositionOccupied(left, top)) {
         left += step;
         top += step;
-
         if (left > desktop.clientWidth - window.clientWidth) {
             left = 25;
         }
@@ -530,11 +471,9 @@ function positionWindow(window) {
             top = 25;
         }
     }
-
     window.style.left = `${left}%`;
     window.style.top = `${top}%`;
 }
-
 function isPositionOccupied(left, top) {
     const windows = document.querySelectorAll('.window');
     for (let w of windows) {
@@ -546,13 +485,11 @@ function isPositionOccupied(left, top) {
     }
     return false;
 }
-
 function updateClock() {
     const now = new Date();
     const timeString = now.toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles', hour: '2-digit', minute: '2-digit' });
     document.getElementById('clock').textContent = timeString;
 }
-
 function showErrorDialog(message) {
     const dialogOverlay = document.createElement('div');
     dialogOverlay.className = 'dialog-overlay';
@@ -587,7 +524,6 @@ function showErrorDialog(message) {
     closeButton.addEventListener('click', closeDialog);
     okButton.addEventListener('click', closeDialog);
 }
-
 function createLemonListContent() {
     return `
         <div id="loading-indicator">Loading...</div>
@@ -609,7 +545,6 @@ function createLemonListContent() {
         </div>
     `;
 }
-
 const filterOptions = [
     { emoji: '🚓', label: 'Law Enforcement' },
     { emoji: '🚑', label: 'Los Santos Medical Group' },
@@ -624,12 +559,10 @@ const filterOptions = [
     { emoji: '🔧', label: 'Mechanic' },
     { emoji: '🧺', label: 'Laundry' }
 ];
-
 let listings = [];
 let currentPage = 1;
 let itemsPerPage = 0;
 const debounceTime = 300;
-
 function loadCSV() {
     return new Promise((resolve, reject) => {
         console.log('Starting to load CSV');
@@ -652,28 +585,22 @@ function loadCSV() {
             });
     });
 }
-
 function parseCSV(csv) {
     return csv.split('\n').map(row => {
         const parts = row.match(/(".*?"|[^,]+)(?=\s*,|\s*$)/g) || [];
         const cleanParts = parts.map(part => part.replace(/^"|"$/g, '').trim());
-
         let emoji = '';
         let lastName = '';
         let firstName = '';
         let phoneNumber = '';
-
         if (/^\p{Emoji}/u.test(cleanParts[0])) {
             [emoji, lastName, firstName, phoneNumber] = cleanParts;
         } else {
             [lastName, firstName, phoneNumber] = cleanParts;
         }
-
         lastName = lastName.endsWith(',') ? lastName + ' ' : lastName + ', ';
-
         // Construct the base text without hyphens first
         let text = `${lastName}${firstName} ${phoneNumber}`;
-
         // Calculate remaining space for hyphens
         const remainingSpace = 55 - text.length;
         
@@ -685,13 +612,10 @@ function parseCSV(csv) {
             // If no space for hyphens, just ensure the text is 55 characters
             text = text.padEnd(55, ' ').slice(0, 55);
         }
-
         console.log('Parsed text:', text, 'Length:', text.length); // Debug log
-
         return { emoji, text };
     }).filter(item => item.text.length > 0);
 }
-
 function setupFilters() {
     const filterContainer = document.getElementById('filter-checkboxes');
     filterOptions.forEach(option => {
@@ -704,84 +628,90 @@ function setupFilters() {
         filterContainer.appendChild(filterItem);
     });
 }
-
 function calculateItemsPerPage() {
     const column = document.querySelector('.listing-column');
     if (!column) return; // Exit if the column doesn't exist
-
     const listing = document.createElement('div');
     listing.className = 'listing';
     listing.innerHTML = '<span class="listing-emoji">&nbsp;</span><span class="listing-text">X</span>';
     column.appendChild(listing);
-
     const columnHeight = column.clientHeight;
     const listingHeight = listing.offsetHeight;
-
     column.removeChild(listing);
-
     if (columnHeight > 0 && listingHeight > 0) {
         itemsPerPage = Math.floor(columnHeight / listingHeight) * 2; // Multiply by 2 for two columns
         itemsPerPage -= 14;
     } else {
         itemsPerPage = 40; // Fallback value
     }
-
     console.log('Column height:', columnHeight, 'Listing height:', listingHeight, 'Items per page:', itemsPerPage);
 }
 
 function adjustFontSize() {
-    const lemonListWindow = document.querySelector('.window[data-app="Lemon List"]');
-    if (!lemonListWindow) return;
-
-    const listingsContainer = lemonListWindow.querySelector('.listings-container');
-    if (!listingsContainer) return;
-
-    const column = listingsContainer.querySelector('.listing-column');
+    const column = document.querySelector('.listing-column');
     if (!column) return;
 
     const testListing = document.createElement('div');
     testListing.className = 'listing';
-    testListing.innerHTML = '<span class="listing-emoji">🌽</span><span class="listing-text">' + 'X'.repeat(60) + '</span>';
+    testListing.innerHTML = '<span class="listing-emoji">🌽</span><span class="listing-text">' + 'X'.repeat(55) + '</span>';
     column.appendChild(testListing);
 
     const textElement = testListing.querySelector('.listing-text');
+
+    
+        
+          
+    
+
+        
+        Expand All
+    
+    @@ -756,14 +762,12 @@ function adjustFontSize() {
+  
     let fontSize = 16; // Start with 16px
     textElement.style.fontSize = `${fontSize}px`;
-
     while (textElement.scrollWidth > column.clientWidth - 28 && fontSize > 1) {
         fontSize -= 0.5;
         textElement.style.fontSize = `${fontSize}px`;
     }
-
     column.removeChild(testListing);
-
     // Multiply the fontSize by 0.9 before applying
     fontSize *= 0.9;
 
-    // Apply the calculated and adjusted font size to all listing-text elements within the Lemon List window
-    lemonListWindow.querySelectorAll('.listing-text').forEach(el => {
+    // Apply the calculated and adjusted font size to all listing-text elements
+    document.querySelectorAll('.listing-text').forEach(el => {
         el.style.fontSize = `${fontSize}px`;
     });
 
     console.log('Adjusted font size:', fontSize, 'px');
+
+    calculateItemsPerPage();
 }
 
 function displayListings() {
+
+    
+          
+            
+    
+
+          
+          Expand Down
+    
+    
+  
     if (itemsPerPage === 0) {
         console.log('Items per page not calculated yet');
         return;
     }
-
     const filteredListings = filterListings();
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     const pageListings = filteredListings.slice(startIndex, endIndex);
-
     const leftColumn = document.getElementById('left-column');
     const rightColumn = document.getElementById('right-column');
     leftColumn.innerHTML = '';
     rightColumn.innerHTML = '';
-
     pageListings.forEach((listing, index) => {
         const listingElement = document.createElement('div');
         listingElement.className = 'listing';
@@ -795,29 +725,24 @@ function displayListings() {
             rightColumn.appendChild(listingElement);
         }
     });
-
     updatePagination(filteredListings.length);
 }
-
 function filterListings() {
     const searchTerm = document.getElementById('search-bar').value.toLowerCase();
     const activeFilters = Array.from(document.querySelectorAll('#filter-checkboxes input:checked'))
         .map(checkbox => checkbox.value);
-
     return listings.filter(listing => {
         const matchesSearch = listing.text.toLowerCase().includes(searchTerm);
         const matchesFilter = activeFilters.length === 0 || activeFilters.includes(listing.emoji);
         return matchesSearch && matchesFilter;
     });
 }
-
 function updatePagination(totalItems) {
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     document.getElementById('page-indicator').textContent = `Page ${currentPage} of ${totalPages}`;
     document.getElementById('prev-page').disabled = currentPage === 1;
     document.getElementById('next-page').disabled = currentPage === totalPages;
 }
-
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -829,32 +754,27 @@ function debounce(func, wait) {
         timeout = setTimeout(later, wait);
     };
 }
-
 function setupEventListeners() {
     document.getElementById('search-bar').addEventListener('input', debounce(() => {
         currentPage = 1;
         displayListings();
     }, debounceTime));
-
     document.getElementById('filter-checkboxes').addEventListener('change', () => {
         currentPage = 1;
         displayListings();
     });
-
     document.getElementById('clear-filters').addEventListener('click', () => {
         document.getElementById('search-bar').value = '';
         document.querySelectorAll('#filter-checkboxes input').forEach(checkbox => checkbox.checked = false);
         currentPage = 1;
         displayListings();
     });
-
     document.getElementById('prev-page').addEventListener('click', () => {
         if (currentPage > 1) {
             currentPage--;
             displayListings();
         }
     });
-
     document.getElementById('next-page').addEventListener('click', () => {
         const totalItems = filterListings().length;
         const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -863,24 +783,20 @@ function setupEventListeners() {
             displayListings();
         }
     });
-
     window.addEventListener('resize', debounce(() => {
         calculateItemsPerPage();
         displayListings();
     }, 250));
 }
-
 function initializeLemonList() {
     loadCSV().then(() => {
         document.getElementById('loading-indicator').style.display = 'none';
         document.getElementById('lemon-list-app').style.display = 'block';
-
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 adjustFontSize();
                 displayListings();
                 setupEventListeners();
-
                 window.addEventListener('resize', debounce(() => {
                     adjustFontSize();
                     displayListings();
@@ -889,11 +805,9 @@ function initializeLemonList() {
         });
     });
 }
-
 createDesktopIcons();
 updateClock();
 setInterval(updateClock, 1000);
-
 document.getElementById('start-button').addEventListener('click', () => {
     const password = prompt('Enter password:');
     if (password) {
