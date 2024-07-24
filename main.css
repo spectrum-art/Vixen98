@@ -525,15 +525,17 @@ body, html {
     overflow: visible;
     display: flex;
     flex-direction: column;
+    padding-left: 1.5em;
 }
 
 .listing {
-    display: flex;
-    align-items: flex-start;
+    position: relative;
     font-family: 'Nanum Gothic Coding', monospace;
     margin-bottom: 2px;
     width: 100%;
     box-sizing: border-box;
+    white-space: pre;
+    overflow: hidden;
 }
 
 .listings-container {
@@ -546,13 +548,16 @@ body, html {
 }
 
 .listing-emoji {
-    flex-shrink: 0;
-    width: 24px;
+    position: absolute;
+    left: -1.5em;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.5em;
     text-align: center;
-    margin-right: 4px;
 }
 
 .listing-text {
+    display: inline-block;
     flex-grow: 1;
     white-space: pre;
     overflow: hidden;

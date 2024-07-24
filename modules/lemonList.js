@@ -180,19 +180,18 @@ function calculateItemsPerPage() {
     const column = content.querySelector('.listing-column');
     if (!column) return;
 
-    const listing = document.createElement('div');
-    listing.className = 'listing';
-    listing.innerHTML = '<span class="listing-emoji">&nbsp;</span><span class="listing-text">X</span>';
-    column.appendChild(listing);
+    const listings = column.querySelectorAll('.listing');
+    if (listings.length === 0) return;
+
     const columnHeight = column.clientHeight;
-    const listingHeight = listing.offsetHeight;
-    column.removeChild(listing);
+    const listingHeight = listings[0].offsetHeight;
+
     if (columnHeight > 0 && listingHeight > 0) {
         itemsPerPage = Math.floor(columnHeight / listingHeight) * 2; // Multiply by 2 for two columns
-        itemsPerPage -= 14;
     } else {
         itemsPerPage = 40; // Fallback value
     }
+
     console.log('Column height:', columnHeight, 'Listing height:', listingHeight, 'Items per page:', itemsPerPage);
 }
 
@@ -205,22 +204,36 @@ function adjustFontSize() {
 
     const testListing = document.createElement('div');
     testListing.className = 'listing';
-    testListing.innerHTML = '<span class="listing-emoji">🌽</span><span class="listing-text">' + 'X'.repeat(60) + '</span>';
+    testListing.innerHTML = '<span class="listing-text">' + 'X'.repeat(60) + '</span>';
     column.appendChild(testListing);
 
-    let fontSize = 16;
+    let fontSize = 20; // Start with a larger font size
     testListing.style.fontSize = `${fontSize}px`;
     while (testListing.scrollWidth > column.clientWidth && fontSize > 1) {
         fontSize -= 0.5;
         testListing.style.fontSize = `${fontSize}px`;
     }
-    column.removeChild(testListing);
     
+    // Set line-height based on font size
+    const lineHeight = fontSize * 1.2; // Adjust the multiplier as needed
+
+    column.removeChild(testListing);
+
+    // Apply the calculated font size and line height to all listing elements
     content.querySelectorAll('.listing').forEach(el => {
         el.style.fontSize = `${fontSize}px`;
+        el.style.lineHeight = `${lineHeight}px`;
+        el.style.height = `${lineHeight}px`; // Ensure consistent height
+    });
+
+    // Also apply to emojis to maintain consistent sizing
+    content.querySelectorAll('.listing-emoji').forEach(el => {
+        el.style.fontSize = `${fontSize}px`;
+        el.style.lineHeight = `${lineHeight}px`;
     });
 
     console.log('Adjusted font size:', fontSize, 'px');
+    console.log('Adjusted line height:', lineHeight, 'px');
 
     calculateItemsPerPage();
 }
