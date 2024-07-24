@@ -138,11 +138,7 @@ function openWindow(icon) {
         }
         img.src = 'lemonlistbg.png';
         
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                initializeLemonList();
-            });
-        });
+        initializeLemonList();
     }
     
     bringToFront(window);
