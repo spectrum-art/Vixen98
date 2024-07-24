@@ -62,7 +62,7 @@ function setupLemonListApp() {
             });
         });
     }
-    img.src = 'lemonlistbg.png';
+    img.src = 'images/lemonlistbg.png';
 }
 
 function createLemonListContent() {
