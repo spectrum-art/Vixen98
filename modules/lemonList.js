@@ -112,7 +112,7 @@ function initializeLemonListContent() {
 function loadCSV() {
     return new Promise((resolve, reject) => {
         console.log('Starting to load CSV');
-        fetch('vixenlemonlist.csv')
+        fetch('data/vixenlemonlist.csv')
             .then(response => {
                 console.log('CSV fetched, starting to parse');
                 return response.text();
