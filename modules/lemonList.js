@@ -95,17 +95,20 @@ function initializeLemonListContent() {
         content.querySelector('#loading-indicator').style.display = 'none';
         content.querySelector('#lemon-list-app').style.display = 'block';
 
+        setupFilters();
+
         requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                adjustFontSize();
-                displayListings();
-                setupEventListeners();
-                window.addEventListener('resize', debounce(() => {
-                    adjustFontSize();
-                    displayListings();
-                }, 250));
-            });
+            adjustFontSize();
+            calculateItemsPerPage();
+            displayListings();
+            setupEventListeners();
         });
+
+        window.addEventListener('resize', debounce(() => {
+            adjustFontSize();
+            calculateItemsPerPage();
+            displayListings();
+        }, 250));
     });
 }
 
@@ -180,11 +183,23 @@ function calculateItemsPerPage() {
     const column = content.querySelector('.listing-column');
     if (!column) return;
 
-    const listings = column.querySelectorAll('.listing');
-    if (listings.length === 0) return;
+    let listingHeight;
+    const existingListing = column.querySelector('.listing');
+
+    if (existingListing) {
+        listingHeight = existingListing.offsetHeight;
+    } else {
+        // Create a temporary listing to measure height
+        const tempListing = document.createElement('div');
+        tempListing.className = 'listing';
+        tempListing.innerHTML = '<span class="listing-text">Temporary</span>';
+        tempListing.style.visibility = 'hidden';
+        column.appendChild(tempListing);
+        listingHeight = tempListing.offsetHeight;
+        column.removeChild(tempListing);
+    }
 
     const columnHeight = column.clientHeight;
-    const listingHeight = listings[0].offsetHeight;
 
     if (columnHeight > 0 && listingHeight > 0) {
         itemsPerPage = Math.floor(columnHeight / listingHeight) * 2; // Multiply by 2 for two columns
@@ -232,6 +247,7 @@ function adjustFontSize() {
         el.style.lineHeight = `${lineHeight}px`;
     });
 
+    console.log('Column width:', column.clientWidth, 'Test listing width:', testListing.scrollWidth);
     console.log('Adjusted font size:', fontSize, 'px');
     console.log('Adjusted line height:', lineHeight, 'px');
 
@@ -244,7 +260,11 @@ function displayListings() {
 
     if (itemsPerPage === 0) {
         console.log('Items per page not calculated yet');
-        return;
+        calculateItemsPerPage();
+        if (itemsPerPage === 0) {
+            console.log('Failed to calculate items per page');
+            return;
+        }
     }
     const filteredListings = filterListings();
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -268,6 +288,7 @@ function displayListings() {
         }
     });
     updatePagination(filteredListings.length);
+    console.log('Displaying listings:', pageListings.length);
 }
 
 function filterListings() {
