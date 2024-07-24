@@ -657,17 +657,6 @@ function adjustFontSize() {
     column.appendChild(testListing);
 
     const textElement = testListing.querySelector('.listing-text');
-
-    
-        
-          
-    
-
-        
-        Expand All
-    
-    @@ -756,14 +762,12 @@ function adjustFontSize() {
-  
     let fontSize = 16; // Start with 16px
     textElement.style.fontSize = `${fontSize}px`;
     while (textElement.scrollWidth > column.clientWidth - 28 && fontSize > 1) {
@@ -689,17 +678,6 @@ function adjustFontSize() {
 }
 
 function displayListings() {
-
-    
-          
-            
-    
-
-          
-          Expand Down
-    
-    
-  
     if (itemsPerPage === 0) {
         console.log('Items per page not calculated yet');
         return;
