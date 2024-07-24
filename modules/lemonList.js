@@ -147,29 +147,13 @@ function parseListings(data) {
     return data.map(row => {
         let [emoji, lastName, firstName, phoneNumber] = row;
         
-        if (!/^\p{Emoji}/u.test(emoji)) {
-            [lastName, firstName, phoneNumber] = [emoji, lastName, firstName];
-            emoji = '';
-        }
+        let formattedText = `${lastName}, ${firstName} `;
+        
+        const hyphenCount = 60 - (formattedText.length + phoneNumber.length + 1);
+        
+        formattedText += '-'.repeat(hyphenCount) + ' ' + phoneNumber;
 
-        lastName = lastName.endsWith(',') ? lastName + ' ' : lastName + ', ';
-        
-        // Construct the base text without hyphens first
-        let text = `${lastName}${firstName} ${phoneNumber}`;
-        
-        // Calculate remaining space for hyphens
-        const remainingSpace = 55 - text.length;
-        
-        // Insert hyphens between the name and phone number
-        if (remainingSpace > 0) {
-            const hyphens = '-'.repeat(remainingSpace);
-            text = `${lastName}${firstName} ${hyphens} ${phoneNumber}`;
-        } else {
-            // If no space for hyphens, just ensure the text is 55 characters
-            text = text.padEnd(55, ' ').slice(0, 55);
-        }
-
-        return { emoji, text };
+        return { emoji, text: formattedText };
     }).filter(item => item.text.length > 0);
 }
 

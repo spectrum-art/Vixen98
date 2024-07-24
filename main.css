@@ -555,8 +555,8 @@ body, html {
 .listing-text {
     flex-grow: 1;
     white-space: pre;
-    overflow: visible;
-    text-overflow: clip;
+    overflow: hidden;
+    text-overflow: ellipsis;
     width: calc(100% - 28px);
     box-sizing: border-box;
 }
