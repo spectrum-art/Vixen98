@@ -3,28 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vixen98</title></title>
-    <link rel="icon" type="image/x-icon" href="vixenfavicon.png">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/98.css">
+    <title>Vixen98</title>
     <link rel="stylesheet" href="main.css">
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="images/vixenfavicon.png">
 </head>
 <body>
     <div id="splash-screen">
-    <img src="BIOS-screen.gif" alt="Loading..." id="splash-gif">
+        <img src="images/BIOS-screen.gif" id="splash-gif" alt="Loading...">
     </div>
+
     <div id="screen">
         <div id="desktop-container" class="hidden">
             <div id="desktop">
-                <img id="desktop-background" src="vixen98logo.png">
-                <div id="icon-grid">
-                    <!-- Desktop icons will be dynamically added here -->
-                </div>
+                <img src="images/vixen98logo.png" id="desktop-background" alt="Vixen 98 Logo">
+                <div id="icon-grid"></div>
             </div>
+
             <div id="taskbar">
                 <button id="start-button">
-                    <img src="vixenstartbutton.png" alt="Start" id="start-button-img">
+                    <img src="images/vixenstartbutton.png" id="start-button-img" alt="Start">
                 </button>
                 <div id="taskbar-separator"></div>
                 <div id="open-windows"></div>
@@ -37,6 +35,9 @@
             </div>
         </div>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script type="module" src="main.js"></script>
 </body>
 </html>
