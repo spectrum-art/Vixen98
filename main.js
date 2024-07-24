@@ -148,7 +148,6 @@ function openWindow(icon) {
             adjustFontSize();
             displayListings();
         }, 0);
-    }
     
     bringToFront(window);
 }
