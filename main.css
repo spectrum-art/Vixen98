@@ -513,12 +513,17 @@ body, html {
     justify-content: space-between;
     flex-grow: 1;
     overflow: hidden;
+    padding: 0 2%;
 }
 
 .listing-column {
     width: 45%;
     overflow-y: auto;
     padding-right: 10px;
+}
+
+.listing-column + .listing-column {
+    margin-left: 6%;
 }
 
 .listing {
