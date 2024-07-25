@@ -58,7 +58,7 @@ function styleWindow(content) {
     window.classList.add('lemon-list-window');
     
     content.style.backgroundImage = 'url("images/lemonlistbg.png")';
-    content.style.backgroundSize = 'cover';
+    content.style.backgroundSize = 'contain';
     content.style.backgroundRepeat = 'no-repeat';
     content.style.backgroundPosition = 'center';
     content.style.fontFamily = '"Nanum Gothic Coding", monospace';
