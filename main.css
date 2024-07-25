@@ -499,8 +499,9 @@ body, html {
 #filter-checkboxes {
     display: flex;
     flex-wrap: wrap;
-    gap: 5px;
+    gap: 10px;
     flex-grow: 1;
+    margin-left: 40px;
 }
 
 .filter-item {
@@ -519,10 +520,11 @@ body, html {
     justify-content: center;
     flex-grow: 1;
     overflow: hidden;
+    margin-left: 7px;
 }
 
 .listing-column {
-    width: 45%;
+    width: 46%;
     overflow-y: auto;
     padding-right: 10px;
 }
