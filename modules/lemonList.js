@@ -177,14 +177,14 @@ function adjustFontSize() {
     // Adjust font size until the text fits without wrapping
     while ((testListing.scrollWidth > column.clientWidth || testListing.scrollHeight > testListing.clientHeight) && fontSize > 1) {
         fontSize -= 0.5;
-        testListing.style.fontSize = `${(fontSize-0.5)}px`;
+        testListing.style.fontSize = `${fontSize}px`;
     }
 
     column.removeChild(testListing);
 
     // Apply the calculated font size to all listings
     content.querySelectorAll('.listing').forEach(el => {
-        el.style.fontSize = `${fontSize}px`;
+        el.style.fontSize = `${(fontSize-0.5)}px`;
     });
 
     console.log('Adjusted font size:', fontSize, 'px');
