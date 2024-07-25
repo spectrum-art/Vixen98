@@ -62,6 +62,9 @@ function styleWindow(content) {
     content.style.backgroundRepeat = 'no-repeat';
     content.style.backgroundPosition = 'center';
     content.style.fontFamily = '"Nanum Gothic Coding", monospace';
+
+    content.style.padding = '0';
+    content.style.boxSizing = 'border-box';
 }
 
 function loadCSV() {
