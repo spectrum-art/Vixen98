@@ -521,6 +521,7 @@ body, html {
     flex-grow: 1;
     overflow: hidden;
     margin-left: 7px;
+    padding-top: 15px;
 }
 
 .listing-column {
@@ -563,7 +564,7 @@ body, html {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 10px;
+    margin-top: 25px;
 }
 
 .pagination-container button {
