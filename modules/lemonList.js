@@ -52,8 +52,9 @@ function styleWindow(content) {
     const window = content.closest('.window');
     window.style.width = '90%';
     window.style.height = '90%';
-    window.style.left = '5%';
-    window.style.top = '5%';
+    window.style.left = '50%';
+    window.style.top = '50%';
+    window.style.transform = 'translate(-50%, -50%)';
     window.classList.add('lemon-list-window');
     
     content.style.backgroundImage = 'url("images/lemonlistbg.png")';
