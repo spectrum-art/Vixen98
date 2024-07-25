@@ -493,6 +493,7 @@ body, html {
     display: flex;
     flex-grow: 1;
     padding: 5px;
+    margin-left: 25px;
 }
 
 #filter-checkboxes {
@@ -509,6 +510,7 @@ body, html {
 
 #clear-filters {
     padding: 5px 10px;
+    margin-right: 25px;
     white-space: nowrap;
 }
 
