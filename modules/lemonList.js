@@ -33,7 +33,7 @@ function createLemonListContent() {
             <div class="search-filter-container">
                 <input type="text" id="search-bar" placeholder="Search listings..." aria-label="Search listings">
                 <div id="filter-checkboxes"></div>
-                <button id="clear-filters">Clear All Filters</button>
+                <button id="clear-filters">Reset</button>
             </div>
             <div class="listings-container">
                 <div class="listing-column" id="left-column"></div>

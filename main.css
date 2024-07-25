@@ -483,20 +483,23 @@ body, html {
 }
 
 .search-filter-container {
+    display: flex;
+    align-items: center;
     margin-bottom: 10px;
+    gap: 10px;
 }
 
 #search-bar {
-    width: 100%;
+    display: flex;
+    flex-grow: 1;
     padding: 5px;
-    margin-bottom: 5px;
 }
 
 #filter-checkboxes {
     display: flex;
     flex-wrap: wrap;
     gap: 5px;
-    margin-bottom: 5px;
+    flex-grow: 1;
 }
 
 .filter-item {
@@ -506,6 +509,7 @@ body, html {
 
 #clear-filters {
     padding: 5px 10px;
+    white-space: nowrap;
 }
 
 .listings-container {
