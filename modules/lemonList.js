@@ -88,6 +88,21 @@ function loadCSV() {
         });
 }
 
+const emojiTooltips = {
+    '🚓': 'Law Enforcement',
+    '🚑': 'Los Santos Medical Group',
+    '⚖️': 'Lawyer/Paralegal',
+    '🏛️': 'Government Employee',
+    '🎵': 'Musician/Producer',
+    '🌽': 'Farmer',
+    '💵': 'Loans',
+    '🚗': 'Car Sales',
+    '🧰': 'Impound/Tow',
+    '🪑': 'Furniture Sales',
+    '🔧': 'Mechanic',
+    '🧺': 'Laundry'
+};
+
 function setupFilters() {
     const filterContainer = document.getElementById('filter-checkboxes');
     const uniqueEmojis = [...new Set(listings.map(item => item.emoji))];
@@ -95,9 +110,10 @@ function setupFilters() {
         if (emoji) {
             const filterItem = document.createElement('div');
             filterItem.className = 'filter-item';
+            const tooltip = emojiTooltips[emoji] || '';
             filterItem.innerHTML = `
                 <input type="checkbox" id="filter-${emoji}" value="${emoji}">
-                <label for="filter-${emoji}">${emoji}</label>
+                <label for="filter-${emoji}" title="${tooltip}">${emoji}</label>
             `;
             filterContainer.appendChild(filterItem);
         }

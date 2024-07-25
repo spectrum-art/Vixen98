@@ -509,6 +509,30 @@ body, html {
     align-items: center;
 }
 
+.filter-item label {
+    cursor: pointer;
+}
+
+.filter-item label:hover {
+    position: relative;
+}
+
+.filter-item label:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    white-space: nowrap;
+    z-index: 1000;
+    pointer-events: none;
+}
+
 #clear-filters {
     padding: 5px 10px;
     margin-right: 25px;
