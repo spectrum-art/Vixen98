@@ -3,7 +3,7 @@ import { getWindowContent } from './windowManagement.js';
 
 let listings = [];
 let currentPage = 1;
-const itemsPerPage = 60;
+const itemsPerPage = 50;
 const debounceTime = 300;
 
 export function initializeLemonList() {
@@ -60,7 +60,7 @@ function styleWindow(content) {
     content.style.backgroundImage = 'url("images/lemonlistbg.png")';
     content.style.backgroundSize = 'contain';
     content.style.backgroundRepeat = 'no-repeat';
-    content.style.backgroundPosition = '50% 45%';
+    content.style.backgroundPosition = 'center';
     content.style.fontFamily = '"Nanum Gothic Coding", monospace';
 
     content.style.padding = '0';
