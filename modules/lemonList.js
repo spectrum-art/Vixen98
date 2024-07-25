@@ -68,7 +68,13 @@ function loadCSV() {
     return fetch('data/vixenlemonlist.csv')
         .then(response => response.text())
         .then(data => {
-            listings = Papa.parse(data, { header: false }).data
+            listings = Papa.parse(data, { 
+                header: false,
+                skipEmptyLines: true,
+                transform: function(value) {
+                    return value.replace(/ /g, '\u00A0');
+                }
+            }).data
                 .map(row => ({ emoji: row[0], text: row[1] }))
                 .filter(item => item.text && item.text.trim().length > 0);
             console.log('Listings loaded:', listings.length);
