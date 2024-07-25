@@ -162,20 +162,27 @@ function adjustFontSize() {
     const column = content.querySelector('.listing-column');
     if (!column) return;
 
+    // Find the longest text among all listings
+    const longestText = listings.reduce((longest, current) => 
+        current.text.length > longest.length ? current.text : longest, '');
+
     const testListing = document.createElement('div');
     testListing.className = 'listing';
-    testListing.innerHTML = '<span class="listing-text">X'.repeat(60) + '</span>';
+    testListing.innerHTML = `<span class="listing-text">${longestText}</span>`;
     column.appendChild(testListing);
 
     let fontSize = 20; // Start with a larger font size
     testListing.style.fontSize = `${fontSize}px`;
-    while (testListing.scrollWidth > column.clientWidth && fontSize > 1) {
+
+    // Adjust font size until the text fits without wrapping
+    while ((testListing.scrollWidth > column.clientWidth || testListing.scrollHeight > testListing.clientHeight) && fontSize > 1) {
         fontSize -= 0.5;
         testListing.style.fontSize = `${fontSize}px`;
     }
 
     column.removeChild(testListing);
 
+    // Apply the calculated font size to all listings
     content.querySelectorAll('.listing').forEach(el => {
         el.style.fontSize = `${fontSize}px`;
     });
