@@ -485,8 +485,8 @@ body, html {
 .search-filter-container {
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
     gap: 10px;
+    margin: 20px;
 }
 
 #search-bar {
