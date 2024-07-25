@@ -60,7 +60,7 @@ function styleWindow(content) {
     content.style.backgroundImage = 'url("images/lemonlistbg.png")';
     content.style.backgroundSize = 'contain';
     content.style.backgroundRepeat = 'no-repeat';
-    content.style.backgroundPosition = 'center';
+    content.style.backgroundPosition = '50% 45%';
     content.style.fontFamily = '"Nanum Gothic Coding", monospace';
 
     content.style.padding = '0';
