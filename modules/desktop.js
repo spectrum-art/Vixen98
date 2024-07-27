@@ -39,3 +39,11 @@ function updateClock() {
     const timeString = now.toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles', hour: '2-digit', minute: '2-digit' });
     document.getElementById('clock').textContent = timeString;
 }
+
+function updateDesktopIcons(accessLevel) {
+    const icons = document.querySelectorAll('.desktop-icon');
+    icons.forEach((iconElement, index) => {
+        const icon = desktopIcons[index];
+        iconElement.style.display = accessLevel >= icon.accessLevel ? 'flex' : 'none';
+    });
+}

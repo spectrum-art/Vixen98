@@ -14,7 +14,21 @@ const defaultConfig = {
 };
 
 export function initializeWindowManagement() {
+    console.log('Initializing window management');
     EventBus.subscribe('openApp', openWindow);
+}
+
+function openWindow(config) {
+    console.log('openWindow called with config:', config);
+    const existingWindow = windows.find(w => w.appName === config.title);
+    if (existingWindow) {
+        console.log('Existing window found, bringing to front');
+        bringToFront(existingWindow.element);
+        return;
+    }
+
+    console.log('Creating new window');
+    createAppWindow(config);
 }
 
 export function createAppWindow(config) {
@@ -34,19 +48,6 @@ export function createAppWindow(config) {
 
     console.log('Window created:', window);
     return window;
-}
-
-function openWindow(config) {
-    console.log('openWindow called with config:', config);
-    const existingWindow = windows.find(w => w.appName === config.title);
-    if (existingWindow) {
-        console.log('Existing window found, bringing to front');
-        bringToFront(existingWindow.element);
-        return;
-    }
-
-    console.log('Creating new window');
-    createAppWindow(config);
 }
 
 function minimizeWindow(window) {

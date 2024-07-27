@@ -1,5 +1,5 @@
 import { initializeDesktop } from './modules/desktop.js';
-import { initializeWindowManagement, createAppWindow } from './modules/windowManagement.js';
+import { initializeWindowManagement } from './modules/windowManagement.js';
 import { initializeEncryption } from './modules/encryption.js';
 import { initializeDocuments } from './modules/documents.js';
 import { initializeLemonList } from './modules/lemonList.js';
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     startSplashScreen();
 
-    // Initialize modules
+    console.log('DOM content loaded, initializing modules');
     initializeDesktop();
     initializeWindowManagement();
     initializeEncryption();
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Set up routing
     window.addEventListener('hashchange', handleRouting);
-    handleRouting(); // Handle initial route
+    handleRouting();
 });
 
 export function openApp(appName) {
