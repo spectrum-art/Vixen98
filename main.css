@@ -229,6 +229,27 @@ body, html {
     padding: 10px;
 }
 
+.window-resizer {
+    width: 10px;
+    height: 10px;
+    background-color: #c3c3c3;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    cursor: se-resize;
+}
+
+.window.maximized {
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: calc(100% - 30px) !important;
+}
+
+.window.maximized .window-resizer {
+    display: none;
+}
+
 .taskbar-item {
     display: flex;
     align-items: center;
@@ -398,7 +419,7 @@ body, html {
 }
 
 .map-window .window-content {
-    height: calc(100% - 30px);  /* Adjust based on your window header height */
+    height: calc(100% - 30px);
     padding: 0;
 }
 
@@ -465,13 +486,6 @@ body, html {
     position: absolute !important;
     transform: translate(-50%, -50%);
 }
-
-/* .window[data-app="Lemon List"] .window-content {
-    display: flex;
-    flex-direction: column;
-    height: calc(100% - 20px);
-    background-color: transparent;
-} */
 
 #loading-indicator {
     position: absolute;
@@ -574,16 +588,6 @@ body, html {
     transform: translateY(-50%);
 }
 
-/* .listing-text {
-    display: inline-block;
-    flex-grow: 1;
-    white-space: pre;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: calc(100% - 28px);
-    box-sizing: border-box;
-} */
-
 .pagination-container {
     display: flex;
     justify-content: center;
@@ -594,3 +598,4 @@ body, html {
 .pagination-container button {
     margin: 0 10px;
 }
+
