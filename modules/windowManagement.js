@@ -49,25 +49,6 @@ function openWindow(config) {
     createAppWindow(config);
 }
 
-export function createAppWindow(config) {
-    console.log('Creating app window with config:', config);
-    const mergedConfig = { ...defaultConfig, ...config };
-    console.log('Merged config:', mergedConfig);
-    const window = createWindow(mergedConfig);
-    const desktop = document.getElementById('desktop');
-    desktop.appendChild(window);
-    windows.push({ appName: mergedConfig.title, element: window });
-
-    createTaskbarItem(mergedConfig.title, window);
-    positionWindow(window);
-    makeDraggable(window);
-    if (mergedConfig.resizable) makeResizable(window);
-    bringToFront(window);
-
-    console.log('Window created:', window);
-    return window;
-}
-
 function minimizeWindow(window) {
     window.style.transformOrigin = 'bottom left';
     window.classList.add('minimizing');
