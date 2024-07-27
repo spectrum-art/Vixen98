@@ -81,6 +81,8 @@ function styleWindow(window) {
         content.style.fontFamily = '"Nanum Gothic Coding", monospace';
         content.style.padding = '0';
         content.style.boxSizing = 'border-box';
+        content.style.width = '100%';
+        content.style.height = '100%';
     }
 }
 
