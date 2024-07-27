@@ -14,6 +14,10 @@ export function createAppWindow(appConfig = {}) {
         content: '',
     };
 
+    if (appConfig.className) {
+        window.classList.add(appConfig.className);
+    }
+
     const config = { ...defaultConfig, ...appConfig };
     console.log('Creating app window with config:', config);
 

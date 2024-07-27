@@ -6,6 +6,25 @@ const lemonListConfig = {
     width: '90%',
     height: '90%',
     content: '<div id="lemon-list-app"></div>',
+    styles: {
+        window: {
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)'
+        },
+        content: {
+            backgroundImage: 'url("images/lemonlistbg.png")',
+            backgroundSize: 'contain',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'center',
+            fontFamily: '"Nanum Gothic Coding", monospace',
+            padding: '0',
+            boxSizing: 'border-box',
+            width: '100%',
+            height: '100%'
+        }
+    },
+    className: 'lemon-list-window'
 };
 
 let listings = [];
@@ -35,16 +54,26 @@ export function initializeLemonList() {
 }
 
 function setupLemonListApp(window) {
+    applyStyles(window);
     const container = window.querySelector('#lemon-list-app');
     if (!container) return;
 
     container.innerHTML = createLemonListContent();
-    styleWindow(window);
     loadCSV().then(() => {
         setupFilters(container);
         displayListings(container);
         setupEventListeners(container);
     });
+}
+
+function applyStyles(window) {
+    Object.assign(window.style, lemonListConfig.styles.window);
+    window.classList.add(lemonListConfig.className);
+
+    const content = window.querySelector('#lemon-list-app');
+    if (content) {
+        Object.assign(content.style, lemonListConfig.styles.content);
+    }
 }
 
 function createLemonListContent() {
@@ -64,26 +93,6 @@ function createLemonListContent() {
             <button id="next-page" aria-label="Next page">▶</button>
         </div>
     `;
-}
-
-function styleWindow(window) {
-    window.style.left = '50%';
-    window.style.top = '50%';
-    window.style.transform = 'translate(-50%, -50%)';
-    window.classList.add('lemon-list-window');
-    
-    const content = window.querySelector('#lemon-list-app');
-    if (content) {
-        content.style.backgroundImage = 'url("images/lemonlistbg.png")';
-        content.style.backgroundSize = 'contain';
-        content.style.backgroundRepeat = 'no-repeat';
-        content.style.backgroundPosition = 'center';
-        content.style.fontFamily = '"Nanum Gothic Coding", monospace';
-        content.style.padding = '0';
-        content.style.boxSizing = 'border-box';
-        content.style.width = '100%';
-        content.style.height = '100%';
-    }
 }
 
 function loadCSV() {
