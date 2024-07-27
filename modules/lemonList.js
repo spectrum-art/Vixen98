@@ -1,5 +1,5 @@
 import { EventBus, debounce } from './utils.js';
-import { createAppWindow, getWindowContent } from './windowManagement.js';
+import { createAppWindow } from './windowManagement.js';
 
 const lemonListConfig = {
     title: 'Lemon List',
@@ -33,18 +33,21 @@ export function initializeLemonList() {
     EventBus.subscribe('openApp', (appName) => {
         if (appName === 'Lemon List') {
             const window = createAppWindow(lemonListConfig);
-            setupLemonListApp(window.querySelector('#lemon-list-app'));
+            setupLemonListApp(window);
         }
     });
 }
 
-function setupLemonListApp(container) {
+function setupLemonListApp(window) {
+    const container = window.querySelector('#lemon-list-app');
+    if (!container) return;
+
     container.innerHTML = createLemonListContent();
-    styleWindow(container);
+    styleWindow(window);
     loadCSV().then(() => {
-        setupFilters();
-        displayListings();
-        setupEventListeners();
+        setupFilters(container);
+        displayListings(container);
+        setupEventListeners(container);
     });
 }
 
@@ -67,20 +70,22 @@ function createLemonListContent() {
     `;
 }
 
-function styleWindow(content) {
-    const window = content.closest('.window');
+function styleWindow(window) {
     window.style.left = '50%';
     window.style.top = '50%';
     window.style.transform = 'translate(-50%, -50%)';
     window.classList.add('lemon-list-window');
     
-    content.style.backgroundImage = 'url("images/lemonlistbg.png")';
-    content.style.backgroundSize = 'contain';
-    content.style.backgroundRepeat = 'no-repeat';
-    content.style.backgroundPosition = 'center';
-    content.style.fontFamily = '"Nanum Gothic Coding", monospace';
-    content.style.padding = '0';
-    content.style.boxSizing = 'border-box';
+    const content = window.querySelector('#lemon-list-app');
+    if (content) {
+        content.style.backgroundImage = 'url("images/lemonlistbg.png")';
+        content.style.backgroundSize = 'contain';
+        content.style.backgroundRepeat = 'no-repeat';
+        content.style.backgroundPosition = 'center';
+        content.style.fontFamily = '"Nanum Gothic Coding", monospace';
+        content.style.padding = '0';
+        content.style.boxSizing = 'border-box';
+    }
 }
 
 function loadCSV() {
@@ -100,12 +105,13 @@ function loadCSV() {
         })
         .catch(error => {
             console.error('Error loading CSV:', error);
-            getWindowContent('Lemon List').innerHTML = 'Error loading data';
         });
 }
 
-function setupFilters() {
-    const filterContainer = document.getElementById('filter-checkboxes');
+function setupFilters(container) {
+    const filterContainer = container.querySelector('#filter-checkboxes');
+    if (!filterContainer) return;
+
     const uniqueEmojis = [...new Set(listings.map(item => item.emoji))];
     uniqueEmojis.forEach(emoji => {
         if (emoji) {
@@ -121,17 +127,16 @@ function setupFilters() {
     });
 }
 
-function displayListings() {
-    const content = getWindowContent('Lemon List');
-    if (!content) return;
+function displayListings(container) {
+    const leftColumn = container.querySelector('#left-column');
+    const rightColumn = container.querySelector('#right-column');
+    if (!leftColumn || !rightColumn) return;
 
-    const filteredListings = filterListings();
+    const filteredListings = filterListings(container);
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     const pageListings = filteredListings.slice(startIndex, endIndex);
 
-    const leftColumn = content.querySelector('#left-column');
-    const rightColumn = content.querySelector('#right-column');
     leftColumn.innerHTML = '';
     rightColumn.innerHTML = '';
 
@@ -149,13 +154,14 @@ function displayListings() {
         }
     });
 
-    updatePagination(filteredListings.length);
-    adjustFontSize();
+    updatePagination(container, filteredListings.length);
+    adjustFontSize(container);
 }
 
-function filterListings() {
-    const searchTerm = document.getElementById('search-bar').value.toLowerCase();
-    const activeFilters = Array.from(document.querySelectorAll('#filter-checkboxes input:checked'))
+function filterListings(container) {
+    const searchBar = container.querySelector('#search-bar');
+    const searchTerm = searchBar ? searchBar.value.toLowerCase() : '';
+    const activeFilters = Array.from(container.querySelectorAll('#filter-checkboxes input:checked'))
         .map(checkbox => checkbox.value);
     
     return listings.filter(listing => {
@@ -165,18 +171,21 @@ function filterListings() {
     });
 }
 
-function updatePagination(totalItems) {
+function updatePagination(container, totalItems) {
+    const pageIndicator = container.querySelector('#page-indicator');
+    const prevButton = container.querySelector('#prev-page');
+    const nextButton = container.querySelector('#next-page');
+
+    if (!pageIndicator || !prevButton || !nextButton) return;
+
     const totalPages = Math.ceil(totalItems / itemsPerPage);
-    document.getElementById('page-indicator').textContent = `Page ${currentPage} of ${totalPages}`;
-    document.getElementById('prev-page').disabled = currentPage === 1;
-    document.getElementById('next-page').disabled = currentPage === totalPages;
+    pageIndicator.textContent = `Page ${currentPage} of ${totalPages}`;
+    prevButton.disabled = currentPage === 1;
+    nextButton.disabled = currentPage === totalPages;
 }
 
-function adjustFontSize() {
-    const content = getWindowContent('Lemon List');
-    if (!content) return;
-
-    const column = content.querySelector('.listing-column');
+function adjustFontSize(container) {
+    const column = container.querySelector('.listing-column');
     if (!column) return;
 
     const longestText = listings.reduce((longest, current) => 
@@ -197,48 +206,64 @@ function adjustFontSize() {
 
     column.removeChild(testListing);
 
-    content.querySelectorAll('.listing').forEach(el => {
+    container.querySelectorAll('.listing').forEach(el => {
         el.style.fontSize = `${(fontSize-0.5)}px`;
     });
 
     console.log('Adjusted font size:', fontSize, 'px');
 }
 
-function setupEventListeners() {
-    document.getElementById('search-bar').addEventListener('input', debounce(() => {
-        currentPage = 1;
-        displayListings();
-    }, debounceTime));
+function setupEventListeners(container) {
+    const searchBar = container.querySelector('#search-bar');
+    const filterCheckboxes = container.querySelector('#filter-checkboxes');
+    const clearFiltersButton = container.querySelector('#clear-filters');
+    const prevPageButton = container.querySelector('#prev-page');
+    const nextPageButton = container.querySelector('#next-page');
 
-    document.getElementById('filter-checkboxes').addEventListener('change', () => {
-        currentPage = 1;
-        displayListings();
-    });
+    if (searchBar) {
+        searchBar.addEventListener('input', debounce(() => {
+            currentPage = 1;
+            displayListings(container);
+        }, debounceTime));
+    }
 
-    document.getElementById('clear-filters').addEventListener('click', () => {
-        document.getElementById('search-bar').value = '';
-        document.querySelectorAll('#filter-checkboxes input').forEach(checkbox => checkbox.checked = false);
-        currentPage = 1;
-        displayListings();
-    });
+    if (filterCheckboxes) {
+        filterCheckboxes.addEventListener('change', () => {
+            currentPage = 1;
+            displayListings(container);
+        });
+    }
 
-    document.getElementById('prev-page').addEventListener('click', () => {
-        if (currentPage > 1) {
-            currentPage--;
-            displayListings();
-        }
-    });
+    if (clearFiltersButton) {
+        clearFiltersButton.addEventListener('click', () => {
+            if (searchBar) searchBar.value = '';
+            container.querySelectorAll('#filter-checkboxes input').forEach(checkbox => checkbox.checked = false);
+            currentPage = 1;
+            displayListings(container);
+        });
+    }
 
-    document.getElementById('next-page').addEventListener('click', () => {
-        const totalItems = filterListings().length;
-        const totalPages = Math.ceil(totalItems / itemsPerPage);
-        if (currentPage < totalPages) {
-            currentPage++;
-            displayListings();
-        }
-    });
+    if (prevPageButton) {
+        prevPageButton.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                displayListings(container);
+            }
+        });
+    }
+
+    if (nextPageButton) {
+        nextPageButton.addEventListener('click', () => {
+            const totalItems = filterListings(container).length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                displayListings(container);
+            }
+        });
+    }
 
     window.addEventListener('resize', debounce(() => {
-        displayListings();
+        displayListings(container);
     }, 250));
 }

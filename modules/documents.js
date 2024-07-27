@@ -3,8 +3,8 @@ import { createAppWindow } from './windowManagement.js';
 
 const documentsConfig = {
     title: 'Documents',
-    width: '70%',
-    height: '70%',
+    width: '50%',
+    height: '30%',
     content: '<div id="documents-app"></div>',
 };
 
@@ -19,13 +19,15 @@ export function initializeDocuments() {
     EventBus.subscribe('openApp', (appName) => {
         if (appName === 'Documents') {
             const window = createAppWindow(documentsConfig);
-            setupDocumentsApp(window.querySelector('#documents-app'));
+            setupDocumentsApp(window);
         }
     });
 }
 
-function setupDocumentsApp(container) {
-    // Initialize the Documents app UI and functionality
+function setupDocumentsApp(window) {
+    const container = window.querySelector('#documents-app');
+    if (!container) return;
+    
     container.innerHTML = createDocumentsAppHTML();
     setupDocumentsEventListeners(container);
 }
