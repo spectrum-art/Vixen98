@@ -16,12 +16,8 @@ const myDocumentsIcons = [
 ];
 
 export function initializeDocuments() {
-    EventBus.subscribe('openApp', (appName) => {
-        if (appName === 'Documents') {
-            const window = createAppWindow(documentsConfig);
-            setupDocumentsApp(window);
-        }
-    });
+    const window = createAppWindow(documentsConfig);
+    setupDocumentsApp(window);
 }
 
 function setupDocumentsApp(window) {

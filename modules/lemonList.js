@@ -30,12 +30,8 @@ const emojiTooltips = {
 };
 
 export function initializeLemonList() {
-    EventBus.subscribe('openApp', (appName) => {
-        if (appName === 'Lemon List') {
-            const window = createAppWindow(lemonListConfig);
-            setupLemonListApp(window);
-        }
-    });
+    const window = createAppWindow(lemonListConfig);
+    setupLemonListApp(window);
 }
 
 function setupLemonListApp(window) {

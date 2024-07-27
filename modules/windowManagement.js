@@ -4,20 +4,7 @@ let windows = [];
 
 export function initializeWindowManagement() {
     console.log('Initializing window management');
-    EventBus.subscribe('openApp', openWindow);
-}
-
-function openWindow(appName) {
-    console.log('openWindow called for:', appName);
-    const existingWindow = windows.find(w => w.appName === appName);
-    if (existingWindow) {
-        console.log('Existing window found, bringing to front');
-        bringToFront(existingWindow.element);
-        return;
-    }
-
-    console.log('Creating new window');
-    createAppWindow({ title: appName });
+    EventBus.subscribe(openWindow);
 }
 
 export function createAppWindow(appConfig = {}) {
