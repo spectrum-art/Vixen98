@@ -1,25 +1,46 @@
 import { EventBus, debounce } from './utils.js';
-import { getWindowContent } from './windowManagement.js';
+import { createAppWindow, getWindowContent } from './windowManagement.js';
+
+const lemonListConfig = {
+    title: 'Lemon List',
+    width: '90%',
+    height: '90%',
+    content: '<div id="lemon-list-app"></div>',
+};
 
 let listings = [];
 let currentPage = 1;
 const itemsPerPage = 50;
 const debounceTime = 300;
 
+const emojiTooltips = {
+    '🚓': 'Law Enforcement',
+    '🚑': 'Los Santos Medical Group',
+    '⚖️': 'Lawyer/Paralegal',
+    '🏛️': 'Government Employee',
+    '🎵': 'Musician/Producer',
+    '🌽': 'Farmer',
+    '💵': 'Loans',
+    '🚗': 'Car Sales',
+    '🧰': 'Impound/Tow',
+    '🪑': 'Furniture Sales',
+    '🔧': 'Mechanic',
+    '🧺': 'Laundry',
+    '🚕': 'Taxi'
+};
+
 export function initializeLemonList() {
-    EventBus.subscribe('windowOpened', (appName) => {
+    EventBus.subscribe('openApp', (appName) => {
         if (appName === 'Lemon List') {
-            setupLemonListApp();
+            const window = createAppWindow(lemonListConfig);
+            setupLemonListApp(window.querySelector('#lemon-list-app'));
         }
     });
 }
 
-function setupLemonListApp() {
-    const content = getWindowContent('Lemon List');
-    if (!content) return;
-
-    content.innerHTML = createLemonListContent();
-    styleWindow(content);
+function setupLemonListApp(container) {
+    container.innerHTML = createLemonListContent();
+    styleWindow(container);
     loadCSV().then(() => {
         setupFilters();
         displayListings();
@@ -29,29 +50,25 @@ function setupLemonListApp() {
 
 function createLemonListContent() {
     return `
-        <div id="lemon-list-app">
-            <div class="search-filter-container">
-                <input type="text" id="search-bar" placeholder="Search listings..." aria-label="Search listings">
-                <div id="filter-checkboxes"></div>
-                <button id="clear-filters">Reset</button>
-            </div>
-            <div class="listings-container">
-                <div class="listing-column" id="left-column"></div>
-                <div class="listing-column" id="right-column"></div>
-            </div>
-            <div class="pagination-container">
-                <button id="prev-page" aria-label="Previous page">◀</button>
-                <span id="page-indicator">Page 1 of 1</span>
-                <button id="next-page" aria-label="Next page">▶</button>
-            </div>
+        <div class="search-filter-container">
+            <input type="text" id="search-bar" placeholder="Search listings..." aria-label="Search listings">
+            <div id="filter-checkboxes"></div>
+            <button id="clear-filters">Reset</button>
+        </div>
+        <div class="listings-container">
+            <div class="listing-column" id="left-column"></div>
+            <div class="listing-column" id="right-column"></div>
+        </div>
+        <div class="pagination-container">
+            <button id="prev-page" aria-label="Previous page">◀</button>
+            <span id="page-indicator">Page 1 of 1</span>
+            <button id="next-page" aria-label="Next page">▶</button>
         </div>
     `;
 }
 
 function styleWindow(content) {
     const window = content.closest('.window');
-    window.style.width = '90%';
-    window.style.height = '90%';
     window.style.left = '50%';
     window.style.top = '50%';
     window.style.transform = 'translate(-50%, -50%)';
@@ -62,7 +79,6 @@ function styleWindow(content) {
     content.style.backgroundRepeat = 'no-repeat';
     content.style.backgroundPosition = 'center';
     content.style.fontFamily = '"Nanum Gothic Coding", monospace';
-
     content.style.padding = '0';
     content.style.boxSizing = 'border-box';
 }
@@ -87,22 +103,6 @@ function loadCSV() {
             getWindowContent('Lemon List').innerHTML = 'Error loading data';
         });
 }
-
-const emojiTooltips = {
-    '🚓': 'Law Enforcement',
-    '🚑': 'Los Santos Medical Group',
-    '⚖️': 'Lawyer/Paralegal',
-    '🏛️': 'Government Employee',
-    '🎵': 'Musician/Producer',
-    '🌽': 'Farmer',
-    '💵': 'Loans',
-    '🚗': 'Car Sales',
-    '🧰': 'Impound/Tow',
-    '🪑': 'Furniture Sales',
-    '🔧': 'Mechanic',
-    '🧺': 'Laundry',
-    '🚕': 'Taxi'
-};
 
 function setupFilters() {
     const filterContainer = document.getElementById('filter-checkboxes');
@@ -179,7 +179,6 @@ function adjustFontSize() {
     const column = content.querySelector('.listing-column');
     if (!column) return;
 
-    // Find the longest text among all listings
     const longestText = listings.reduce((longest, current) => 
         current.text.length > longest.length ? current.text : longest, '');
 
@@ -188,10 +187,9 @@ function adjustFontSize() {
     testListing.innerHTML = `<span class="listing-text">${longestText}</span>`;
     column.appendChild(testListing);
 
-    let fontSize = 20; // Start with a larger font size
+    let fontSize = 20;
     testListing.style.fontSize = `${fontSize}px`;
 
-    // Adjust font size until the text fits without wrapping
     while ((testListing.scrollWidth > column.clientWidth || testListing.scrollHeight > testListing.clientHeight) && fontSize > 1) {
         fontSize -= 0.5;
         testListing.style.fontSize = `${fontSize}px`;
@@ -199,7 +197,6 @@ function adjustFontSize() {
 
     column.removeChild(testListing);
 
-    // Apply the calculated font size to all listings
     content.querySelectorAll('.listing').forEach(el => {
         el.style.fontSize = `${(fontSize-0.5)}px`;
     });

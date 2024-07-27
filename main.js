@@ -41,50 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 export function openApp(appName) {
     console.log('Opening app:', appName);
-    let config;
-    switch(appName) {
-        case 'System':
-            config = {
-                title: 'System',
-                content: `<div id="system-app"></div>`,
-                // Add any System-specific config here
-            };
-            break;
-        case 'Trash':
-            config = {
-                title: 'Trash',
-                content: `<div id="trash-app"></div>`,
-                // Add any Trash-specific config here
-            };
-            break;
-        case 'Documents':
-            config = {
-                title: 'Documents',
-                content: `<div id="documents-app"></div>`,
-            };
-            break;
-        case 'Lemon List':
-            config = {
-                title: 'Lemon List',
-                content: `<div id="lemon-list-app"></div>`,
-            };
-            break;
-        case 'Encryption':
-            config = {
-                title: 'Encryption',
-                content: `<div id="encryption-app"></div>`,
-                // Add any Encryption-specific config here
-            };
-            break;
-        default:
-            console.error(`Unknown app: ${appName}`);
-            return;  // Exit the function for unknown apps
-    }
-
-    console.log('App config:', config);
-    createAppWindow(config);
-    console.log(`Publishing windowOpened event for ${appName}`);
-    EventBus.publish('windowOpened', appName);
+    EventBus.publish('openApp', appName);
 }
 
 function handleRouting() {

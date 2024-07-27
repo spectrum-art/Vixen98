@@ -1,6 +1,12 @@
 import { EventBus } from './utils.js';
-import { getWindowContent } from './windowManagement.js';
 import { createAppWindow } from './windowManagement.js';
+
+const documentsConfig = {
+    title: 'Documents',
+    width: '70%',
+    height: '70%',
+    content: '<div id="documents-app"></div>',
+};
 
 const myDocumentsIcons = [
     { name: 'Cookie Delivery Map', icon: '🗺️' },
@@ -10,19 +16,18 @@ const myDocumentsIcons = [
 ];
 
 export function initializeDocuments() {
-    EventBus.subscribe('windowOpened', (appName) => {
+    EventBus.subscribe('openApp', (appName) => {
         if (appName === 'Documents') {
-            setupDocumentsApp();
+            const window = createAppWindow(documentsConfig);
+            setupDocumentsApp(window.querySelector('#documents-app'));
         }
     });
 }
 
-function setupDocumentsApp() {
-    const content = getWindowContent('Documents');
-    if (!content) return;
-
-    content.innerHTML = createDocumentsAppHTML();
-    setupDocumentsEventListeners(content);
+function setupDocumentsApp(container) {
+    // Initialize the Documents app UI and functionality
+    container.innerHTML = createDocumentsAppHTML();
+    setupDocumentsEventListeners(container);
 }
 
 function createDocumentsAppHTML() {
@@ -61,8 +66,6 @@ function openCookieDeliveryMap() {
         minWidth: '400px',
         minHeight: '300px',
     };
-    console.log('Map config:', mapConfig);
     
     const window = createAppWindow(mapConfig);
-    console.log('Map window created:', window);
 }
