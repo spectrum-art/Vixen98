@@ -2,6 +2,24 @@ import { EventBus } from './utils.js';
 
 let windows = [];
 
+export function initializeWindowManagement() {
+    console.log('Initializing window management');
+    EventBus.subscribe(openWindow);
+}
+
+function openWindow(appName) {
+    console.log('openWindow called for:', appName);
+    const existingWindow = windows.find(w => w.appName === appName);
+    if (existingWindow) {
+        console.log('Existing window found, bringing to front');
+        bringToFront(existingWindow.element);
+        return;
+    }
+
+    console.log('Creating new window');
+    createAppWindow({ title: appName });
+}
+
 export function createAppWindow(appConfig = {}) {
     const defaultConfig = {
         width: '50%',

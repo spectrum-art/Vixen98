@@ -1,8 +1,10 @@
 import { initializeDesktop } from './modules/desktop.js';
+import { initializeWindowManagement, createAppWindow } from './modules/windowManagement.js';
 import { initializeEncryption } from './modules/encryption.js';
 import { initializeDocuments } from './modules/documents.js';
 import { initializeLemonList } from './modules/lemonList.js';
 import { initializeAuth } from './modules/auth.js';
+import { EventBus } from './modules/utils.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     const splashScreen = document.getElementById('splash-screen');
@@ -26,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     console.log('DOM content loaded, initializing modules');
     initializeDesktop();
+    initializeWindowManagement();
     initializeEncryption();
     initializeDocuments();
     initializeLemonList();
