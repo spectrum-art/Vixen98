@@ -53,12 +53,15 @@ function openApp(appName) {
         case 'Documents':
         case 'Lemon List':
         case 'Encryption':
-            createAppWindow({
+            const config = {
                 title: appName,
                 content: `<div id="${appName.toLowerCase().replace(' ', '-')}-app"></div>`,
                 width: '50%',
                 height: '60%',
-            });
+                minWidth: '300px',
+                minHeight: '200px'
+            };
+            createAppWindow(config);
             EventBus.publish('windowOpened', appName);
             break;
         default:
