@@ -1,5 +1,5 @@
 import { initializeDesktop } from './modules/desktop.js';
-import { initializeWindowManagement } from './modules/windowManagement.js';
+import { initializeWindowManagement, createAppWindow } from './modules/windowManagement.js';
 import { initializeEncryption } from './modules/encryption.js';
 import { initializeDocuments } from './modules/documents.js';
 import { initializeLemonList } from './modules/lemonList.js';
@@ -57,7 +57,9 @@ export function openApp(appName) {
                 minHeight: '200px'
             };
             console.log('App config:', config);
-            EventBus.publish('openApp', config);
+            createAppWindow(config);
+            console.log(`Publishing windowOpened event for ${appName}`);
+            EventBus.publish('windowOpened', appName);
             break;
         default:
             console.error(`Unknown app: ${appName}`);
