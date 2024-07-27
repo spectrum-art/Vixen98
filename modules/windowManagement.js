@@ -2,8 +2,71 @@ import { EventBus } from './utils.js';
 
 let windows = [];
 
+const defaultConfig = {
+    title: 'New Window',
+    content: '',
+    width: '50%',
+    height: '30%',
+    minWidth: '200px',
+    minHeight: '100px',
+    resizable: true,
+    maximizable: true,
+};
+
 export function initializeWindowManagement() {
     EventBus.subscribe('openApp', openWindow);
+}
+
+export function createAppWindow(config) {
+    const mergedConfig = { ...defaultConfig, ...config };
+    const window = createWindow(mergedConfig);
+    const desktop = document.getElementById('desktop');
+    desktop.appendChild(window);
+    windows.push({ appName: mergedConfig.title, element: window });
+
+    createTaskbarItem(mergedConfig.title, window);
+    positionWindow(window);
+    makeDraggable(window);
+    if (mergedConfig.resizable) makeResizable(window);
+    bringToFront(window);
+
+    return window;
+}
+
+function createWindow(config) {
+    const window = document.createElement('div');
+    window.className = 'window';
+    window.setAttribute('data-app', config.title);
+    
+    window.innerHTML = `
+        <div class="window-header">
+            <span class="window-title">${config.title}</span>
+            <div class="window-controls">
+                <span class="window-minimize">🗕</span>
+                ${config.maximizable ? '<span class="window-maximize">🗖</span>' : ''}
+                <span class="window-close">❌</span>
+            </div>
+        </div>
+        <div class="window-content"></div>
+    `;
+    
+    const content = window.querySelector('.window-content');
+    content.innerHTML = config.content;
+
+    window.style.width = config.width;
+    window.style.height = config.height;
+    window.style.minWidth = config.minWidth;
+    window.style.minHeight = config.minHeight;
+    
+    const minimizeBtn = window.querySelector('.window-minimize');
+    const maximizeBtn = window.querySelector('.window-maximize');
+    const closeBtn = window.querySelector('.window-close');
+    
+    minimizeBtn.addEventListener('click', () => minimizeWindow(window));
+    if (maximizeBtn) maximizeBtn.addEventListener('click', () => maximizeWindow(window));
+    closeBtn.addEventListener('click', () => closeWindow(window));
+
+    return window;
 }
 
 function openWindow(appName) {
@@ -13,42 +76,7 @@ function openWindow(appName) {
         return;
     }
 
-    const window = createWindow(appName);
-    const desktop = document.getElementById('desktop');
-    desktop.appendChild(window);
-    windows.push({ appName, element: window });
-
-    createTaskbarItem(appName, window);
-    positionWindow(window);
-    makeDraggable(window);
-    bringToFront(window);
-
-    EventBus.publish('windowOpened', appName);
-}
-
-function createWindow(appName) {
-    const window = document.createElement('div');
-    window.className = 'window';
-    window.setAttribute('data-app', appName);
-    
-    window.innerHTML = `
-        <div class="window-header">
-            <span class="window-title">${appName}</span>
-            <div class="window-controls">
-                <span class="window-minimize">🗕</span>
-                <span class="window-close">❌</span>
-            </div>
-        </div>
-        <div class="window-content"></div>
-    `;
-    
-    const minimizeBtn = window.querySelector('.window-minimize');
-    const closeBtn = window.querySelector('.window-close');
-    
-    minimizeBtn.addEventListener('click', () => minimizeWindow(window));
-    closeBtn.addEventListener('click', () => closeWindow(window));
-
-    return window;
+    createAppWindow({ title: appName });
 }
 
 function minimizeWindow(window) {
@@ -231,6 +259,53 @@ function isPositionOccupied(left, top) {
         const wTop = parseInt(w.element.style.top);
         return Math.abs(wLeft - left) < 10 && Math.abs(wTop - top) < 10;
     });
+}
+
+function makeResizable(window) {
+    const resizer = document.createElement('div');
+    resizer.className = 'window-resizer';
+    window.appendChild(resizer);
+
+    resizer.addEventListener('mousedown', initResize, false);
+
+    function initResize(e) {
+        window.startX = e.clientX;
+        window.startY = e.clientY;
+        window.startWidth = parseInt(document.defaultView.getComputedStyle(window).width, 10);
+        window.startHeight = parseInt(document.defaultView.getComputedStyle(window).height, 10);
+        document.documentElement.addEventListener('mousemove', resize, false);
+        document.documentElement.addEventListener('mouseup', stopResize, false);
+    }
+
+    function resize(e) {
+        window.style.width = (window.startWidth + e.clientX - window.startX) + 'px';
+        window.style.height = (window.startHeight + e.clientY - window.startY) + 'px';
+    }
+
+    function stopResize() {
+        document.documentElement.removeEventListener('mousemove', resize, false);
+        document.documentElement.removeEventListener('mouseup', stopResize, false);
+    }
+}
+
+function maximizeWindow(window) {
+    if (window.classList.contains('maximized')) {
+        window.classList.remove('maximized');
+        window.style.width = window.dataset.originalWidth;
+        window.style.height = window.dataset.originalHeight;
+        window.style.left = window.dataset.originalLeft;
+        window.style.top = window.dataset.originalTop;
+    } else {
+        window.classList.add('maximized');
+        window.dataset.originalWidth = window.style.width;
+        window.dataset.originalHeight = window.style.height;
+        window.dataset.originalLeft = window.style.left;
+        window.dataset.originalTop = window.style.top;
+        window.style.width = '100%';
+        window.style.height = 'calc(100% - 30px)'; // Adjust for taskbar height
+        window.style.left = '0';
+        window.style.top = '0';
+    }
 }
 
 export function getWindowContent(appName) {
