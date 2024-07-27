@@ -81,14 +81,17 @@ function createWindow(config) {
     return window;
 }
 
-function openWindow(appName) {
-    const existingWindow = windows.find(w => w.appName === appName);
+function openWindow(config) {
+    console.log('openWindow called with config:', config);
+    const existingWindow = windows.find(w => w.appName === config.title);
     if (existingWindow) {
+        console.log('Existing window found, bringing to front');
         bringToFront(existingWindow.element);
         return;
     }
 
-    createAppWindow({ title: appName });
+    console.log('Creating new window');
+    createAppWindow(config);
 }
 
 function minimizeWindow(window) {

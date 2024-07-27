@@ -25,9 +25,17 @@ function createDesktopIcons() {
             <div class="icon">${icon.icon}</div>
             <div class="label">${icon.name}</div>
         `;
-        iconElement.addEventListener('click', () => EventBus.publish('openApp', icon.name));
+        iconElement.addEventListener('click', () => {
+            console.log('Desktop icon clicked:', icon.name);
+            openApp(icon.name);
+        });
         iconGrid.appendChild(iconElement);
     });
+}
+
+function openApp(appName) {
+    console.log('openApp called from desktop.js:', appName);
+    EventBus.publish('openApp', { title: appName });
 }
 
 function updateDesktopIcons(accessLevel) {

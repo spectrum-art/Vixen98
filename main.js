@@ -42,19 +42,21 @@ document.addEventListener('DOMContentLoaded', function() {
 function handleRouting() {
     const hash = window.location.hash.slice(1);
     if (hash) {
+        console.log('Routing to:', hash);
         openApp(hash);
     }
 }
 
 function openApp(appName) {
     console.log('Opening app:', appName);
+    let config;
     switch(appName) {
         case 'System':
         case 'Trash':
         case 'Documents':
         case 'Lemon List':
         case 'Encryption':
-            const config = {
+            config = {
                 title: appName,
                 content: `<div id="${appName.toLowerCase().replace(' ', '-')}-app"></div>`,
                 width: '50%',
@@ -63,9 +65,7 @@ function openApp(appName) {
                 minHeight: '200px'
             };
             console.log('App config:', config);
-            const window = createAppWindow(config);
-            console.log('Window created:', window);
-            EventBus.publish('windowOpened', appName);
+            EventBus.publish('openApp', config);
             break;
         default:
             console.error(`Unknown app: ${appName}`);
