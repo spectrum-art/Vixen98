@@ -1,10 +1,8 @@
 import { initializeDesktop } from './modules/desktop.js';
-import { initializeWindowManagement, createAppWindow } from './modules/windowManagement.js';
 import { initializeEncryption } from './modules/encryption.js';
 import { initializeDocuments } from './modules/documents.js';
 import { initializeLemonList } from './modules/lemonList.js';
 import { initializeAuth } from './modules/auth.js';
-import { EventBus } from './modules/utils.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     const splashScreen = document.getElementById('splash-screen');
@@ -28,7 +26,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     console.log('DOM content loaded, initializing modules');
     initializeDesktop();
-    initializeWindowManagement();
     initializeEncryption();
     initializeDocuments();
     initializeLemonList();
@@ -41,7 +38,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
 export function openApp(appName) {
     console.log('Opening app:', appName);
-    EventBus.publish('openApp', appName);
+    // Instead of publishing an event, directly call the appropriate initialization function
+    switch(appName) {
+        case 'Documents':
+            initializeDocuments();
+            break;
+        case 'Lemon List':
+            initializeLemonList();
+            break;
+        // Add cases for other apps
+        default:
+            console.error(`Unknown app: ${appName}`);
+    }
 }
 
 function handleRouting() {

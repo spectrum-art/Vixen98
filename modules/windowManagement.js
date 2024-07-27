@@ -2,11 +2,6 @@ import { EventBus } from './utils.js';
 
 let windows = [];
 
-export function initializeWindowManagement() {
-    console.log('Initializing window management');
-    EventBus.subscribe(openWindow);
-}
-
 export function createAppWindow(appConfig = {}) {
     const defaultConfig = {
         width: '50%',
