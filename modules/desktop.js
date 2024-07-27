@@ -1,4 +1,5 @@
 import { EventBus } from './utils.js';
+import { openApp } from '../main.js';
 
 const desktopIcons = [
     { name: 'System', icon: '💻', accessLevel: 1 },
@@ -30,19 +31,6 @@ function createDesktopIcons() {
             openApp(icon.name);
         });
         iconGrid.appendChild(iconElement);
-    });
-}
-
-function openApp(appName) {
-    console.log('openApp called from desktop.js:', appName);
-    EventBus.publish('openApp', { title: appName });
-}
-
-function updateDesktopIcons(accessLevel) {
-    const icons = document.querySelectorAll('.desktop-icon');
-    icons.forEach((iconElement, index) => {
-        const icon = desktopIcons[index];
-        iconElement.style.display = accessLevel >= icon.accessLevel ? 'flex' : 'none';
     });
 }
 

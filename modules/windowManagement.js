@@ -36,51 +36,6 @@ export function createAppWindow(config) {
     return window;
 }
 
-function createWindow(config) {
-    console.log('Creating window with config:', config);
-    const window = document.createElement('div');
-    window.className = 'window';
-    window.setAttribute('data-app', config.title);
-    
-    window.innerHTML = `
-        <div class="window-header">
-            <span class="window-title">${config.title}</span>
-            <div class="window-controls">
-                <span class="window-minimize">🗕</span>
-                ${config.maximizable ? '<span class="window-maximize">🗖</span>' : ''}
-                <span class="window-close">❌</span>
-            </div>
-        </div>
-        <div class="window-content"></div>
-    `;
-    
-    const content = window.querySelector('.window-content');
-    content.innerHTML = config.content;
-    console.log('Window content set:', content.innerHTML);
-
-    window.style.width = config.width;
-    window.style.height = config.height;
-    window.style.minWidth = config.minWidth;
-    window.style.minHeight = config.minHeight;
-    
-    console.log('Window styles set:', {
-        width: window.style.width,
-        height: window.style.height,
-        minWidth: window.style.minWidth,
-        minHeight: window.style.minHeight
-    });
-    
-    const minimizeBtn = window.querySelector('.window-minimize');
-    const maximizeBtn = window.querySelector('.window-maximize');
-    const closeBtn = window.querySelector('.window-close');
-    
-    minimizeBtn.addEventListener('click', () => minimizeWindow(window));
-    if (maximizeBtn) maximizeBtn.addEventListener('click', () => maximizeWindow(window));
-    closeBtn.addEventListener('click', () => closeWindow(window));
-
-    return window;
-}
-
 function openWindow(config) {
     console.log('openWindow called with config:', config);
     const existingWindow = windows.find(w => w.appName === config.title);
@@ -92,6 +47,25 @@ function openWindow(config) {
 
     console.log('Creating new window');
     createAppWindow(config);
+}
+
+export function createAppWindow(config) {
+    console.log('Creating app window with config:', config);
+    const mergedConfig = { ...defaultConfig, ...config };
+    console.log('Merged config:', mergedConfig);
+    const window = createWindow(mergedConfig);
+    const desktop = document.getElementById('desktop');
+    desktop.appendChild(window);
+    windows.push({ appName: mergedConfig.title, element: window });
+
+    createTaskbarItem(mergedConfig.title, window);
+    positionWindow(window);
+    makeDraggable(window);
+    if (mergedConfig.resizable) makeResizable(window);
+    bringToFront(window);
+
+    console.log('Window created:', window);
+    return window;
 }
 
 function minimizeWindow(window) {
