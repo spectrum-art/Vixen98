@@ -31,11 +31,12 @@ function openWindow(config) {
     createAppWindow(config);
 }
 
+// Main function to create a new application window.
 export function createAppWindow(config) {
     console.log('Creating app window with config:', config);
     const mergedConfig = { ...defaultConfig, ...config };
     console.log('Merged config:', mergedConfig);
-    const window = createWindow(mergedConfig);
+    const window = createWindowElement(mergedConfig);
     const desktop = document.getElementById('desktop');
     desktop.appendChild(window);
     windows.push({ appName: mergedConfig.title, element: window });
@@ -50,8 +51,9 @@ export function createAppWindow(config) {
     return window;
 }
 
-function createWindow(config) {
-    console.log('Creating window with config:', config);
+// Helper function to create the actual DOM elements for a window.
+function createWindowElement(config) {
+    console.log('Creating window element with config:', config);
     const window = document.createElement('div');
     window.className = 'window';
     window.setAttribute('data-app', config.title);

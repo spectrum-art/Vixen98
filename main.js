@@ -44,26 +44,47 @@ export function openApp(appName) {
     let config;
     switch(appName) {
         case 'System':
+            config = {
+                title: 'System',
+                content: `<div id="system-app"></div>`,
+                // Add any System-specific config here
+            };
+            break;
         case 'Trash':
+            config = {
+                title: 'Trash',
+                content: `<div id="trash-app"></div>`,
+                // Add any Trash-specific config here
+            };
+            break;
         case 'Documents':
+            config = {
+                title: 'Documents',
+                content: `<div id="documents-app"></div>`,
+            };
+            break;
         case 'Lemon List':
+            config = {
+                title: 'Lemon List',
+                content: `<div id="lemon-list-app"></div>`,
+            };
+            break;
         case 'Encryption':
             config = {
-                title: appName,
-                content: `<div id="${appName.toLowerCase().replace(' ', '-')}-app"></div>`,
-                width: '50%',
-                height: '60%',
-                minWidth: '300px',
-                minHeight: '200px'
+                title: 'Encryption',
+                content: `<div id="encryption-app"></div>`,
+                // Add any Encryption-specific config here
             };
-            console.log('App config:', config);
-            createAppWindow(config);
-            console.log(`Publishing windowOpened event for ${appName}`);
-            EventBus.publish('windowOpened', appName);
             break;
         default:
             console.error(`Unknown app: ${appName}`);
+            return;  // Exit the function for unknown apps
     }
+
+    console.log('App config:', config);
+    createAppWindow(config);
+    console.log(`Publishing windowOpened event for ${appName}`);
+    EventBus.publish('windowOpened', appName);
 }
 
 function handleRouting() {
