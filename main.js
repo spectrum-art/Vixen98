@@ -1,5 +1,4 @@
 import { initializeDesktop } from './modules/desktop.js';
-import { initializeWindowManagement, createAppWindow } from './modules/windowManagement.js';
 import { initializeEncryption } from './modules/encryption.js';
 import { initializeDocuments } from './modules/documents.js';
 import { initializeLemonList } from './modules/lemonList.js';
@@ -28,10 +27,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     console.log('DOM content loaded, initializing modules');
     initializeDesktop();
-    initializeWindowManagement();
-    initializeEncryption();
-    initializeDocuments();
-    initializeLemonList();
     initializeAuth();
 
     // Set up routing
@@ -46,9 +41,12 @@ export function openApp(appName) {
         case 'Documents':
             initializeDocuments();
             break;
-        case 'Lemon List':
-            initializeLemonList();
-            break;
+            case 'Lemon List':
+                initializeLemonList();
+                break;
+                case 'Encryption':
+                    initializeEncryption();
+                    break;
         // Add cases for other apps
         default:
             console.error(`Unknown app: ${appName}`);
