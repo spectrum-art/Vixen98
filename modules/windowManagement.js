@@ -18,7 +18,9 @@ export function initializeWindowManagement() {
 }
 
 export function createAppWindow(config) {
+    console.log('Creating app window with config:', config);
     const mergedConfig = { ...defaultConfig, ...config };
+    console.log('Merged config:', mergedConfig);
     const window = createWindow(mergedConfig);
     const desktop = document.getElementById('desktop');
     desktop.appendChild(window);
@@ -30,10 +32,12 @@ export function createAppWindow(config) {
     if (mergedConfig.resizable) makeResizable(window);
     bringToFront(window);
 
+    console.log('Window created:', window);
     return window;
 }
 
 function createWindow(config) {
+    console.log('Creating window with config:', config);
     const window = document.createElement('div');
     window.className = 'window';
     window.setAttribute('data-app', config.title);
@@ -52,11 +56,19 @@ function createWindow(config) {
     
     const content = window.querySelector('.window-content');
     content.innerHTML = config.content;
+    console.log('Window content set:', content.innerHTML);
 
     window.style.width = config.width;
     window.style.height = config.height;
     window.style.minWidth = config.minWidth;
     window.style.minHeight = config.minHeight;
+    
+    console.log('Window styles set:', {
+        width: window.style.width,
+        height: window.style.height,
+        minWidth: window.style.minWidth,
+        minHeight: window.style.minHeight
+    });
     
     const minimizeBtn = window.querySelector('.window-minimize');
     const maximizeBtn = window.querySelector('.window-maximize');

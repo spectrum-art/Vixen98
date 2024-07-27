@@ -47,6 +47,7 @@ function handleRouting() {
 }
 
 function openApp(appName) {
+    console.log('Opening app:', appName);
     switch(appName) {
         case 'System':
         case 'Trash':
@@ -61,7 +62,9 @@ function openApp(appName) {
                 minWidth: '300px',
                 minHeight: '200px'
             };
-            createAppWindow(config);
+            console.log('App config:', config);
+            const window = createAppWindow(config);
+            console.log('Window created:', window);
             EventBus.publish('windowOpened', appName);
             break;
         default:
