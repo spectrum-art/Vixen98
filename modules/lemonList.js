@@ -100,7 +100,8 @@ const emojiTooltips = {
     '🧰': 'Impound/Tow',
     '🪑': 'Furniture Sales',
     '🔧': 'Mechanic',
-    '🧺': 'Laundry'
+    '🧺': 'Laundry',
+    '🚕': 'Taxi'
 };
 
 function setupFilters() {
