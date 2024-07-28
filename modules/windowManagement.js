@@ -94,9 +94,9 @@ function positionWindow(windowElement, width, height) {
     const desktop = document.getElementById('desktop');
     const desktopRect = desktop.getBoundingClientRect();
 
-    // Calculate the center position
-    const centerX = (desktopRect.width - parseInt(width)) / 2;
-    const centerY = (desktopRect.height - parseInt(height)) / 2;
+    // Calculate the center position for the window
+    const centerX = Math.floor((desktopRect.width - parseInt(width)) / 2);
+    const centerY = Math.floor((desktopRect.height - parseInt(height)) / 2);
 
     const position = findAvailablePosition(centerX, centerY);
     
@@ -105,7 +105,7 @@ function positionWindow(windowElement, width, height) {
 }
 
 function findAvailablePosition(x, y, depth = 0) {
-    if (depth > 10) {
+    if (depth > 20) {  // Increased depth limit for more positioning attempts
         return { x, y };
     }
 
@@ -113,11 +113,12 @@ function findAvailablePosition(x, y, depth = 0) {
         return { x, y };
     }
 
+    // If occupied, try a position 25px down and to the right
     return findAvailablePosition(x + 25, y + 25, depth + 1);
 }
 
 function isPositionOccupied(x, y) {
-    const threshold = 5;
+    const threshold = 10;  // Increased threshold for a bit more leniency
     return windows.some(w => {
         const rect = w.element.getBoundingClientRect();
         return Math.abs(rect.left - x) < threshold && Math.abs(rect.top - y) < threshold;
