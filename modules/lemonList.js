@@ -6,6 +6,10 @@ const lemonListConfig = {
     width: '90%',
     height: '90%',
     content: '<div id="lemon-list-app"></div>',
+    features: {
+        resizable: false,
+        maximizable: false
+    },
     styles: {
         window: {
             left: '50%',
