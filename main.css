@@ -282,6 +282,42 @@ body, html {
     margin-right: 5px;
 }
 
+.system-content {
+    display: flex;
+    height: 100%;
+    font-family: "Nanum Gothic Coding", monospace;
+}
+
+.system-image {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}
+
+.system-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    aspect-ratio: 1 / 1;
+}
+
+.system-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: #000080;
+    color: #ffffff;
+}
+
+.system-info pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
 .encryption-app {
     display: flex;
     flex-direction: column;

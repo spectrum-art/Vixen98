@@ -1,9 +1,9 @@
 import { initializeDesktop } from './modules/desktop.js';
-import { initializeEncryption } from './modules/encryption.js';
+import { initializeSystem } from './modules/system.js';
 import { initializeDocuments } from './modules/documents.js';
 import { initializeLemonList } from './modules/lemonList.js';
+import { initializeEncryption } from './modules/encryption.js';
 import { initializeAuth } from './modules/auth.js';
-import { EventBus } from './modules/utils.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     const splashScreen = document.getElementById('splash-screen');
@@ -37,6 +37,9 @@ document.addEventListener('DOMContentLoaded', function() {
 export function openApp(appName) {
     console.log('Opening app:', appName);
     switch(appName) {
+        case 'System':
+            initializeSystem();
+            break;
         case 'Documents':
             initializeDocuments();
             break;
