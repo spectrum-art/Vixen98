@@ -14,23 +14,19 @@ export function createAppWindow(appConfig = {}) {
         content: '',
     };
 
-    if (appConfig.className) {
-        window.classList.add(appConfig.className);
-    }
-
     const config = { ...defaultConfig, ...appConfig };
     console.log('Creating app window with config:', config);
 
-    const window = document.createElement('div');
-    window.className = 'window';
-    window.setAttribute('data-app', config.title);
+    const windowElement = document.createElement('div');
+    windowElement.className = 'window';
+    windowElement.setAttribute('data-app', config.title);
 
-    window.style.width = config.width;
-    window.style.height = config.height;
-    window.style.minWidth = config.minWidth;
-    window.style.minHeight = config.minHeight;
+    windowElement.style.width = config.width;
+    windowElement.style.height = config.height;
+    windowElement.style.minWidth = config.minWidth;
+    windowElement.style.minHeight = config.minHeight;
 
-    window.innerHTML = `
+    windowElement.innerHTML = `
         <div class="window-header">
             <span class="window-title">${config.title}</span>
             <div class="window-controls">
@@ -42,23 +38,27 @@ export function createAppWindow(appConfig = {}) {
         <div class="window-content">${config.content}</div>
     `;
 
+    if (config.className) {
+        windowElement.classList.add(config.className);
+    }
+
     const desktop = document.getElementById('desktop');
-    desktop.appendChild(window);
-    windows.push({ appName: config.title, element: window });
+    desktop.appendChild(windowElement);
+    windows.push({ appName: config.title, element: windowElement });
 
-    createTaskbarItem(config.title, window);
-    positionWindow(window);
-    makeDraggable(window);
-    if (config.resizable) makeResizable(window);
-    bringToFront(window);
+    createTaskbarItem(config.title, windowElement);
+    positionWindow(windowElement);
+    makeDraggable(windowElement);
+    if (config.resizable) makeResizable(windowElement);
+    bringToFront(windowElement);
 
-    setupWindowControls(window);
+    setupWindowControls(windowElement);
 
-    console.log('Window created:', window);
-    return window;
+    console.log('Window created:', windowElement);
+    return windowElement;
 }
 
-function createTaskbarItem(appName, window) {
+function createTaskbarItem(appName, windowElement) {
     const openWindows = document.getElementById('open-windows');
     const taskbarItem = document.createElement('div');
     taskbarItem.className = 'taskbar-item';
@@ -68,12 +68,12 @@ function createTaskbarItem(appName, window) {
         <span>${appName}</span>
     `;
     taskbarItem.addEventListener('click', () => {
-        if (window.style.display === 'none') {
-            unminimizeWindow(window);
-        } else if (window.classList.contains('active')) {
-            minimizeWindow(window);
+        if (windowElement.style.display === 'none') {
+            unminimizeWindow(windowElement);
+        } else if (windowElement.classList.contains('active')) {
+            minimizeWindow(windowElement);
         } else {
-            bringToFront(window);
+            bringToFront(windowElement);
         }
     });
     openWindows.appendChild(taskbarItem);
@@ -90,7 +90,7 @@ function getIconForApp(appName) {
     return iconMap[appName] || '📄';
 }
 
-function positionWindow(window) {
+function positionWindow(windowElement) {
     let left = 25;
     let top = 25;
     const step = 5;
@@ -99,15 +99,15 @@ function positionWindow(window) {
     while (isPositionOccupied(left, top)) {
         left += step;
         top += step;
-        if (left > desktop.clientWidth - window.clientWidth) {
+        if (left > desktop.clientWidth - windowElement.clientWidth) {
             left = 25;
         }
-        if (top > desktop.clientHeight - window.clientHeight) {
+        if (top > desktop.clientHeight - windowElement.clientHeight) {
             top = 25;
         }
     }
-    window.style.left = `${left}px`;
-    window.style.top = `${top}px`;
+    windowElement.style.left = `${left}px`;
+    windowElement.style.top = `${top}px`;
 }
 
 function isPositionOccupied(left, top) {
@@ -153,25 +153,25 @@ function makeDraggable(element) {
     });
 }
 
-function makeResizable(window) {
+function makeResizable(windowElement) {
     const resizer = document.createElement('div');
     resizer.className = 'window-resizer';
-    window.appendChild(resizer);
+    windowElement.appendChild(resizer);
 
     resizer.addEventListener('mousedown', initResize, false);
 
     function initResize(e) {
-        window.startX = e.clientX;
-        window.startY = e.clientY;
-        window.startWidth = parseInt(document.defaultView.getComputedStyle(window).width, 10);
-        window.startHeight = parseInt(document.defaultView.getComputedStyle(window).height, 10);
+        windowElement.startX = e.clientX;
+        windowElement.startY = e.clientY;
+        windowElement.startWidth = parseInt(document.defaultView.getComputedStyle(windowElement).width, 10);
+        windowElement.startHeight = parseInt(document.defaultView.getComputedStyle(windowElement).height, 10);
         document.documentElement.addEventListener('mousemove', resize, false);
         document.documentElement.addEventListener('mouseup', stopResize, false);
     }
 
     function resize(e) {
-        window.style.width = (window.startWidth + e.clientX - window.startX) + 'px';
-        window.style.height = (window.startHeight + e.clientY - window.startY) + 'px';
+        windowElement.style.width = (windowElement.startWidth + e.clientX - windowElement.startX) + 'px';
+        windowElement.style.height = (windowElement.startHeight + e.clientY - windowElement.startY) + 'px';
     }
 
     function stopResize() {
@@ -180,7 +180,7 @@ function makeResizable(window) {
     }
 }
 
-function bringToFront(window) {
+function bringToFront(windowElement) {
     let maxZIndex = 0;
     windows.forEach(w => {
         const zIndex = parseInt(w.element.style.zIndex || '0');
@@ -191,104 +191,104 @@ function bringToFront(window) {
             taskbarItem.classList.remove('active');
         }
     });
-    window.style.zIndex = maxZIndex + 1;
-    window.classList.add('active');
-    const taskbarItem = document.querySelector(`[data-icon="${window.getAttribute('data-app')}"]`);
+    windowElement.style.zIndex = maxZIndex + 1;
+    windowElement.classList.add('active');
+    const taskbarItem = document.querySelector(`[data-icon="${windowElement.getAttribute('data-app')}"]`);
     if (taskbarItem) {
         taskbarItem.classList.add('active');
     }
 }
 
-function setupWindowControls(window) {
-    const minimizeBtn = window.querySelector('.window-minimize');
-    const maximizeBtn = window.querySelector('.window-maximize');
-    const closeBtn = window.querySelector('.window-close');
+function setupWindowControls(windowElement) {
+    const minimizeBtn = windowElement.querySelector('.window-minimize');
+    const maximizeBtn = windowElement.querySelector('.window-maximize');
+    const closeBtn = windowElement.querySelector('.window-close');
     
-    minimizeBtn.addEventListener('click', () => minimizeWindow(window));
-    if (maximizeBtn) maximizeBtn.addEventListener('click', () => maximizeWindow(window));
-    closeBtn.addEventListener('click', () => closeWindow(window));
+    minimizeBtn.addEventListener('click', () => minimizeWindow(windowElement));
+    if (maximizeBtn) maximizeBtn.addEventListener('click', () => maximizeWindow(windowElement));
+    closeBtn.addEventListener('click', () => closeWindow(windowElement));
 }
 
-function minimizeWindow(window) {
-    window.style.transformOrigin = 'bottom left';
-    window.classList.add('minimizing');
+function minimizeWindow(windowElement) {
+    windowElement.style.transformOrigin = 'bottom left';
+    windowElement.classList.add('minimizing');
     
-    window.dataset.originalLeft = window.style.left;
-    window.dataset.originalTop = window.style.top;
+    windowElement.dataset.originalLeft = windowElement.style.left;
+    windowElement.dataset.originalTop = windowElement.style.top;
     
-    window.offsetWidth; // Force reflow
-    const taskbarItem = document.querySelector(`[data-icon="${window.getAttribute('data-app')}"]`);
+    windowElement.offsetWidth; // Force reflow
+    const taskbarItem = document.querySelector(`[data-icon="${windowElement.getAttribute('data-app')}"]`);
     if (taskbarItem) {
         const taskbarRect = taskbarItem.getBoundingClientRect();
-        const windowRect = window.getBoundingClientRect();
+        const windowRect = windowElement.getBoundingClientRect();
         
         const translateX = taskbarRect.left - windowRect.left;
         const translateY = taskbarRect.top - windowRect.top;
         
-        window.style.transform = `translate(${translateX}px, ${translateY}px) scale(0.1)`;
-        window.style.opacity = '0';
+        windowElement.style.transform = `translate(${translateX}px, ${translateY}px) scale(0.1)`;
+        windowElement.style.opacity = '0';
     }
-    window.addEventListener('transitionend', () => {
-        window.style.display = 'none';
-        window.style.transform = '';
-        window.style.opacity = '';
-        window.classList.remove('minimizing');
+    windowElement.addEventListener('transitionend', () => {
+        windowElement.style.display = 'none';
+        windowElement.style.transform = '';
+        windowElement.style.opacity = '';
+        windowElement.classList.remove('minimizing');
     }, { once: true });
 }
 
-function unminimizeWindow(window) {
-    window.style.display = 'flex';
-    window.style.transformOrigin = 'bottom left';
-    window.classList.add('unminimizing');
+function unminimizeWindow(windowElement) {
+    windowElement.style.display = 'flex';
+    windowElement.style.transformOrigin = 'bottom left';
+    windowElement.classList.add('unminimizing');
     
-    window.offsetWidth; // Force reflow
-    const taskbarItem = document.querySelector(`[data-icon="${window.getAttribute('data-app')}"]`);
+    windowElement.offsetWidth; // Force reflow
+    const taskbarItem = document.querySelector(`[data-icon="${windowElement.getAttribute('data-app')}"]`);
     if (taskbarItem) {
         const taskbarRect = taskbarItem.getBoundingClientRect();
-        const windowRect = window.getBoundingClientRect();
+        const windowRect = windowElement.getBoundingClientRect();
         
         const translateX = taskbarRect.left - windowRect.left;
         const translateY = taskbarRect.top - windowRect.top;
         
-        window.style.transform = `translate(${translateX}px, ${translateY}px) scale(0.1)`;
-        window.style.opacity = '0';
+        windowElement.style.transform = `translate(${translateX}px, ${translateY}px) scale(0.1)`;
+        windowElement.style.opacity = '0';
         
-        window.offsetWidth; // Force reflow
+        windowElement.offsetWidth; // Force reflow
         
-        window.style.transform = '';
-        window.style.opacity = '1';
-        window.style.left = window.dataset.originalLeft;
-        window.style.top = window.dataset.originalTop;
+        windowElement.style.transform = '';
+        windowElement.style.opacity = '1';
+        windowElement.style.left = windowElement.dataset.originalLeft;
+        windowElement.style.top = windowElement.dataset.originalTop;
     }
-    window.addEventListener('transitionend', () => {
-        window.classList.remove('unminimizing');
-        bringToFront(window);
+    windowElement.addEventListener('transitionend', () => {
+        windowElement.classList.remove('unminimizing');
+        bringToFront(windowElement);
     }, { once: true });
 }
 
-function maximizeWindow(window) {
-    if (window.classList.contains('maximized')) {
-        window.classList.remove('maximized');
-        window.style.width = window.dataset.originalWidth;
-        window.style.height = window.dataset.originalHeight;
-        window.style.left = window.dataset.originalLeft;
-        window.style.top = window.dataset.originalTop;
+function maximizeWindow(windowElement) {
+    if (windowElement.classList.contains('maximized')) {
+        windowElement.classList.remove('maximized');
+        windowElement.style.width = windowElement.dataset.originalWidth;
+        windowElement.style.height = windowElement.dataset.originalHeight;
+        windowElement.style.left = windowElement.dataset.originalLeft;
+        windowElement.style.top = windowElement.dataset.originalTop;
     } else {
-        window.classList.add('maximized');
-        window.dataset.originalWidth = window.style.width;
-        window.dataset.originalHeight = window.style.height;
-        window.dataset.originalLeft = window.style.left;
-        window.dataset.originalTop = window.style.top;
-        window.style.width = '100%';
-        window.style.height = 'calc(100% - 30px)'; // Adjust for taskbar height
-        window.style.left = '0';
-        window.style.top = '0';
+        windowElement.classList.add('maximized');
+        windowElement.dataset.originalWidth = windowElement.style.width;
+        windowElement.dataset.originalHeight = windowElement.style.height;
+        windowElement.dataset.originalLeft = windowElement.style.left;
+        windowElement.dataset.originalTop = windowElement.style.top;
+        windowElement.style.width = '100%';
+        windowElement.style.height = 'calc(100% - 30px)'; // Adjust for taskbar height
+        windowElement.style.left = '0';
+        windowElement.style.top = '0';
     }
 }
 
-function closeWindow(window) {
-    const appName = window.getAttribute('data-app');
-    window.remove();
+function closeWindow(windowElement) {
+    const appName = windowElement.getAttribute('data-app');
+    windowElement.remove();
     const taskbarItem = document.querySelector(`[data-icon="${appName}"]`);
     if (taskbarItem) {
         taskbarItem.remove();
@@ -298,6 +298,6 @@ function closeWindow(window) {
 }
 
 export function getWindowContent(appName) {
-    const window = windows.find(w => w.appName === appName);
-    return window ? window.element.querySelector('.window-content') : null;
+    const windowObj = windows.find(w => w.appName === appName);
+    return windowObj ? windowObj.element.querySelector('.window-content') : null;
 }
