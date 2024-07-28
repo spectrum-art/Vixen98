@@ -14,14 +14,16 @@ const lemonListConfig = {
         },
         content: {
             backgroundImage: 'url("images/lemonlistbg.png")',
-            backgroundSize: 'contain',
+            backgroundSize: 'cover',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center',
             fontFamily: '"Nanum Gothic Coding", monospace',
             padding: '0',
             boxSizing: 'border-box',
             width: '100%',
-            height: '100%'
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column'
         }
     },
     className: 'lemon-list-window'
@@ -70,9 +72,16 @@ function applyStyles(window) {
     Object.assign(window.style, lemonListConfig.styles.window);
     window.classList.add(lemonListConfig.className);
 
-    const content = window.querySelector('#lemon-list-app');
-    if (content) {
-        Object.assign(content.style, lemonListConfig.styles.content);
+    const windowContent = window.querySelector('.window-content');
+    if (windowContent) {
+        Object.assign(windowContent.style, lemonListConfig.styles.content);
+    }
+
+    const lemonListApp = window.querySelector('#lemon-list-app');
+    if (lemonListApp) {
+        lemonListApp.style.flexGrow = '1';
+        lemonListApp.style.display = 'flex';
+        lemonListApp.style.flexDirection = 'column';
     }
 }
 
