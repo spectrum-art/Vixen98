@@ -47,7 +47,7 @@ export function createAppWindow(appConfig = {}) {
     windows.push({ appName: config.title, element: windowElement });
 
     createTaskbarItem(config.title, windowElement);
-    positionWindow(windowElement);
+    positionWindow(windowElement, config.width, config.height);
     makeDraggable(windowElement);
     if (config.resizable) makeResizable(windowElement);
     bringToFront(windowElement);
@@ -90,31 +90,37 @@ function getIconForApp(appName) {
     return iconMap[appName] || '📄';
 }
 
-function positionWindow(windowElement) {
-    let left = 25;
-    let top = 25;
-    const step = 5;
+function positionWindow(windowElement, width, height) {
     const desktop = document.getElementById('desktop');
+    const desktopRect = desktop.getBoundingClientRect();
+
+    // Calculate the center position
+    const centerX = (desktopRect.width - parseInt(width)) / 2;
+    const centerY = (desktopRect.height - parseInt(height)) / 2;
+
+    const position = findAvailablePosition(centerX, centerY);
     
-    while (isPositionOccupied(left, top)) {
-        left += step;
-        top += step;
-        if (left > desktop.clientWidth - windowElement.clientWidth) {
-            left = 25;
-        }
-        if (top > desktop.clientHeight - windowElement.clientHeight) {
-            top = 25;
-        }
-    }
-    windowElement.style.left = `${left}px`;
-    windowElement.style.top = `${top}px`;
+    windowElement.style.left = `${position.x}px`;
+    windowElement.style.top = `${position.y}px`;
 }
 
-function isPositionOccupied(left, top) {
+function findAvailablePosition(x, y, depth = 0) {
+    if (depth > 10) {
+        return { x, y };
+    }
+
+    if (!isPositionOccupied(x, y)) {
+        return { x, y };
+    }
+
+    return findAvailablePosition(x + 25, y + 25, depth + 1);
+}
+
+function isPositionOccupied(x, y) {
+    const threshold = 5;
     return windows.some(w => {
-        const wLeft = parseInt(w.element.style.left);
-        const wTop = parseInt(w.element.style.top);
-        return Math.abs(wLeft - left) < 10 && Math.abs(wTop - top) < 10;
+        const rect = w.element.getBoundingClientRect();
+        return Math.abs(rect.left - x) < threshold && Math.abs(rect.top - y) < threshold;
     });
 }
 
