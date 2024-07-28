@@ -320,13 +320,12 @@ body, html {
 .system-button-container {
     display: flex;
     justify-content: flex-end;
-    padding: 10px;
+    padding: 6px;
 }
 
 #system-ok-button {
-    padding: 5px 20px;
-    font-family: "Nanum Gothic Coding", monospace;
-    cursor: pointer;
+    min-width: 75px;
+    padding: 0 12px;
 }
 
 .encryption-app {

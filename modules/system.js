@@ -29,12 +29,13 @@ function setupSystemApp(window) {
 
 function createSystemAppHTML() {
     return `
-        <div class="system-content">
-            <div class="system-image">
-                <img src="images/vixensystem.png" alt="Vixen System">
-            </div>
-            <div class="system-info">
-                <pre>
+        <div class="system-container">
+            <div class="system-content">
+                <div class="system-image">
+                    <img src="images/vixensystem.png" alt="Vixen System">
+                </div>
+                <div class="system-info">
+                    <pre>
 
 System:
     Vixen 98
@@ -53,11 +54,12 @@ Computer:
         64 cores @ 3.1GHz
     XTR 9090 Ti GPU
         24GB VRAM
-                </pre>
+                    </pre>
+                </div>
             </div>
-        </div>
-        <div class="system-button-container">
-            <button id="system-ok-button">OK</button>
+            <div class="system-button-container">
+                <button id="system-ok-button">OK</button>
+            </div>
         </div>
     `;
 }
