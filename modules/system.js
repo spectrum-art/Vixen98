@@ -5,6 +5,10 @@ const systemConfig = {
     width: '40%',
     height: '47%',
     content: '<div id="system-app"></div>',
+    features: {
+        resizable: false,
+        maximizable: false
+    }
 };
 
 export function initializeSystem() {
