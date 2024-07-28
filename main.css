@@ -284,7 +284,7 @@ body, html {
 
 .system-content {
     display: flex;
-    height: 100%;
+    height: calc(100% - 40px);
     font-family: "Nanum Gothic Coding", monospace;
 }
 
@@ -293,12 +293,12 @@ body, html {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 10px;
+    padding: 12px;
 }
 
 .system-image img {
-    width: 100%;
-    height: 100%;
+    width: calc(100% - 24px);
+    height: calc(100% - 24px);
     object-fit: contain;
     aspect-ratio: 1 / 1;
 }
@@ -308,14 +308,36 @@ body, html {
     display: flex;
     align-items: center;
     padding: 10px;
-    background-color: #000080;
-    color: #ffffff;
+    color: #000000;
+    background-color: transparent;
 }
 
 .system-info pre {
     margin: 0;
     white-space: pre-wrap;
     word-wrap: break-word;
+}
+
+.system-button-container {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px;
+}
+
+#system-ok-button {
+    padding: 5px 20px;
+    background-color: #c0c0c0;
+    border: 1px solid #ffffff;
+    border-right-color: #808080;
+    border-bottom-color: #808080;
+    font-family: "Nanum Gothic Coding", monospace;
+    cursor: pointer;
+}
+
+#system-ok-button:active {
+    border: 1px solid #808080;
+    border-right-color: #ffffff;
+    border-bottom-color: #ffffff;
 }
 
 .encryption-app {

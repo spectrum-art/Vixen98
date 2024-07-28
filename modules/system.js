@@ -17,6 +17,14 @@ function setupSystemApp(window) {
     if (!container) return;
     
     container.innerHTML = createSystemAppHTML();
+    
+    const okButton = container.querySelector('#system-ok-button');
+    okButton.addEventListener('click', () => {
+        const closeButton = window.querySelector('.window-close');
+        if (closeButton) {
+            closeButton.click();
+        }
+    });
 }
 
 function createSystemAppHTML() {
@@ -27,20 +35,29 @@ function createSystemAppHTML() {
             </div>
             <div class="system-info">
                 <pre>
+
 System:
     Vixen 98
     0.500
+
 
 Registered to:
     █████████  █████
     24796-OEM-0014736-66386
 
+
 Computer:
     AuthenticVIX
     64.0GB RAM
+    DMA EPIC 9900 CPU
+        64 cores @ 3.1GHz
     XTR 9090 Ti GPU
+        24GB VRAM
                 </pre>
             </div>
+        </div>
+        <div class="system-button-container">
+            <button id="system-ok-button">OK</button>
         </div>
     `;
 }
