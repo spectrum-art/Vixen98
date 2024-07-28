@@ -1,10 +1,9 @@
-import { EventBus } from './utils.js';
 import { createAppWindow } from './windowManagement.js';
 
 const documentsConfig = {
     title: 'Documents',
     width: '50%',
-    height: '30%',
+    height: '40%',
     content: '<div id="documents-app"></div>',
 };
 

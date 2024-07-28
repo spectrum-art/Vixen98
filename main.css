@@ -399,7 +399,7 @@ body, html {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    height: 35%;
+    height: 90%;
     padding: 20px;
 }
 
@@ -602,7 +602,7 @@ body, html {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 25px;
+    margin-bottom: 25px;                                                                                                                                                                                                                        
 }
 
 .pagination-container button {
