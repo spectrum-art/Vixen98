@@ -3,7 +3,7 @@ import { createAppWindow } from './windowManagement.js';
 const systemConfig = {
     title: 'System',
     width: '40%',
-    height: '55%',
+    height: '47%',
     content: '<div id="system-app"></div>',
 };
 
