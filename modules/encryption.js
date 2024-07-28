@@ -1,41 +1,25 @@
 import { EventBus } from './utils.js';
-import { getWindowContent } from './windowManagement.js';
+import { createAppWindow, getWindowContent } from './windowManagement.js';
+
+const encryptionConfig = {
+    title: 'Encryption',
+    width: '50%',
+    height: '60%',
+    content: '<div id="encryption-app"></div>',
+};
 
 export function initializeEncryption() {
-    EventBus.subscribe('windowOpened', (appName) => {
-        if (appName === 'Encryption') {
-            setupEncryptionApp();
-        }
-    });
+    const window = createAppWindow(encryptionConfig);
+    setupEncryptionApp(window);
 }
 
-function setupEncryptionApp() {
-    const content = getWindowContent('Encryption');
-    if (!content) return;
+function setupEncryptionApp(window) {
+    const container = getWindowContent('Encryption');
+    if (!container) return;
 
-    content.innerHTML = createEncryptionAppHTML();
-    
-    const encryptBtn = content.querySelector('#encryptBtn');
-    const decryptBtn = content.querySelector('#decryptBtn');
-    const togglePassword = content.querySelector('#togglePassword');
-    const browseButton = content.querySelector('#browseButton');
-    const fileInput = content.querySelector('#fileInput');
-    const fileNameInput = content.querySelector('.file-input-wrapper input[type="text"]');
-
-    browseButton.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files.length > 0) {
-            fileNameInput.value = e.target.files[0].name;
-        } else {
-            fileNameInput.value = '';
-        }
-    });
-
-    encryptBtn.addEventListener('click', () => handleEncryptDecrypt(true));
-    decryptBtn.addEventListener('click', () => handleEncryptDecrypt(false));
-    togglePassword.addEventListener('click', togglePasswordVisibility);
-
-    setupFileDrop(content);
+    container.innerHTML = createEncryptionAppHTML();
+    setupEventListeners(container);
+    setupFileDrop(container);
 }
 
 function createEncryptionAppHTML() {
@@ -69,15 +53,76 @@ function createEncryptionAppHTML() {
     `;
 }
 
-function handleEncryptDecrypt(isEncrypt) {
-    const content = getWindowContent('Encryption');
-    if (!content) return;
+function setupEventListeners(container) {
+    const encryptBtn = container.querySelector('#encryptBtn');
+    const decryptBtn = container.querySelector('#decryptBtn');
+    const togglePassword = container.querySelector('#togglePassword');
+    const browseButton = container.querySelector('#browseButton');
+    const fileInput = container.querySelector('#fileInput');
+    const fileNameInput = container.querySelector('.file-input-wrapper input[type="text"]');
 
-    const fileInput = content.querySelector('#fileInput');
-    const passwordInput = content.querySelector('#passwordInput');
-    const statusBar = content.querySelector('#statusBar');
-    const downloadContainer = content.querySelector('#downloadContainer');
-    const downloadLink = content.querySelector('#downloadLink');
+    browseButton.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            fileNameInput.value = e.target.files[0].name;
+        } else {
+            fileNameInput.value = '';
+        }
+    });
+
+    encryptBtn.addEventListener('click', () => handleEncryptDecrypt(true, container));
+    decryptBtn.addEventListener('click', () => handleEncryptDecrypt(false, container));
+    togglePassword.addEventListener('click', () => togglePasswordVisibility(container));
+}
+
+function setupFileDrop(container) {
+    const dropArea = container.querySelector('.file-drop-area');
+    const fileInput = container.querySelector('#fileInput');
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight() {
+        dropArea.classList.add('dragover');
+    }
+
+    function unhighlight() {
+        dropArea.classList.remove('dragover');
+    }
+
+    dropArea.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        fileInput.files = files;
+        const fileNameInput = container.querySelector('.file-input-wrapper input[type="text"]');
+        if (files.length > 0) {
+            fileNameInput.value = files[0].name;
+        }
+    }
+}
+
+function handleEncryptDecrypt(isEncrypt, container) {
+    const fileInput = container.querySelector('#fileInput');
+    const passwordInput = container.querySelector('#passwordInput');
+    const statusBar = container.querySelector('#statusBar');
+    const downloadContainer = container.querySelector('#downloadContainer');
+    const downloadLink = container.querySelector('#downloadLink');
 
     const file = fileInput.files[0];
     const password = passwordInput.value;
@@ -136,55 +181,10 @@ function handleEncryptDecrypt(isEncrypt) {
     }
 }
 
-function togglePasswordVisibility() {
-    const content = getWindowContent('Encryption');
-    if (!content) return;
-
-    const passwordInput = content.querySelector('#passwordInput');
-    const toggleButton = content.querySelector('#togglePassword');
+function togglePasswordVisibility(container) {
+    const passwordInput = container.querySelector('#passwordInput');
+    const toggleButton = container.querySelector('#togglePassword');
     const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
     passwordInput.setAttribute('type', type);
     toggleButton.classList.toggle('active');
-}
-
-function setupFileDrop(content) {
-    const dropArea = content.querySelector('.file-drop-area');
-    const fileInput = content.querySelector('#fileInput');
-
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropArea.addEventListener(eventName, preventDefaults, false);
-    });
-
-    function preventDefaults(e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-
-    ['dragenter', 'dragover'].forEach(eventName => {
-        dropArea.addEventListener(eventName, highlight, false);
-    });
-
-    ['dragleave', 'drop'].forEach(eventName => {
-        dropArea.addEventListener(eventName, unhighlight, false);
-    });
-
-    function highlight() {
-        dropArea.classList.add('dragover');
-    }
-
-    function unhighlight() {
-        dropArea.classList.remove('dragover');
-    }
-
-    dropArea.addEventListener('drop', handleDrop, false);
-
-    function handleDrop(e) {
-        const dt = e.dataTransfer;
-        const files = dt.files;
-        fileInput.files = files;
-        const fileNameInput = content.querySelector('.file-input-wrapper input[type="text"]');
-        if (files.length > 0) {
-            fileNameInput.value = files[0].name;
-        }
-    }
 }

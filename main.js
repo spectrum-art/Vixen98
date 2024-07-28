@@ -36,17 +36,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
 export function openApp(appName) {
     console.log('Opening app:', appName);
-    // Instead of publishing an event, directly call the appropriate initialization function
     switch(appName) {
         case 'Documents':
             initializeDocuments();
             break;
-            case 'Lemon List':
-                initializeLemonList();
-                break;
-                case 'Encryption':
-                    initializeEncryption();
-                    break;
+        case 'Lemon List':
+            initializeLemonList();
+            break;
+        case 'Encryption':
+            initializeEncryption();
+            break;
         // Add cases for other apps
         default:
             console.error(`Unknown app: ${appName}`);
