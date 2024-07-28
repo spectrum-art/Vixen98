@@ -47,7 +47,7 @@ export function createAppWindow(appConfig = {}) {
     windows.push({ appName: config.title, element: windowElement });
 
     createTaskbarItem(config.title, windowElement);
-    positionWindow(windowElement, config.width, config.height);
+    positionWindow(windowElement);
     makeDraggable(windowElement);
     if (config.resizable) makeResizable(windowElement);
     bringToFront(windowElement);
@@ -56,6 +56,18 @@ export function createAppWindow(appConfig = {}) {
 
     console.log('Window created:', windowElement);
     return windowElement;
+}
+
+function positionWindow(windowElement) {
+    const desktop = document.getElementById('desktop');
+    const desktopRect = desktop.getBoundingClientRect();
+    const windowRect = windowElement.getBoundingClientRect();
+
+    const left = Math.round((desktopRect.width - windowRect.width) / 2);
+    const top = Math.round((desktopRect.height - windowRect.height) / 2);
+
+    windowElement.style.left = `${left}px`;
+    windowElement.style.top = `${top}px`;
 }
 
 function createTaskbarItem(appName, windowElement) {
@@ -90,39 +102,6 @@ function getIconForApp(appName) {
     return iconMap[appName] || '📄';
 }
 
-function positionWindow(windowElement, width, height) {
-    const desktop = document.getElementById('desktop');
-    const desktopRect = desktop.getBoundingClientRect();
-
-    const centerX = Math.floor((desktopRect.width - parseInt(width)) / 2);
-    const centerY = Math.floor((desktopRect.height - parseInt(height)) / 2);
-
-    const position = findAvailablePosition(centerX, centerY);
-    
-    windowElement.style.left = `${position.x}px`;
-    windowElement.style.top = `${position.y}px`;
-}
-
-function findAvailablePosition(x, y, depth = 0) {
-    if (depth > 20) {
-        return { x, y };
-    }
-
-    if (!isPositionOccupied(x, y)) {
-        return { x, y };
-    }
-
-    return findAvailablePosition(x + 20, y + 20, depth + 1);
-}
-
-function isPositionOccupied(x, y) {
-    const threshold = 10;
-    return windows.some(w => {
-        const rect = w.element.getBoundingClientRect();
-        return Math.abs(rect.left - x) < threshold && Math.abs(rect.top - y) < threshold;
-    });
-}
-
 function makeDraggable(element) {
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
     element.querySelector('.window-header').onmousedown = dragMouseDown;
@@ -152,10 +131,6 @@ function makeDraggable(element) {
         document.onmouseup = null;
         document.onmousemove = null;
     }
-
-    element.addEventListener('mousedown', () => {
-        bringToFront(element);
-    });
 }
 
 function makeResizable(windowElement) {
@@ -215,75 +190,24 @@ function setupWindowControls(windowElement) {
 }
 
 function minimizeWindow(windowElement) {
-    windowElement.style.transformOrigin = 'bottom left';
-    windowElement.classList.add('minimizing');
-    
-    windowElement.dataset.originalLeft = windowElement.style.left;
-    windowElement.dataset.originalTop = windowElement.style.top;
-    
-    windowElement.offsetWidth; // Force reflow
+    windowElement.style.display = 'none';
     const taskbarItem = document.querySelector(`[data-icon="${windowElement.getAttribute('data-app')}"]`);
     if (taskbarItem) {
-        const taskbarRect = taskbarItem.getBoundingClientRect();
-        const windowRect = windowElement.getBoundingClientRect();
-        
-        const translateX = taskbarRect.left - windowRect.left;
-        const translateY = taskbarRect.top - windowRect.top;
-        
-        windowElement.style.transform = `translate(${translateX}px, ${translateY}px) scale(0.1)`;
-        windowElement.style.opacity = '0';
+        taskbarItem.classList.remove('active');
     }
-    windowElement.addEventListener('transitionend', () => {
-        windowElement.style.display = 'none';
-        windowElement.style.transform = '';
-        windowElement.style.opacity = '';
-        windowElement.classList.remove('minimizing');
-    }, { once: true });
 }
 
 function unminimizeWindow(windowElement) {
     windowElement.style.display = 'flex';
-    windowElement.style.transformOrigin = 'bottom left';
-    windowElement.classList.add('unminimizing');
-    
-    windowElement.offsetWidth; // Force reflow
-    const taskbarItem = document.querySelector(`[data-icon="${windowElement.getAttribute('data-app')}"]`);
-    if (taskbarItem) {
-        const taskbarRect = taskbarItem.getBoundingClientRect();
-        const windowRect = windowElement.getBoundingClientRect();
-        
-        const translateX = taskbarRect.left - windowRect.left;
-        const translateY = taskbarRect.top - windowRect.top;
-        
-        windowElement.style.transform = `translate(${translateX}px, ${translateY}px) scale(0.1)`;
-        windowElement.style.opacity = '0';
-        
-        windowElement.offsetWidth; // Force reflow
-        
-        windowElement.style.transform = '';
-        windowElement.style.opacity = '1';
-        windowElement.style.left = windowElement.dataset.originalLeft;
-        windowElement.style.top = windowElement.dataset.originalTop;
-    }
-    windowElement.addEventListener('transitionend', () => {
-        windowElement.classList.remove('unminimizing');
-        bringToFront(windowElement);
-    }, { once: true });
+    bringToFront(windowElement);
 }
 
 function maximizeWindow(windowElement) {
     if (windowElement.classList.contains('maximized')) {
         windowElement.classList.remove('maximized');
-        windowElement.style.width = windowElement.dataset.originalWidth;
-        windowElement.style.height = windowElement.dataset.originalHeight;
-        windowElement.style.left = windowElement.dataset.originalLeft;
-        windowElement.style.top = windowElement.dataset.originalTop;
+        positionWindow(windowElement);
     } else {
         windowElement.classList.add('maximized');
-        windowElement.dataset.originalWidth = windowElement.style.width;
-        windowElement.dataset.originalHeight = windowElement.style.height;
-        windowElement.dataset.originalLeft = windowElement.style.left;
-        windowElement.dataset.originalTop = windowElement.style.top;
         windowElement.style.width = '100%';
         windowElement.style.height = 'calc(100% - 30px)'; // Adjust for taskbar height
         windowElement.style.left = '0';
