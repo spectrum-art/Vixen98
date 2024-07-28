@@ -8,13 +8,24 @@ export function createAppWindow(appConfig = {}) {
         height: '60%',
         minWidth: '300px',
         minHeight: '200px',
-        resizable: true,
-        maximizable: true,
         title: 'New Window',
         content: '',
+        features: {
+            resizable: true,
+            minimizable: true,
+            maximizable: true,
+            closable: true,
+            draggable: true,
+            showInTaskbar: true
+        }
     };
 
-    const config = { ...defaultConfig, ...appConfig };
+    const config = {
+        ...defaultConfig,
+        ...appConfig,
+        features: { ...defaultConfig.features, ...appConfig.features }
+    };
+
     console.log('Creating app window with config:', config);
 
     const windowElement = document.createElement('div');
@@ -30,9 +41,9 @@ export function createAppWindow(appConfig = {}) {
         <div class="window-header">
             <span class="window-title">${config.title}</span>
             <div class="window-controls">
-                <span class="window-minimize">🗕</span>
-                ${config.maximizable ? '<span class="window-maximize">🗖</span>' : ''}
-                <span class="window-close">❌</span>
+                ${config.features.minimizable ? '<span class="window-minimize">🗕</span>' : ''}
+                ${config.features.maximizable ? '<span class="window-maximize">🗖</span>' : ''}
+                ${config.features.closable ? '<span class="window-close">❌</span>' : ''}
             </div>
         </div>
         <div class="window-content">${config.content}</div>
@@ -44,15 +55,17 @@ export function createAppWindow(appConfig = {}) {
 
     const desktop = document.getElementById('desktop');
     desktop.appendChild(windowElement);
-    windows.push({ appName: config.title, element: windowElement });
+    windows.push({ appName: config.title, element: windowElement, config });
 
-    createTaskbarItem(config.title, windowElement);
+    if (config.features.showInTaskbar) {
+        createTaskbarItem(config.title, windowElement);
+    }
     positionWindow(windowElement);
-    makeDraggable(windowElement);
-    if (config.resizable) makeResizable(windowElement);
+    if (config.features.draggable) makeDraggable(windowElement);
+    if (config.features.resizable) makeResizable(windowElement);
     bringToFront(windowElement);
 
-    setupWindowControls(windowElement);
+    setupWindowControls(windowElement, config);
 
     console.log('Window created:', windowElement);
     return windowElement;
@@ -104,7 +117,10 @@ function getIconForApp(appName) {
 
 function makeDraggable(element) {
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-    element.querySelector('.window-header').onmousedown = dragMouseDown;
+    const header = element.querySelector('.window-header');
+    if (header) {
+        header.onmousedown = dragMouseDown;
+    }
 
     function dragMouseDown(e) {
         e = e || window.event;
@@ -179,14 +195,20 @@ function bringToFront(windowElement) {
     }
 }
 
-function setupWindowControls(windowElement) {
+function setupWindowControls(windowElement, config) {
     const minimizeBtn = windowElement.querySelector('.window-minimize');
     const maximizeBtn = windowElement.querySelector('.window-maximize');
     const closeBtn = windowElement.querySelector('.window-close');
     
-    minimizeBtn.addEventListener('click', () => minimizeWindow(windowElement));
-    if (maximizeBtn) maximizeBtn.addEventListener('click', () => maximizeWindow(windowElement));
-    closeBtn.addEventListener('click', () => closeWindow(windowElement));
+    if (minimizeBtn && config.features.minimizable) {
+        minimizeBtn.addEventListener('click', () => minimizeWindow(windowElement));
+    }
+    if (maximizeBtn && config.features.maximizable) {
+        maximizeBtn.addEventListener('click', () => maximizeWindow(windowElement));
+    }
+    if (closeBtn && config.features.closable) {
+        closeBtn.addEventListener('click', () => closeWindow(windowElement));
+    }
 }
 
 function minimizeWindow(windowElement) {
