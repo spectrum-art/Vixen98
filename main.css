@@ -727,3 +727,10 @@ body, html {
 #see-more-button:hover {
     background-color: #d0d0d0;
 }
+
+.error-message {
+    color: #ff0000;
+    font-weight: bold;
+    text-align: center;
+    padding: 20px;
+}

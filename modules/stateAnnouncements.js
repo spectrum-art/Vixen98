@@ -40,16 +40,31 @@ function loadAnnouncements(container) {
             const xmlDoc = parser.parseFromString(data, 'text/xml');
             const items = xmlDoc.querySelectorAll('item');
             
-            announcements = Array.from(items).map(item => ({
-                title: item.querySelector('title').textContent,
-                date: new Date(item.querySelector('pubDate').textContent),
-                link: item.querySelector('link').textContent,
-                content: item.querySelector('content\\:encoded').textContent
-            }));
+            announcements = Array.from(items).map(item => {
+                const title = item.querySelector('title');
+                const pubDate = item.querySelector('pubDate');
+                const link = item.querySelector('link');
+                const content = item.querySelector('content\\:encoded') || item.querySelector('description');
+
+                return {
+                    title: title ? title.textContent : 'No Title',
+                    date: pubDate ? new Date(pubDate.textContent) : new Date(),
+                    link: link ? link.textContent : '#',
+                    content: content ? content.textContent : 'No content available'
+                };
+            }).filter(announcement => announcement.title !== 'No Title' || announcement.content !== 'No content available');
 
             displayAnnouncements(container);
         })
-        .catch(error => console.error('Error loading announcements:', error));
+        .catch(error => {
+            console.error('Error loading announcements:', error);
+            displayError(container);
+        });
+}
+
+function displayError(container) {
+    const listContainer = container.querySelector('#announcements-list');
+    listContainer.innerHTML = '<p class="error-message">Error loading announcements. Please try again later.</p>';
 }
 
 function displayAnnouncements(container) {
