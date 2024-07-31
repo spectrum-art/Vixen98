@@ -133,7 +133,7 @@ function setupFilters(container) {
     if (!filterContainer) return;
 
     const uniqueEmojis = [...new Set(listings.map(item => item.emoji))];
-    uniqueEmojis.forEach(emoji => {
+    uniqueEmojis.forEach((emoji, index) => {
         if (emoji) {
             const filterItem = document.createElement('div');
             filterItem.className = 'filter-item';

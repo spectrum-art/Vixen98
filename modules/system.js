@@ -2,8 +2,8 @@ import { createAppWindow } from './windowManagement.js';
 
 const systemConfig = {
     title: 'System',
-    width: '40%',
-    height: '50%',
+    width: '600px',
+    height: '400px',
     content: '<div id="system-app"></div>',
     features: {
         resizable: false,
@@ -40,16 +40,13 @@ function createSystemAppHTML() {
                 </div>
                 <div class="system-info">
                     <pre>
-
 System:
     Vixen 98
     0.500
 
-
 Registered to:
     █████████  █████
     24796-OEM-0014736-66386
-
 
 Computer:
     AuthenticVIX

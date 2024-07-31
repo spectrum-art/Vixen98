@@ -150,6 +150,7 @@ body, html {
     flex-grow: 1;
     display: flex;
     align-items: center;
+    overflow: hidden;
 }
 
 #system-tray {
@@ -278,6 +279,14 @@ body, html {
     margin-right: 2px;
     font-size: 12px;
     cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+.taskbar-item:first-child {
+    margin-left: 10px;
 }
 
 .taskbar-item.active {
@@ -291,46 +300,44 @@ body, html {
     margin-right: 5px;
 }
 
+.system-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
 .system-content {
     display: flex;
-    height: calc(100% - 40px);
-    font-size: 1.2em;
-    font-family: "Nanum Gothic Coding", monospace;
+    flex: 1;
+    padding: 20px;
 }
 
 .system-image {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    padding: 25px;
+    flex: 0 0 auto;
+    margin-right: 20px;
 }
 
 .system-image img {
-    width: calc(100% - 24px);
-    height: calc(100% - 60px);
-    object-fit: contain;
-    aspect-ratio: 1 / 1;
+    max-width: 100%;
+    height: auto;
 }
 
 .system-info {
     flex: 1;
-    display: flex;
-    align-items: center;
-    padding: 20px 20px 20px 0px;
-    color: #000000;
-    background-color: transparent;
+    overflow: hidden;
 }
 
 .system-info pre {
     margin: 0;
     white-space: pre-wrap;
     word-wrap: break-word;
+    font-size: 14px;
 }
 
 .system-button-container {
     display: flex;
     justify-content: flex-end;
-    padding: 6px;
+    padding: 10px;
 }
 
 #system-ok-button {
@@ -628,6 +635,7 @@ body, html {
     overflow: hidden;
     margin-left: 7px;
     padding-top: 15px;
+    padding-bottom: 40px;
 }
 
 .listing-column {
@@ -657,10 +665,14 @@ body, html {
 }
 
 .pagination-container {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    right: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 25px;                                                                                                                                                                                                                        
+    padding: 10px;
 }
 
 .pagination-container button {

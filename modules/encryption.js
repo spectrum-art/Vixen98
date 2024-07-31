@@ -4,7 +4,7 @@ import { createAppWindow, getWindowContent } from './windowManagement.js';
 const encryptionConfig = {
     title: 'Encryption',
     width: '50%',
-    height: '34%',
+    height: '41%',
     content: '<div id="encryption-app"></div>',
 };
 
