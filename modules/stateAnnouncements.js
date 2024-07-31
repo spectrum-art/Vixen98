@@ -44,7 +44,7 @@ function loadAnnouncements(container) {
                 const title = item.querySelector('title');
                 const pubDate = item.querySelector('pubDate');
                 const link = item.querySelector('link');
-                const content = item.querySelector('content\\:encoded') || item.querySelector('description');
+                const content = item.getElementsByTagName('content:encoded')[0];
 
                 return {
                     title: title ? title.textContent : 'No Title',
@@ -62,11 +62,6 @@ function loadAnnouncements(container) {
         });
 }
 
-function displayError(container) {
-    const listContainer = container.querySelector('#announcements-list');
-    listContainer.innerHTML = '<p class="error-message">Error loading announcements. Please try again later.</p>';
-}
-
 function displayAnnouncements(container) {
     const listContainer = container.querySelector('#announcements-list');
     listContainer.innerHTML = '';
@@ -79,6 +74,9 @@ function displayAnnouncements(container) {
             <p class="date">${announcement.date.toLocaleDateString()}</p>
             <p class="snippet">${getSnippet(announcement.content)}</p>
         `;
+        announcementElement.addEventListener('click', () => {
+            window.open(announcement.link, '_blank');
+        });
         listContainer.appendChild(announcementElement);
     });
 
@@ -93,4 +91,9 @@ function getSnippet(content) {
     div.innerHTML = content;
     const text = div.textContent || div.innerText || '';
     return text.slice(0, 150) + '...';
+}
+
+function displayError(container) {
+    const listContainer = container.querySelector('#announcements-list');
+    listContainer.innerHTML = '<p class="error-message">Error loading announcements. Please try again later.</p>';
 }

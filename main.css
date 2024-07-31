@@ -734,3 +734,16 @@ body, html {
     text-align: center;
     padding: 20px;
 }
+
+.announcement {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border: 1px solid #d0d0d0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.announcement:hover {
+    background-color: #e0e0e0;
+}
