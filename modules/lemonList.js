@@ -66,15 +66,13 @@ function setupLemonListApp(window, params) {
     if (!container) return;
 
     container.innerHTML = createLemonListContent();
-    loadCSV().then(() => {
-        setupFilters(container);
-        displayListings(container);
-        setupEventListeners(container);
-    });
+    addShareSearchButton(container);
 
     if (params.search) {
         const searchBar = container.querySelector('#search-bar');
-        searchBar.value = params.search;
+        if (searchBar) {
+            searchBar.value = params.search;
+        }
     }
 
     if (params.filters) {
@@ -84,8 +82,11 @@ function setupLemonListApp(window, params) {
         });
     }
 
-    displayListings(container);
-    setupEventListeners(container);
+    loadCSV().then(() => {
+        setupFilters(container);
+        displayListings(container);
+        setupEventListeners(container);
+    });
 }
 
 function applyStyles(window) {
@@ -122,6 +123,25 @@ function createLemonListContent() {
             <button id="next-page" aria-label="Next page">▶</button>
         </div>
     `;
+}
+
+function addShareSearchButton(container) {
+    const searchFilterContainer = container.querySelector('.search-filter-container');
+    if (!searchFilterContainer) {
+        console.error('Search filter container not found');
+        return;
+    }
+
+    const shareSearchButton = document.createElement('button');
+    shareSearchButton.id = 'share-search';
+    shareSearchButton.textContent = 'Share search';
+    
+    const clearFiltersButton = searchFilterContainer.querySelector('#clear-filters');
+    if (clearFiltersButton) {
+        clearFiltersButton.parentNode.insertBefore(shareSearchButton, clearFiltersButton);
+    } else {
+        searchFilterContainer.appendChild(shareSearchButton);
+    }
 }
 
 function loadCSV() {
@@ -255,6 +275,7 @@ function setupEventListeners(container) {
     const clearFiltersButton = container.querySelector('#clear-filters');
     const prevPageButton = container.querySelector('#prev-page');
     const nextPageButton = container.querySelector('#next-page');
+    const shareSearchButton = container.querySelector('#share-search');
 
     if (searchBar) {
         searchBar.addEventListener('input', debounce(() => {
@@ -299,15 +320,13 @@ function setupEventListeners(container) {
         });
     }
 
+    if (shareSearchButton) {
+        shareSearchButton.addEventListener('click', () => shareCurrentSearch(container));
+    }
+
     window.addEventListener('resize', debounce(() => {
         displayListings(container);
     }, 250));
-
-    const shareSearchButton = document.createElement('button');
-    shareSearchButton.id = 'share-search';
-    shareSearchButton.textContent = 'Share search';
-    shareSearchButton.addEventListener('click', () => shareCurrentSearch(container));
-    clearFiltersButton.parentNode.insertBefore(shareSearchButton, clearFiltersButton);
 }
 
 function shareCurrentSearch(container) {
