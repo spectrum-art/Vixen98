@@ -1,0 +1,112 @@
+.encryption-app {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 10px;
+}
+
+.app-row {
+    display: flex;
+    justify-content: center;
+}
+
+#fileInput {
+    width: 100%;
+    padding: 5px;
+}
+
+.password-container {
+    width: 50%;
+    position: relative;
+    right: 5.1%;
+}
+
+#passwordInput {
+    width: calc(100% - 30px);
+    padding: 5px;
+}
+
+#encryptBtn, #decryptBtn {
+    width: 35%;
+    margin-left: 2%;
+    margin-right: 2%;
+}
+
+#statusBar {
+    min-height: 20px;
+    word-wrap: break-word;
+    padding: 5px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.download-button {
+    padding: 5px 10px;
+    background-color: #008080;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    width: 100%;
+}
+
+.download-button:hover {
+    background-color: #006666;
+}
+
+#togglePassword {
+    position: absolute;
+    right: -60px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+#togglePassword.active {
+    color: #000080;
+}
+
+.file-drop-area {
+    border: 2px solid #808080;
+    border-right-color: #ffffff;
+    border-bottom-color: #ffffff;
+    background-color: #c0c0c0;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.file-drop-area .file-input-wrapper {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.file-drop-area input[type="text"] {
+    flex-grow: 1;
+    border: 1px solid #808080;
+    border-right-color: #ffffff;
+    border-bottom-color: #ffffff;
+    background-color: #ffffff;
+    padding: 2px 5px;
+}
+
+.file-drop-area button {
+    margin-left: 5px;
+    padding: 2px 10px;
+    background-color: #c0c0c0;
+    border: 1px solid #ffffff;
+    border-right-color: #808080;
+    border-bottom-color: #808080;
+}
+
+.file-drop-area p {
+    margin: 5px 0;
+    font-size: 12px;
+}
+
+.file-drop-area.dragover {
+    background-color: #f0f0f0;
+}

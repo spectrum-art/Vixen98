@@ -1,5 +1,8 @@
 import { EventBus, debounce } from './utils.js';
 import { createAppWindow } from './windowManagement.js';
+import '../styles/lemonList.css';
+import '../styles/main.css';
+import '../styles/common.css';
 
 const lemonListConfig = {
     title: 'Lemon List',

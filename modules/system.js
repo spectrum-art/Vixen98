@@ -1,4 +1,7 @@
 import { createAppWindow } from './windowManagement.js';
+import '../styles/system.css';
+import '../styles/main.css';
+import '../styles/common.css';
 
 const systemConfig = {
     title: 'System',

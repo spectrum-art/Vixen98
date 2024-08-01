@@ -1,4 +1,7 @@
 import { createAppWindow } from './windowManagement.js';
+import '../styles/documents.css';
+import '../styles/main.css';
+import '../styles/common.css';
 
 const documentsConfig = {
     title: 'Documents',

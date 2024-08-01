@@ -1,0 +1,46 @@
+.system-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.system-content {
+    display: flex;
+    flex: 1;
+    padding: 20px;
+}
+
+.system-image {
+    flex: 0 0 auto;
+    margin-right: 20px;
+}
+
+.system-image img {
+    max-width: 100%;
+    height: auto;
+}
+
+.system-info {
+    flex: 1;
+    overflow: hidden;
+}
+
+.system-info pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 14px;
+}
+
+.system-button-container {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px;
+}
+
+#system-ok-button {
+    min-width: 75px;
+    padding: 0 12px;
+    margin-right: 10px;
+    margin-top: 10px;
+}

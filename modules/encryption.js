@@ -1,5 +1,8 @@
 import { EventBus } from './utils.js';
 import { createAppWindow, getWindowContent } from './windowManagement.js';
+import '../styles/encryption.css';
+import '../styles/main.css';
+import '../styles/common.css';
 
 const encryptionConfig = {
     title: 'Encryption',

@@ -1,0 +1,298 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    background-color: black;
+}
+
+#screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+/* -------------- Splash Screen -------------- */
+
+#splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+#splash-gif {
+    width: 94vh;
+    height: 70.5vh;
+    object-fit: contain;
+}
+
+.fade-out {
+    animation: fadeOut 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* -------------- Desktop -------------- */
+
+#desktop-container {
+    width: 94vh;
+    height: 70.5vh;
+    aspect-ratio: 4 / 3;
+    background-color: #57abab;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+#desktop {
+    flex-grow: 1;
+    position: relative;
+    overflow: hidden;
+    background-color: #57abab;
+}
+
+#desktop-background {
+    position: absolute;
+    opacity: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-height: 50%;
+    object-fit: contain;
+    z-index: 0;
+    pointer-events: none;
+}
+
+#icon-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(16%, 1fr));
+    grid-auto-rows: 16%;
+    height: 100%;
+    width: 100%;
+}
+
+.desktop-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.desktop-icon .icon {
+    width: 100%;
+    height: 43%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3em;
+}
+
+.desktop-icon .label {
+    color: white;
+    text-align: center;
+    margin-top: 5px;
+    font-size: 18px;
+    max-width: 100%;
+    white-space: normal;
+}
+
+/* -------------- Taskbar -------------- */
+
+#taskbar {
+    height: 5%;
+    background-color: #c3c3c3;
+    display: flex;
+    align-items: center;
+    padding: 1px;
+    border-top: 1px solid #ffffff;
+    border-left: 1px solid #ffffff;
+    border-right: 1px solid #808080;
+    border-bottom: 1px solid #808080;
+}
+
+#start-button {
+    height: 100%;
+    margin-right: 2px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+#start-button-img {
+    content: url('images/vixenstartbutton.png');
+    height: 60%;
+    margin: 9px;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+#taskbar-separator {
+    width: 3px;
+    height: 90%;
+    background: linear-gradient(to right, #808080, #ffffff);
+    margin: 0 2px;
+}
+
+#open-windows {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+#system-tray {
+    display: flex;
+    align-items: center;
+    padding: 8px 5px;
+    border-top: 1px solid #808080;
+    border-left: 1px solid #808080;
+    border-right: 1px solid #ffffff;
+    border-bottom: 1px solid #ffffff;
+}
+
+#calendar-icon, #volume-icon {
+    font-size: 16px;
+    margin-right: 5px;
+}
+
+#clock {
+    font-size: 14px;
+    font-style: bold;
+    margin-left: 5px;
+}
+
+.taskbar-item {
+    display: flex;
+    align-items: center;
+    background-color: #c3c3c3;
+    border: 1px solid #000;
+    padding: 2px 5px;
+    margin-right: 2px;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+.taskbar-item:first-child {
+    margin-left: 10px;
+}
+
+.taskbar-item.active {
+    background-color: #a0a0a0;
+}
+
+.taskbar-item-icon {
+    width: 16px;
+    height: 16px;
+    background-color: #000;
+    margin-right: 5px;
+}
+
+/* -------------- Windows -------------- */
+
+.window {
+    position: absolute;
+    background-color: #c3c3c3;
+    border: 2px solid #000;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease-in, opacity 0.2s ease-in;
+}
+
+.window-content {
+    flex-grow: 1;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.window.active {
+    z-index: 2;
+}
+
+.window.minimizing, .window.unminimizing {
+    pointer-events: none;
+}
+
+.window.unminimizing {
+    display: flex !important;
+}
+
+.window-controls {
+    display: flex;
+}
+
+.window-header {
+    background-color: #808080;
+    color: #c0c0c0;
+    padding: 2px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.window.active .window-header {
+    background-color: #000080;
+    color: #ffffff;
+}
+
+.window-title {
+    font-weight: bold;
+}
+
+.window-minimize, .window-close {
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.window-resizer {
+    width: 15px;
+    height: 15px;
+    background-color: #c3c3c3;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    cursor: se-resize;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    color: #808080;
+}
+
+.window-resizer::after {
+    content: '⇲';
+}
+
+.window.maximized {
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: calc(100% - 4px) !important;
+}
+
+.window.maximized .window-resizer {
+    display: none;
+}
