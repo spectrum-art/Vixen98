@@ -137,7 +137,7 @@ body, html {
 }
 
 #start-button-img {
-    content: url('images/vixenstartbutton.png');
+    content: url('../images/vixenstartbutton.png');
     height: 60%;
     margin: 9px;
     width: auto;
