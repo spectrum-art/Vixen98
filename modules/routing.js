@@ -25,22 +25,24 @@ export function handleRouting() {
 }
 
 function parseHash(hash) {
-    const [appName, paramString] = hash.split('?');
+    const [encodedAppName, paramString] = hash.split('?');
+    const appName = decodeURIComponent(encodedAppName);
     const params = {};
     if (paramString) {
         paramString.split('&').forEach(param => {
             const [key, value] = param.split('=');
-            params[key] = decodeURIComponent(value);
+            params[decodeURIComponent(key)] = decodeURIComponent(value);
         });
     }
     return [appName, params];
 }
 
 export function generateDeepLink(appName, params = {}) {
+    const encodedAppName = encodeURIComponent(appName);
     const paramString = Object.entries(params)
-        .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+        .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
         .join('&');
-    return `${window.location.origin}/#${appName}${paramString ? `?${paramString}` : ''}`;
+    return `${window.location.origin}/#${encodedAppName}${paramString ? `?${paramString}` : ''}`;
 }
 
 export function updateURL(appName, params = {}) {
