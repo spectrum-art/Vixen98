@@ -3,8 +3,9 @@ import { initializeSystem } from './modules/system.js';
 import { initializeDocuments } from './modules/documents.js';
 import { initializeLemonList } from './modules/lemonList.js';
 import { initializeEncryption } from './modules/encryption.js';
-import { initializeAuth } from './modules/auth.js';
+import { initializeAuth, checkStoredCredentials } from './modules/auth.js';
 import { initializepropaganda } from './modules/propaganda.js';
+import { initializeRouting, handleRouting } from './modules/routing.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     const splashScreen = document.getElementById('splash-screen');
@@ -24,44 +25,37 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(removeSplashScreen, 8500);
     }
 
-    startSplashScreen();
+    if (checkStoredCredentials()) {
+        removeSplashScreen();
+    } else {
+        startSplashScreen();
+    }
 
     console.log('DOM content loaded, initializing modules');
     initializeDesktop();
     initializeAuth();
-
-    // Set up routing
-    window.addEventListener('hashchange', handleRouting);
-    handleRouting();
+    initializeRouting();
 });
 
-export function openApp(appName) {
-    console.log('Opening app:', appName);
+export function openApp(appName, params = {}) {
+    console.log('Opening app:', appName, 'with params:', params);
     switch(appName) {
         case 'System':
-            initializeSystem();
+            initializeSystem(params);
             break;
         case 'Documents':
-            initializeDocuments();
+            initializeDocuments(params);
             break;
         case 'Lemon List':
-            initializeLemonList();
+            initializeLemonList(params);
             break;
         case 'Encryption':
-            initializeEncryption();
+            initializeEncryption(params);
             break;
         case 'Propaganda':
-            initializepropaganda();
+            initializepropaganda(params);
             break;
         default:
             console.error(`Unknown app: ${appName}`);
-    }
-}
-
-function handleRouting() {
-    const hash = window.location.hash.slice(1);
-    if (hash) {
-        console.log('Routing to:', hash);
-        openApp(hash);
     }
 }

@@ -1,5 +1,6 @@
 import { EventBus, debounce } from './utils.js';
 import { createAppWindow } from './windowManagement.js';
+import { generateDeepLink } from './routing.js';
 
 const lemonListConfig = {
     title: 'Lemon List',
@@ -54,12 +55,12 @@ const emojiTooltips = {
     '🚕': 'Taxi'
 };
 
-export function initializeLemonList() {
+export function initializeLemonList(params = {}) {
     const window = createAppWindow(lemonListConfig);
-    setupLemonListApp(window);
+    setupLemonListApp(window, params);
 }
 
-function setupLemonListApp(window) {
+function setupLemonListApp(window, params) {
     applyStyles(window);
     const container = window.querySelector('#lemon-list-app');
     if (!container) return;
@@ -70,6 +71,21 @@ function setupLemonListApp(window) {
         displayListings(container);
         setupEventListeners(container);
     });
+
+    if (params.search) {
+        const searchBar = container.querySelector('#search-bar');
+        searchBar.value = params.search;
+    }
+
+    if (params.filters) {
+        const filters = params.filters.split(',');
+        container.querySelectorAll('#filter-checkboxes input').forEach(checkbox => {
+            checkbox.checked = filters.includes(checkbox.value);
+        });
+    }
+
+    displayListings(container);
+    setupEventListeners(container);
 }
 
 function applyStyles(window) {
@@ -286,4 +302,30 @@ function setupEventListeners(container) {
     window.addEventListener('resize', debounce(() => {
         displayListings(container);
     }, 250));
+
+    const shareSearchButton = document.createElement('button');
+    shareSearchButton.id = 'share-search';
+    shareSearchButton.textContent = 'Share search';
+    shareSearchButton.addEventListener('click', () => shareCurrentSearch(container));
+    clearFiltersButton.parentNode.insertBefore(shareSearchButton, clearFiltersButton);
+}
+
+function shareCurrentSearch(container) {
+    const searchBar = container.querySelector('#search-bar');
+    const activeFilters = Array.from(container.querySelectorAll('#filter-checkboxes input:checked'))
+        .map(checkbox => checkbox.value);
+
+    const params = {
+        search: searchBar.value,
+        filters: activeFilters.join(',')
+    };
+
+    const deepLink = generateDeepLink('Lemon List', params);
+    
+    navigator.clipboard.writeText(deepLink).then(() => {
+        alert('Link copied to clipboard!');
+    }).catch(err => {
+        console.error('Failed to copy link: ', err);
+        alert('Failed to copy link. Please try again.');
+    });
 }

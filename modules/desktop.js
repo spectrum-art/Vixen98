@@ -1,13 +1,15 @@
 import { EventBus } from './utils.js';
 import { openApp } from '../main.js';
+import { appAccessLevels, getAccessLevel } from './auth.js';
+import { generateDeepLink } from './routing.js';
 
 const desktopIcons = [
-    { name: 'System', icon: '💻', accessLevel: 1 },
-    { name: 'Trash', icon: '🗑️', accessLevel: 1 },
-    { name: 'Documents', icon: '📁', accessLevel: 2 },
-    { name: 'Lemon List', icon: '🍋', accessLevel: 1 },
-    { name: 'Encryption', icon: '🔒', accessLevel: 1 },
-    { name: 'Propaganda', icon: '🏛️', accessLevel: 1 }
+    { name: 'System', icon: '💻' },
+    { name: 'Trash', icon: '🗑️' },
+    { name: 'Documents', icon: '📁' },
+    { name: 'Lemon List', icon: '🍋' },
+    { name: 'Encryption', icon: '🔒' },
+    { name: 'Propaganda', icon: '🏛️' }
 ];
 
 export function initializeDesktop() {
@@ -41,10 +43,12 @@ function updateClock() {
     document.getElementById('clock').textContent = timeString;
 }
 
-function updateDesktopIcons(accessLevel) {
+function updateDesktopIcons() {
+    const userAccessLevel = getAccessLevel();
     const icons = document.querySelectorAll('.desktop-icon');
     icons.forEach((iconElement, index) => {
         const icon = desktopIcons[index];
-        iconElement.style.display = accessLevel >= icon.accessLevel ? 'flex' : 'none';
+        const requiredLevel = appAccessLevels[icon.name] || 1;
+        iconElement.style.display = userAccessLevel >= requiredLevel ? 'flex' : 'none';
     });
 }
