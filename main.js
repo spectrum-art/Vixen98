@@ -43,6 +43,8 @@ export function openApp(appName, params = {}) {
         case 'System':
             initializeSystem(params);
             break;
+        case 'Trash':
+            // Add initialization logic here later
         case 'Documents':
             initializeDocuments(params);
             break;
