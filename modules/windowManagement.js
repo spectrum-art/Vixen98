@@ -1,6 +1,4 @@
 import { EventBus } from './utils.js';
-import '../styles/main.css';
-import '../styles/common.css';
 
 let windows = [];
 

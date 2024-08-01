@@ -1,8 +1,5 @@
 import { createAppWindow } from './windowManagement.js';
 import { EventBus } from './utils.js';
-import '../styles/propaganda.css';
-import '../styles/main.css';
-import '../styles/common.css';
 
 const propagandaConfig = {
     title: 'Propaganda',

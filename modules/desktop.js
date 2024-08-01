@@ -1,7 +1,5 @@
 import { EventBus } from './utils.js';
 import { openApp } from '../main.js';
-import '../styles/main.css';
-import '../styles/common.css';
 
 const desktopIcons = [
     { name: 'System', icon: '💻', accessLevel: 1 },

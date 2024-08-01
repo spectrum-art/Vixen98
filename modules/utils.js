@@ -1,6 +1,3 @@
-import '../styles/main.css';
-import '../styles/common.css';
-
 export const EventBus = {
     events: {},
     subscribe(event, callback) {
