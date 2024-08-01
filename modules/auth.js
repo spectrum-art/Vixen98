@@ -71,12 +71,12 @@ export function verifyToken(token) {
     return 1; // Default access level
 }
 
-function storeCredentials(token) {
+export function storeCredentials(token) {
     localStorage.setItem('accessToken', token);
     localStorage.setItem('lastLogin', Date.now().toString());
 }
 
-function checkStoredCredentials() {
+export function checkStoredCredentials() {
     const token = localStorage.getItem('accessToken');
     const lastLogin = localStorage.getItem('lastLogin');
     const currentTime = Date.now();
@@ -104,5 +104,3 @@ export function checkAppAccess(appName) {
     const userLevel = getAccessLevel();
     return userLevel >= requiredLevel;
 }
-
-export { storeCredentials, checkStoredCredentials };
