@@ -1,29 +1,29 @@
 import { createAppWindow } from './windowManagement.js';
 import { EventBus } from './utils.js';
 
-const stateAnnouncementsConfig = {
-    title: 'State Announcements',
+const propagandaConfig = {
+    title: 'Propaganda',
     width: '50%',
     height: '70%',
-    content: '<div id="state-announcements-app"></div>',
+    content: '<div id="propaganda-app"></div>',
 };
 
 let announcements = [];
 
-export function initializeStateAnnouncements() {
-    const window = createAppWindow(stateAnnouncementsConfig);
-    setupStateAnnouncementsApp(window);
+export function initializepropaganda() {
+    const window = createAppWindow(propagandaConfig);
+    setuppropagandaApp(window);
 }
 
-function setupStateAnnouncementsApp(window) {
-    const container = window.querySelector('#state-announcements-app');
+function setuppropagandaApp(window) {
+    const container = window.querySelector('#propaganda-app');
     if (!container) return;
     
-    container.innerHTML = createStateAnnouncementsHTML();
+    container.innerHTML = createpropagandaHTML();
     loadAnnouncements(container);
 }
 
-function createStateAnnouncementsHTML() {
+function createpropagandaHTML() {
     return `
         <div class="announcements-container">
             <div id="announcements-list"></div>
@@ -33,7 +33,7 @@ function createStateAnnouncementsHTML() {
 }
 
 function loadAnnouncements(container) {
-    fetch('/data/StateAnnouncements.txt')
+    fetch('/data/propaganda.txt')
         .then(response => response.text())
         .then(data => {
             const parser = new DOMParser();

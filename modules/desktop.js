@@ -7,7 +7,7 @@ const desktopIcons = [
     { name: 'Documents', icon: '📁', accessLevel: 2 },
     { name: 'Lemon List', icon: '🍋', accessLevel: 1 },
     { name: 'Encryption', icon: '🔒', accessLevel: 1 },
-    { name: 'State Announcements', icon: '📢', accessLevel: 1 }
+    { name: 'Propaganda', icon: '🏛️', accessLevel: 1 }
 ];
 
 export function initializeDesktop() {

@@ -4,7 +4,7 @@ import { initializeDocuments } from './modules/documents.js';
 import { initializeLemonList } from './modules/lemonList.js';
 import { initializeEncryption } from './modules/encryption.js';
 import { initializeAuth } from './modules/auth.js';
-import { initializeStateAnnouncements } from './modules/stateAnnouncements.js';
+import { initializepropaganda } from './modules/propaganda.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     const splashScreen = document.getElementById('splash-screen');
@@ -50,8 +50,8 @@ export function openApp(appName) {
         case 'Encryption':
             initializeEncryption();
             break;
-        case 'State Announcements':
-            initializeStateAnnouncements();
+        case 'Propaganda':
+            initializepropaganda();
             break;
         default:
             console.error(`Unknown app: ${appName}`);
