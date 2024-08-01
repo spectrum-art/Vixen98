@@ -66,7 +66,7 @@ function openCookieDeliveryMap() {
         title: 'Cookie Delivery Map',
         content: `<iframe src="${mapUrl}" 
             style="border: none; width: 100%; height: 100%;" 
-            sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
+            sandbox="allow-scripts allow-same-origin">
         </iframe>`,
         width: '90%',
         height: '90%',
