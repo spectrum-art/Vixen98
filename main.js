@@ -5,7 +5,7 @@ import { initializeLemonList } from './modules/lemonList.js';
 import { initializeEncryption } from './modules/encryption.js';
 import { initializeAuth, checkStoredCredentials } from './modules/auth.js';
 import { initializepropaganda } from './modules/propaganda.js';
-import { initializeRouting, handleRouting } from './modules/routing.js';
+import { initializeRouting, updateURL } from './modules/routing.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     const splashScreen = document.getElementById('splash-screen');
@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 export function openApp(appName, params = {}) {
     console.log('Opening app:', appName, 'with params:', params);
+    updateURL(appName, params);
     switch(appName) {
         case 'System':
             initializeSystem(params);
@@ -69,3 +70,9 @@ export function openApp(appName, params = {}) {
             throw new Error(`Unknown app: ${appName}`);
     }
 }
+
+window.addEventListener('popstate', (event) => {
+    if (event.state && event.state.appName) {
+        openApp(event.state.appName, event.state.params);
+    }
+});

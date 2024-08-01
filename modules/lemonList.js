@@ -1,6 +1,6 @@
 import { EventBus, debounce } from './utils.js';
 import { createAppWindow } from './windowManagement.js';
-import { generateDeepLink } from './routing.js';
+import { generateDeepLink, updateURL } from './routing.js';
 
 const lemonListConfig = {
     title: 'Lemon List',
@@ -281,6 +281,7 @@ function setupEventListeners(container) {
         searchBar.addEventListener('input', debounce(() => {
             currentPage = 1;
             displayListings(container);
+            updateLemonListURL(container);
         }, debounceTime));
     }
 
@@ -288,6 +289,7 @@ function setupEventListeners(container) {
         filterCheckboxes.addEventListener('change', () => {
             currentPage = 1;
             displayListings(container);
+            updateLemonListURL(container);
         });
     }
 
@@ -297,6 +299,7 @@ function setupEventListeners(container) {
             container.querySelectorAll('#filter-checkboxes input').forEach(checkbox => checkbox.checked = false);
             currentPage = 1;
             displayListings(container);
+            updateLemonListURL(container);
         });
     }
 
@@ -367,4 +370,17 @@ function fallbackCopy(text) {
         alert('Failed to copy link. Please copy this URL manually: ' + text);
     }
     document.body.removeChild(textArea);
+}
+
+function updateLemonListURL(container) {
+    const searchBar = container.querySelector('#search-bar');
+    const activeFilters = Array.from(container.querySelectorAll('#filter-checkboxes input:checked'))
+        .map(checkbox => checkbox.value);
+
+    const params = {
+        search: searchBar ? searchBar.value : '',
+        filters: activeFilters.join(',')
+    };
+
+    updateURL('Lemon List', params);
 }

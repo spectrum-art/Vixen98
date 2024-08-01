@@ -43,6 +43,11 @@ export function generateDeepLink(appName, params = {}) {
     return `${window.location.origin}/#${appName}${paramString ? `?${paramString}` : ''}`;
 }
 
+export function updateURL(appName, params = {}) {
+    const url = generateDeepLink(appName, params);
+    window.history.pushState({ appName, params }, '', url);
+}
+
 function showAccessDenied() {
     EventBus.publish('showDialog', {
         title: 'Access Denied',
