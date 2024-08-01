@@ -62,7 +62,6 @@ export function openApp(appName, params = {}) {
         case 'Cookie Batch Log':
         case 'Underground Map':
         case 'Placeholder':
-            // Handle these document sub-items
             initializeDocuments({ subItem: appName, ...params });
             break;
         default:

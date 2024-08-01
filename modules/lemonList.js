@@ -1,6 +1,6 @@
 import { EventBus, debounce } from './utils.js';
 import { createAppWindow } from './windowManagement.js';
-import { generateDeepLink, updateURL } from './routing.js';
+import { generateDeepLink } from './routing.js';
 
 const lemonListConfig = {
     title: 'Lemon List',
@@ -381,6 +381,4 @@ function updateLemonListURL(container) {
         search: searchBar ? searchBar.value : '',
         filters: activeFilters.join(',')
     };
-
-    updateURL('Lemon List', params);
 }
