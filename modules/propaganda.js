@@ -33,7 +33,7 @@ function createpropagandaHTML() {
 }
 
 function loadAnnouncements(container) {
-    fetch('/data/propaganda.txt')
+    fetch('/data/StateAnnouncements.txt')
         .then(response => response.text())
         .then(data => {
             const parser = new DOMParser();
