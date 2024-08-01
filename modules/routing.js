@@ -46,8 +46,13 @@ export function generateDeepLink(appName, params = {}) {
 }
 
 export function updateURL(appName, params = {}) {
-    const url = generateDeepLink(appName, params);
-    window.history.pushState({ appName, params }, '', url);
+    if (!appName) {
+        const baseURL = `${window.location.origin}/`;
+        window.history.pushState(null, '', baseURL);
+    } else {
+        const url = generateDeepLink(appName, params);
+        window.history.pushState({ appName, params }, '', url);
+    }
 }
 
 function showAccessDenied() {

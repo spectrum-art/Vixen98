@@ -1,4 +1,5 @@
 import { EventBus } from './utils.js';
+import { updateURL } from './routing.js';
 
 let windows = [];
 
@@ -68,6 +69,8 @@ export function createAppWindow(appConfig = {}) {
     setupWindowControls(windowElement, config);
 
     console.log('Window created:', windowElement);
+    bringToFront(windowElement);
+    
     return windowElement;
 }
 
@@ -193,6 +196,9 @@ function bringToFront(windowElement) {
     if (taskbarItem) {
         taskbarItem.classList.add('active');
     }
+
+    const appName = windowElement.getAttribute('data-app');
+    updateURL(appName);
 }
 
 function setupWindowControls(windowElement, config) {
@@ -246,6 +252,13 @@ function closeWindow(windowElement) {
     }
     windows = windows.filter(w => w.appName !== appName);
     EventBus.publish('windowClosed', appName);
+
+    if (windows.length > 0) {
+        const topWindow = windows[windows.length - 1];
+        bringToFront(topWindow.element);
+    } else {
+        updateURL('');
+    }
 }
 
 export function getWindowContent(appName) {
