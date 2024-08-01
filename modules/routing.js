@@ -12,7 +12,12 @@ export function handleRouting() {
     if (hash) {
         const [appName, params] = parseHash(hash);
         if (checkAppAccess(appName)) {
-            openApp(appName, params);
+            try {
+                openApp(appName, params);
+            } catch (error) {
+                console.error(`Error opening app ${appName}:`, error);
+                showErrorDialog(`Failed to open ${appName}. Please try again.`);
+            }
         } else {
             showAccessDenied();
         }

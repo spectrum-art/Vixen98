@@ -104,3 +104,5 @@ export function checkAppAccess(appName) {
     const userLevel = getAccessLevel();
     return userLevel >= requiredLevel;
 }
+
+export { storeCredentials, checkStoredCredentials };

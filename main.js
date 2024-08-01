@@ -55,7 +55,15 @@ export function openApp(appName, params = {}) {
         case 'Propaganda':
             initializepropaganda(params);
             break;
+        case 'Cookie Delivery Map':
+        case 'Cookie Batch Log':
+        case 'Underground Map':
+        case 'Placeholder':
+            // Handle these document sub-items
+            initializeDocuments({ subItem: appName, ...params });
+            break;
         default:
             console.error(`Unknown app: ${appName}`);
+            throw new Error(`Unknown app: ${appName}`);
     }
 }

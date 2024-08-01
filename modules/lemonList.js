@@ -316,16 +316,36 @@ function shareCurrentSearch(container) {
         .map(checkbox => checkbox.value);
 
     const params = {
-        search: searchBar.value,
+        search: searchBar ? searchBar.value : '',
         filters: activeFilters.join(',')
     };
 
     const deepLink = generateDeepLink('Lemon List', params);
     
-    navigator.clipboard.writeText(deepLink).then(() => {
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(deepLink).then(() => {
+            alert('Link copied to clipboard!');
+        }).catch(err => {
+            console.error('Failed to copy link: ', err);
+            fallbackCopy(deepLink);
+        });
+    } else {
+        fallbackCopy(deepLink);
+    }
+}
+
+function fallbackCopy(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+        document.execCommand('copy');
         alert('Link copied to clipboard!');
-    }).catch(err => {
-        console.error('Failed to copy link: ', err);
-        alert('Failed to copy link. Please try again.');
-    });
+    } catch (err) {
+        console.error('Fallback: Unable to copy', err);
+        alert('Failed to copy link. Please copy this URL manually: ' + text);
+    }
+    document.body.removeChild(textArea);
 }

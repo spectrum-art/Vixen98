@@ -1,7 +1,6 @@
 import { EventBus } from './utils.js';
 import { openApp } from '../main.js';
 import { appAccessLevels, getAccessLevel } from './auth.js';
-import { generateDeepLink } from './routing.js';
 
 const desktopIcons = [
     { name: 'System', icon: '💻' },
