@@ -21,6 +21,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install PyGithub
 
+    - name: Debug information
+      run: |
+        echo "GITHUB_EVENT_PATH: $GITHUB_EVENT_PATH"
+        cat $GITHUB_EVENT_PATH
+
     - name: Update announcements file
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
