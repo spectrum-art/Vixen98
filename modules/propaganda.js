@@ -33,27 +33,10 @@ function createpropagandaHTML() {
 }
 
 function loadAnnouncements(container) {
-    fetch('/data/StateAnnouncements.txt')
-        .then(response => response.text())
+    fetch('/data/announcements.json')
+        .then(response => response.json())
         .then(data => {
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(data, 'text/xml');
-            const items = xmlDoc.querySelectorAll('item');
-            
-            announcements = Array.from(items).map(item => {
-                const title = item.querySelector('title');
-                const pubDate = item.querySelector('pubDate');
-                const link = item.querySelector('link');
-                const content = item.getElementsByTagName('content:encoded')[0];
-
-                return {
-                    title: title ? title.textContent : 'No Title',
-                    date: pubDate ? new Date(pubDate.textContent) : new Date(),
-                    link: link ? link.textContent : '#',
-                    content: content ? content.textContent : 'No content available'
-                };
-            }).filter(announcement => announcement.title !== 'No Title' || announcement.content !== 'No content available');
-
+            announcements = data;
             displayAnnouncements(container);
         })
         .catch(error => {
@@ -71,11 +54,11 @@ function displayAnnouncements(container) {
         announcementElement.className = 'announcement';
         announcementElement.innerHTML = `
             <h3>${announcement.title}</h3>
-            <p class="date">${announcement.date.toLocaleDateString()}</p>
-            <p class="snippet">${getSnippet(announcement.content)}</p>
+            <p class="date">${new Date(announcement.date).toLocaleDateString()}</p>
+            <p class="snippet">${getSnippet(announcement.body)}</p>
         `;
         announcementElement.addEventListener('click', () => {
-            window.open(announcement.link, '_blank');
+            window.open(announcement.url, '_blank');
         });
         listContainer.appendChild(announcementElement);
     });
@@ -87,9 +70,7 @@ function displayAnnouncements(container) {
 }
 
 function getSnippet(content) {
-    const div = document.createElement('div');
-    div.innerHTML = content;
-    const text = div.textContent || div.innerText || '';
+    const text = content || '';
     return text.slice(0, 150) + '...';
 }
 

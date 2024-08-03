@@ -14,10 +14,10 @@ export const appAccessLevels = {
     'Lemon List': 1,
     Encryption: 1,
     Propaganda: 1,
-    'Cookie Delivery Map': 1,
-    'Cookie Batch Log': 1,
-    'Underground Map': 1,
-    Placeholder: 1
+    'Cookie Delivery Map': 2,
+    'Cookie Batch Log': 2,
+    'Underground Map': 2,
+    Placeholder: 2
 };
 
 export function initializeAuth() {
