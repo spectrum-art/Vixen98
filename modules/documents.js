@@ -1,4 +1,5 @@
 import { createAppWindow } from './windowManagement.js';
+import { initializeUndergroundMap } from './undergroundMap.js';
 
 const documentsConfig = {
     title: 'Documents',
@@ -47,6 +48,8 @@ function setupDocumentsEventListeners(content) {
             const iconName = e.currentTarget.getAttribute('data-name');
             if (iconName === 'Cookie Delivery Map') {
                 openCookieDeliveryMap();
+            } else if (iconName === 'Underground Map') {
+                openUndergroundMap();
             }
             // Add more conditions here for other icons if needed
         });
@@ -75,4 +78,23 @@ function openCookieDeliveryMap() {
     };
     
     const window = createAppWindow(mapConfig);
+}
+
+function openUndergroundMap() {
+    console.log('Opening Underground Map');
+    const desktopHeight = document.getElementById('desktop').clientHeight;
+    const mapHeight = Math.floor(desktopHeight * 0.95);
+    const mapWidth = mapHeight; // 1:1 aspect ratio
+
+    const mapConfig = {
+        title: 'Underground Map',
+        content: '<div id="underground-map"></div>',
+        width: `${mapWidth}px`,
+        height: `${mapHeight}px`,
+        minWidth: '400px',
+        minHeight: '400px',
+    };
+    
+    const window = createAppWindow(mapConfig);
+    initializeUndergroundMap(window.querySelector('#underground-map'));
 }
