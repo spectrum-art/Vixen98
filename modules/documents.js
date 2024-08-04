@@ -82,9 +82,10 @@ function openCookieDeliveryMap() {
 
 function openUndergroundMap() {
     console.log('Opening Underground Map');
-    const desktopHeight = document.getElementById('desktop').clientHeight;
-    const mapHeight = Math.floor(desktopHeight * 0.95);
-    const mapWidth = mapHeight; // 1:1 aspect ratio
+    const desktop = document.getElementById('desktop');
+    const desktopRect = desktop.getBoundingClientRect();
+    const mapHeight = Math.floor(desktopRect.height * 0.95);
+    const mapWidth = mapHeight;
 
     const mapConfig = {
         title: 'Underground Map',
@@ -93,6 +94,7 @@ function openUndergroundMap() {
         height: `${mapHeight}px`,
         minWidth: '400px',
         minHeight: '400px',
+        className: 'underground-map-window'
     };
     
     const window = createAppWindow(mapConfig);

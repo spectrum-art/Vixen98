@@ -1,4 +1,4 @@
-const LAYER_ORDER = ['Surface Labels', 'Surface', 'Entrances', 'Vendors', 'Base'];
+const LAYER_ORDER = ['Base', 'Vendors', 'Entrances', 'Surface', 'Surface Labels'];
 
 export function initializeUndergroundMap(container) {
     const map = L.map(container, {
@@ -11,13 +11,12 @@ export function initializeUndergroundMap(container) {
     const layers = {};
     const controls = L.control.layers(null, null, { position: 'topright' }).addTo(map);
 
-    // Add black background layer
     L.imageOverlay('/images/black_pixel.png', [[0, 0], [1000, 1000]], {
         interactive: false,
         className: 'black-background-layer'
     }).addTo(map);
 
-    LAYER_ORDER.forEach((layerName) => {
+    [...LAYER_ORDER].reverse().forEach((layerName) => {
         const imageUrl = layerName === 'Surface Labels' 
             ? '/images/SewerMapSurfaceLabels.png'
             : `/images/SewerMap${layerName}.png`;
@@ -29,20 +28,17 @@ export function initializeUndergroundMap(container) {
         }
 
         layers[layerName] = layer;
-        controls.addOverlay(layer, layerName);
+        layer.addTo(map);
+    });
 
-        // Add Base layer by default
-        if (layerName === 'Base') {
-            layer.addTo(map);
-        }
+    LAYER_ORDER.forEach((layerName) => {
+        controls.addOverlay(layers[layerName], layerName);
     });
 
     map.fitBounds([[0, 0], [1000, 1000]]);
 
-    // Add zoom control
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // Custom CSS to style the layer control and improve toggle visibility
     const style = document.createElement('style');
     style.textContent = `
         .leaflet-control-layers {
@@ -65,4 +61,12 @@ export function initializeUndergroundMap(container) {
         }
     `;
     document.head.appendChild(style);
+
+    function resizeMap() {
+        map.invalidateSize();
+        map.fitBounds([[0, 0], [1000, 1000]], {animate: false});
+    }
+
+    setTimeout(resizeMap, 100);
+    window.addEventListener('resize', resizeMap);
 }
