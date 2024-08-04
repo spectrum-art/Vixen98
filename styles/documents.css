@@ -36,7 +36,8 @@
     padding: 0;
 }
 
-.underground-map-window {
+.underground-map-window .window-content {
+    padding: 0;
     overflow: hidden;
 }
 
@@ -63,4 +64,8 @@
 .leaflet-control-layers-toggle {
     background-color: #c0c0c0;
     border: 1px solid #808080;
+}
+
+.black-background-layer {
+    z-index: -1 !important;
 }
