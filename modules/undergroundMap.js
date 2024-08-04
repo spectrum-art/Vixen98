@@ -1,5 +1,3 @@
-import L from 'leaflet';
-
 const LAYER_ORDER = ['Base', 'Vendors', 'Entrances', 'Surface'];
 
 export function initializeUndergroundMap(container) {
@@ -13,7 +11,7 @@ export function initializeUndergroundMap(container) {
     const layers = {};
     const controls = L.control.layers(null, null, { position: 'topright' }).addTo(map);
 
-    LAYER_ORDER.forEach((layerName, index) => {
+    LAYER_ORDER.forEach((layerName) => {
         const imageUrl = `/images/SewerMap${layerName}.png`;
         const layer = L.imageOverlay(imageUrl, [[0, 0], [1000, 1000]]);
         
@@ -27,7 +25,6 @@ export function initializeUndergroundMap(container) {
 
     map.fitBounds([[0, 0], [1000, 1000]]);
 
-    // Add zoom control
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
     // Custom CSS to style the layer control
