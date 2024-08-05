@@ -266,7 +266,7 @@ function closeWindow(windowElement) {
         const topWindow = windows[windows.length - 1];
         bringToFront(topWindow.element);
     } else {
-        handleAppOpen('');
+        window.history.pushState({}, '', window.location.origin + window.location.pathname);
     }
 }
 
