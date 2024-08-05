@@ -111,6 +111,33 @@ body, html {
     white-space: normal;
 }
 
+.desktop-icon.locked {
+    position: relative;
+    opacity: 0.7;
+}
+
+.desktop-icon.locked::after {
+    content: '🔒';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    padding: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+.desktop-icon.locked:hover {
+    cursor: not-allowed;
+}
+
+.desktop-icon.locked .icon,
+.desktop-icon.locked .label {
+    filter: grayscale(100%);
+}
+
 /* -------------- Taskbar -------------- */
 
 #taskbar {

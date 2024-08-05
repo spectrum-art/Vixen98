@@ -100,7 +100,7 @@ export function getAccessLevel() {
 }
 
 export function checkAppAccess(appName) {
-    const requiredLevel = appAccessLevels[appName] || 1;
-    const userLevel = getAccessLevel();
-    return userLevel >= requiredLevel;
+    const userAccessLevel = getAccessLevel();
+    const { level: requiredLevel } = appAccessLevels[appName] || { level: 1 };
+    return userAccessLevel >= requiredLevel;
 }

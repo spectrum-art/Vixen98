@@ -25,14 +25,19 @@ function createDesktopIcons() {
     desktopIcons.forEach(icon => {
         const iconElement = document.createElement('div');
         iconElement.className = 'desktop-icon';
+        iconElement.setAttribute('data-name', icon.name);
         iconElement.innerHTML = `
             <div class="icon">${icon.icon}</div>
             <div class="label">${icon.name}</div>
         `;
         iconElement.addEventListener('click', () => {
-            console.log('Desktop icon clicked:', icon.name);
-            openApp(icon.name);
-            updateURL(icon.name);
+            if (!iconElement.classList.contains('locked')) {
+                console.log('Desktop icon clicked:', icon.name);
+                openApp(icon.name);
+                updateURL(icon.name);
+            } else {
+                showAccessDenied();
+            }
         });
         iconGrid.appendChild(iconElement);
     });
@@ -45,12 +50,11 @@ function updateClock() {
 }
 
 function updateDesktopIcons() {
-    const userAccessLevel = getAccessLevel();
     const icons = document.querySelectorAll('.desktop-icon');
-    icons.forEach((iconElement, index) => {
-        const icon = desktopIcons[index];
-        const { level: requiredLevel, hiddenIfLocked } = appAccessLevels[icon.name] || { level: 1, hiddenIfLocked: false };
-        const hasAccess = userAccessLevel >= requiredLevel;
+    icons.forEach((iconElement) => {
+        const iconName = iconElement.getAttribute('data-name');
+        const { hiddenIfLocked } = appAccessLevels[iconName] || { hiddenIfLocked: false };
+        const hasAccess = checkAppAccess(iconName);
         iconElement.style.display = (hasAccess || !hiddenIfLocked) ? 'flex' : 'none';
         iconElement.classList.toggle('locked', !hasAccess);
     });
