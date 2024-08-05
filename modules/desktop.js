@@ -1,7 +1,7 @@
 import { EventBus } from './utils.js';
 import { openApp } from '../main.js';
-import { appAccessLevels, checkAppAccess, showAccessDenied } from './auth.js';
-import { updateURL } from './routing.js';
+import { appAccessLevels, checkAppAccess } from './auth.js';
+import { updateURL, showAccessDenied } from './routing.js';
 
 const desktopIcons = [
     { name: 'System', icon: '💻' },
