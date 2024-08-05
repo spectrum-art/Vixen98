@@ -1,6 +1,23 @@
 const LAYER_ORDER = ['Base', 'Vendors', 'Entrances', 'Surface', 'Surface Labels'];
 
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
 export function initializeUndergroundMap(container) {
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.className = 'map-loading-indicator';
+    loadingIndicator.textContent = 'Loading map...';
+    container.appendChild(loadingIndicator);
+
     const map = L.map(container, {
         crs: L.CRS.Simple,
         minZoom: 0,
@@ -65,13 +82,13 @@ export function initializeUndergroundMap(container) {
     `;
     document.head.appendChild(style);
 
-    function resizeMap() {
+    const resizeMap = debounce(() => {
         const newSize = Math.min(container.clientWidth, container.clientHeight);
         container.style.width = `${newSize}px`;
         container.style.height = `${newSize}px`;
         map.invalidateSize();
         map.fitBounds([[0, 0], [1000, 1000]], {animate: false});
-    }
+    }, 250);
 
     resizeMap();
     setTimeout(resizeMap, 100);
@@ -91,4 +108,9 @@ export function initializeUndergroundMap(container) {
         });
         observer.observe(windowElement, { attributes: true });
     }
+
+    map.on('layeradd', function onLayerAdd() {
+        container.removeChild(loadingIndicator);
+        map.off('layeradd', onLayerAdd);
+    });
 }
