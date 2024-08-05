@@ -20,7 +20,7 @@ export function initializeUndergroundMap(container) {
 
     const map = L.map(container, {
         crs: L.CRS.Simple,
-        minZoom: 0,
+        minZoom: -2,
         maxZoom: 2,
         zoomControl: false
     });

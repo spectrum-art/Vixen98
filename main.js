@@ -1,11 +1,11 @@
 import { initializeDesktop } from './modules/desktop.js';
 import { initializeSystem } from './modules/system.js';
-import { initializeDocuments } from './modules/documents.js';
+import { initializeDocuments, openDeliveryMap, openUndergroundMap } from './modules/documents.js';
 import { initializeLemonList } from './modules/lemonList.js';
 import { initializeEncryption } from './modules/encryption.js';
 import { initializeAuth, checkStoredCredentials } from './modules/auth.js';
 import { initializepropaganda } from './modules/propaganda.js';
-import { initializeRouting, updateURL } from './modules/routing.js';
+import { initializeRouting } from './modules/routing.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     const splashScreen = document.getElementById('splash-screen');
@@ -39,34 +39,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
 export function openApp(appName, params = {}) {
     console.log('Opening app:', appName, 'with params:', params);
-    updateURL(appName, params);
     switch(appName) {
         case 'System':
-            initializeSystem(params);
+            initializeSystem();
             break;
         case 'Trash':
             // Add initialization logic here later
         case 'Documents':
-            initializeDocuments(params);
+            initializeDocuments();
             break;
         case 'Lemon List':
-            initializeLemonList(params);
+            initializeLemonList();
             break;
         case 'Encryption':
-            initializeEncryption(params);
+            initializeEncryption();
             break;
         case 'Propaganda':
-            initializepropaganda(params);
+            initializepropaganda();
             break;
-        case 'Cookie Delivery Map':
+        case 'Delivery Map':
+            openDeliveryMap();
+            break;
         case 'Cookie Batch Log':
-        case 'Underground Map':
-        case 'Placeholder':
-            initializeDocuments({ subItem: appName, ...params });
+             // Add initialization logic here later           openCookieBatchLog();
             break;
+        case 'Underground Map':
+            openUndergroundMap();
+            break;
+        case 'Placeholder':
+            // Add initialization logic here later            openPlaceholder();
+            break;                        
         default:
             console.error(`Unknown app: ${appName}`);
-            throw new Error(`Unknown app: ${appName}`);
     }
 }
 

@@ -1,6 +1,7 @@
 import { EventBus } from './utils.js';
 import { openApp } from '../main.js';
 import { appAccessLevels, getAccessLevel } from './auth.js';
+import { updateURL } from './routing.js';
 
 const desktopIcons = [
     { name: 'System', icon: '💻' },
@@ -31,6 +32,7 @@ function createDesktopIcons() {
         iconElement.addEventListener('click', () => {
             console.log('Desktop icon clicked:', icon.name);
             openApp(icon.name);
+            updateURL(icon.name);
         });
         iconGrid.appendChild(iconElement);
     });

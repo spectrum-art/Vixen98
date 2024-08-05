@@ -9,30 +9,15 @@ const documentsConfig = {
 };
 
 const myDocumentsIcons = [
-    { name: 'Cookie Delivery Map', icon: '🗺️' },
+    { name: 'Delivery Map', icon: '🗺️' },
     { name: 'Cookie Batch Log', icon: '🍪' },
     { name: 'Underground Map', icon: '🐀' },
     { name: 'Placeholder', icon: '📄' }
 ];
 
-export function initializeDocuments({ subItem } = {}) {
-    switch (subItem) {
-        case 'Cookie Delivery Map':
-            openCookieDeliveryMap();
-            break;
-        case 'Underground Map':
-            openUndergroundMap();
-            break;
-        case 'Cookie Batch Log':
-            // Implement this function later
-            break;
-        case 'Placeholder':
-            // Implement this function later
-            break;
-        default:
-            const window = createAppWindow(documentsConfig);
-            setupDocumentsApp(window);
-    }
+export function initializeDocuments() {
+    const window = createAppWindow(documentsConfig);
+    setupDocumentsApp(window);
 }
 
 function setupDocumentsApp(window) {
@@ -61,8 +46,8 @@ function setupDocumentsEventListeners(content) {
     icons.forEach(icon => {
         icon.addEventListener('click', (e) => {
             const iconName = e.currentTarget.getAttribute('data-name');
-            if (iconName === 'Cookie Delivery Map') {
-                openCookieDeliveryMap();
+            if (iconName === 'Delivery Map') {
+                openDeliveryMap();
             } else if (iconName === 'Underground Map') {
                 openUndergroundMap();
             }
@@ -71,8 +56,8 @@ function setupDocumentsEventListeners(content) {
     });
 }
 
-function openCookieDeliveryMap() {
-    console.log('Opening Cookie Delivery Map');
+export function openDeliveryMap() {
+    console.log('Opening Delivery Map');
     const mapUrl = `https://gta-5-map.com/?\
         slideout=false&slideoutright=false&x=-120.1&y=80.5&zoom=3.4&embed=light\
         &notes=3EWfhJLeGcb,3nf05rUzzTS,61hDtXO1IAV,6KSIzbU0JCX,78yKmWHpAxr,8qmes9jiqky,\
@@ -81,7 +66,7 @@ function openCookieDeliveryMap() {
         JbMeXCoX67S,K0Gco51LKq8,KOFXc19AHzl,KuW1Kv0rFKa,tzvgY7VwaI`;
 
     const mapConfig = {
-        title: 'Cookie Delivery Map',
+        title: 'Delivery Map',
         content: `<iframe src="${mapUrl}" 
             style="border: none; width: 100%; height: 100%;" 
             sandbox="allow-scripts allow-same-origin">
@@ -95,7 +80,7 @@ function openCookieDeliveryMap() {
     const window = createAppWindow(mapConfig);
 }
 
-function openUndergroundMap() {
+export function openUndergroundMap() {
     console.log('Opening Underground Map');
     const desktop = document.getElementById('desktop');
     const desktopRect = desktop.getBoundingClientRect();
