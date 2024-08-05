@@ -8,16 +8,16 @@ const accessLevelHashes = {
 };
 
 export const appAccessLevels = {
-    System: { level: 1, hiddenIfLocked: false },
-    Trash: { level: 5, hiddenIfLocked: false },
-    Documents: { level: 2, hiddenIfLocked: false },
-        'Cookie Delivery Map': { level: 2, hiddenIfLocked: false },
-        'Cookie Batch Log': { level: 5, hiddenIfLocked: false },
-        'Underground Map': { level: 2, hiddenIfLocked: false },
-        Placeholder: { level: 5, hiddenIfLocked: true },
-    'Lemon List': { level: 1, hiddenIfLocked: false },
-    Encryption: { level: 2, hiddenIfLocked: false },
-    Propaganda: { level: 1, hiddenIfLocked: false }
+    System: { level: 1, hiddenIfLocked: true },
+    Trash: { level: 1, hiddenIfLocked: true },
+    Documents: { level: 1, hiddenIfLocked: true },
+        'Cookie Delivery Map': { level: 1, hiddenIfLocked: true },
+        'Cookie Batch Log': { level: 1, hiddenIfLocked: true },
+        'Underground Map': { level: 1, hiddenIfLocked: true },
+        Placeholder: { level: 1, hiddenIfLocked: true },
+    'Lemon List': { level: 1, hiddenIfLocked: true },
+    Encryption: { level: 1, hiddenIfLocked: true },
+    Propaganda: { level: 1, hiddenIfLocked: true }
 };
 
 export function initializeAuth() {
