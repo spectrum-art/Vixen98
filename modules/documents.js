@@ -1,6 +1,7 @@
 import { createAppWindow, getWindowContent } from './windowManagement.js';
 import { showAccessDenied } from './routing.js';
 import { initializeUndergroundMap } from './undergroundMap.js';
+import { appAccessLevels, getAccessLevel } from './auth.js';
 
 const documentsConfig = {
     title: 'Documents',
