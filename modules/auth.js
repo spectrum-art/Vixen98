@@ -9,15 +9,15 @@ const accessLevelHashes = {
 
 export const appAccessLevels = {
     System: 1,
-    Trash: 1,
+    Trash: 5,
     Documents: 2,
+        'Cookie Delivery Map': 2,
+        'Cookie Batch Log': 5,
+        'Underground Map': 2,
+        Placeholder: 5,
     'Lemon List': 1,
-    Encryption: 1,
-    Propaganda: 1,
-    'Cookie Delivery Map': 2,
-    'Cookie Batch Log': 2,
-    'Underground Map': 2,
-    Placeholder: 2
+    Encryption: 2,
+    Propaganda: 1
 };
 
 export function initializeAuth() {
