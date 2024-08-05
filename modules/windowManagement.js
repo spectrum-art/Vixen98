@@ -4,6 +4,15 @@ import { handleAppOpen } from './routing.js';
 let windows = [];
 
 export function createAppWindow(appConfig = {}) {
+    const existingWindow = windows.find(w => w.appName === appConfig.title);
+    if (existingWindow) {
+        console.log(`Window for ${appConfig.title} already exists, bringing to front`);
+        bringToFront(existingWindow.element);
+        return existingWindow.element;
+    }
+
+    console.log('Creating app window with config:', appConfig);
+
     const defaultConfig = {
         width: '50%',
         height: '60%',
@@ -26,8 +35,6 @@ export function createAppWindow(appConfig = {}) {
         ...appConfig,
         features: { ...defaultConfig.features, ...appConfig.features }
     };
-
-    console.log('Creating app window with config:', config);
 
     const windowElement = document.createElement('div');
     windowElement.className = 'window';
@@ -55,6 +62,10 @@ export function createAppWindow(appConfig = {}) {
     }
 
     const desktop = document.getElementById('desktop');
+    if (!desktop) {
+        console.error('Desktop element not found');
+        return null;
+    }
     desktop.appendChild(windowElement);
     windows.push({ appName: config.title, element: windowElement, config });
 
@@ -64,8 +75,6 @@ export function createAppWindow(appConfig = {}) {
     positionWindow(windowElement);
     if (config.features.draggable) makeDraggable(windowElement);
     if (config.features.resizable) makeResizable(windowElement);
-    bringToFront(windowElement);
-
     setupWindowControls(windowElement, config);
 
     console.log('Window created:', windowElement);

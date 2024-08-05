@@ -15,14 +15,22 @@ const myDocumentsIcons = [
     { name: 'Placeholder', icon: '📄' }
 ];
 
-export function initializeDocuments() {
+export function initializeDocuments(params = {}) {
+    console.log('Initializing Documents app with params:', params);
     const window = createAppWindow(documentsConfig);
-    setupDocumentsApp(window);
+    if (window) {
+        setupDocumentsApp(window);
+    } else {
+        console.error('Failed to create Documents window');
+    }
 }
 
 function setupDocumentsApp(window) {
     const container = window.querySelector('#documents-app');
-    if (!container) return;
+    if (!container) {
+        console.error('Documents app container not found');
+        return;
+    }
     
     container.innerHTML = createDocumentsAppHTML();
     setupDocumentsEventListeners(container);
