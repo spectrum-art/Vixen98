@@ -20,7 +20,7 @@ export function initializeUndergroundMap(container) {
 
     const map = L.map(container, {
         crs: L.CRS.Simple,
-        minZoom: -0.5,
+        minZoom: -1,  // Adjusted this value
         maxZoom: 2,
         zoomControl: false
     });
@@ -28,11 +28,13 @@ export function initializeUndergroundMap(container) {
     const layers = {};
     const controls = L.control.layers(null, null, { position: 'topright' }).addTo(map);
 
+    // Add black background layer
     L.imageOverlay('/images/black_pixel.png', [[0, 0], [1000, 1000]], {
         interactive: false,
         className: 'black-background-layer'
     }).addTo(map);
 
+    // Reverse the layer order for adding to the map
     [...LAYER_ORDER].reverse().forEach((layerName) => {
         const imageUrl = layerName === 'Surface Labels' 
             ? '/images/SewerMapSurfaceLabels.png'
@@ -51,14 +53,48 @@ export function initializeUndergroundMap(container) {
         }
     });
 
+    // Add layers to control in the correct order
     LAYER_ORDER.forEach((layerName) => {
         controls.addOverlay(layers[layerName], layerName);
     });
 
-    map.fitBounds([[0, 0], [1000, 1000]]);
+    // Ensure the map fills the container
+    const resizeMap = debounce(() => {
+        const newSize = Math.min(container.clientWidth, container.clientHeight);
+        container.style.width = `${newSize}px`;
+        container.style.height = `${newSize}px`;
+        map.invalidateSize();
+        map.fitBounds([[0, 0], [1000, 1000]], {animate: false, padding: [0, 0]});
+    }, 250);
 
+    resizeMap();
+    setTimeout(resizeMap, 100);
+
+    window.addEventListener('resize', resizeMap);
+
+    const windowElement = container.closest('.window');
+    if (windowElement) {
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                    if (windowElement.classList.contains('active')) {
+                        setTimeout(resizeMap, 0);
+                    }
+                }
+            });
+        });
+        observer.observe(windowElement, { attributes: true });
+    }
+
+    // Remove loading indicator after all initial layers are added
+    map.whenReady(() => {
+        container.removeChild(loadingIndicator);
+    });
+
+    // Add zoom control
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
+    // Custom CSS to style the layer control and improve toggle visibility
     const style = document.createElement('style');
     style.textContent = `
         .leaflet-control-layers {
@@ -81,35 +117,4 @@ export function initializeUndergroundMap(container) {
         }
     `;
     document.head.appendChild(style);
-
-    const resizeMap = debounce(() => {
-        const newSize = Math.min(container.clientWidth, container.clientHeight);
-        container.style.width = `${newSize}px`;
-        container.style.height = `${newSize}px`;
-        map.invalidateSize();
-        map.fitBounds([[0, 0], [1000, 1000]], {animate: false});
-    }, 250);
-
-    resizeMap();
-    setTimeout(resizeMap, 100);
-
-    window.addEventListener('resize', resizeMap);
-
-    const windowElement = container.closest('.window');
-    if (windowElement) {
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                    if (windowElement.classList.contains('active')) {
-                        setTimeout(resizeMap, 0);
-                    }
-                }
-            });
-        });
-        observer.observe(windowElement, { attributes: true });
-    }
-
-    map.whenReady(() => {
-        container.removeChild(loadingIndicator);
-    });
 }
