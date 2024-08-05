@@ -22,7 +22,8 @@ export function initializeUndergroundMap(container) {
         crs: L.CRS.Simple,
         minZoom: -2,
         maxZoom: 2,
-        zoomControl: false
+        zoomControl: false,
+        attributionControl: false
     });
 
     const layers = {};
