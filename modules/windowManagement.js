@@ -1,5 +1,5 @@
 import { EventBus } from './utils.js';
-import { updateURL } from './routing.js';
+import { handleAppOpen } from './routing.js';
 
 let windows = [];
 
@@ -198,7 +198,7 @@ function bringToFront(windowElement) {
     }
 
     const appName = windowElement.getAttribute('data-app');
-    updateURL(appName);
+    handleAppOpen(appName);
 }
 
 function setupWindowControls(windowElement, config) {
@@ -257,7 +257,7 @@ function closeWindow(windowElement) {
         const topWindow = windows[windows.length - 1];
         bringToFront(topWindow.element);
     } else {
-        updateURL('');
+        handleAppOpen('');
     }
 }
 

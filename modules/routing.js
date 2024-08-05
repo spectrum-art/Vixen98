@@ -12,12 +12,7 @@ export function handleRouting() {
     if (hash) {
         const [appName, params] = parseHash(hash);
         if (checkAppAccess(appName)) {
-            try {
-                openApp(appName, params);
-            } catch (error) {
-                console.error(`Error opening app ${appName}:`, error);
-                showErrorDialog(`Failed to open ${appName}. Please try again.`);
-            }
+            handleAppOpen(appName, params);
         } else {
             showAccessDenied();
         }
@@ -46,12 +41,19 @@ export function generateDeepLink(appName, params = {}) {
 }
 
 export function updateURL(appName, params = {}) {
-    if (!appName) {
-        const baseURL = `${window.location.origin}/`;
-        window.history.pushState(null, '', baseURL);
-    } else {
-        const url = generateDeepLink(appName, params);
-        window.history.pushState({ appName, params }, '', url);
+    const newURL = appName ? generateDeepLink(appName, params) : `${window.location.origin}/`;
+    if (window.location.href !== newURL) {
+        window.history.pushState({ appName, params }, '', newURL);
+    }
+}
+
+export function handleAppOpen(appName, params = {}) {
+    updateURL(appName, params);
+    try {
+        openApp(appName, params);
+    } catch (error) {
+        console.error(`Error opening app ${appName}:`, error);
+        showErrorDialog(`Failed to open ${appName}. Please try again.`);
     }
 }
 
@@ -59,6 +61,14 @@ function showAccessDenied() {
     EventBus.publish('showDialog', {
         title: 'Access Denied',
         message: 'You do not have permission to access this resource.',
+        buttons: [{ text: 'OK', onClick: () => {} }]
+    });
+}
+
+function showErrorDialog(message) {
+    EventBus.publish('showDialog', {
+        title: 'Error',
+        message: message,
         buttons: [{ text: 'OK', onClick: () => {} }]
     });
 }

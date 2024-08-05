@@ -45,11 +45,12 @@ export function openApp(appName, params = {}) {
             break;
         case 'Trash':
             // Add initialization logic here later
+            break;
         case 'Documents':
-            initializeDocuments();
+            initializeDocuments(params);
             break;
         case 'Lemon List':
-            initializeLemonList();
+            initializeLemonList(params);
             break;
         case 'Encryption':
             initializeEncryption();
@@ -61,16 +62,17 @@ export function openApp(appName, params = {}) {
             openDeliveryMap();
             break;
         case 'Cookie Batch Log':
-             // Add initialization logic here later           openCookieBatchLog();
+            // Add initialization logic here later
             break;
         case 'Underground Map':
             openUndergroundMap();
             break;
         case 'Placeholder':
-            // Add initialization logic here later            openPlaceholder();
+            // Add initialization logic here later
             break;                        
         default:
             console.error(`Unknown app: ${appName}`);
+            throw new Error(`Unknown app: ${appName}`);
     }
 }
 
