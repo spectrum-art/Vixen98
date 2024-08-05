@@ -109,8 +109,7 @@ export function initializeUndergroundMap(container) {
         observer.observe(windowElement, { attributes: true });
     }
 
-    map.on('layeradd', function onLayerAdd() {
+    map.whenReady(() => {
         container.removeChild(loadingIndicator);
-        map.off('layeradd', onLayerAdd);
     });
 }
