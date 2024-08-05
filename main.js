@@ -6,7 +6,7 @@ import { initializeEncryption } from './modules/encryption.js';
 import { initializeAuth, checkStoredCredentials } from './modules/auth.js';
 import { initializepropaganda } from './modules/propaganda.js';
 import { initializeRouting } from './modules/routing.js';
-import { EventBus } from './utils.js';
+import { EventBus } from '/modules/utils.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     const splashScreen = document.getElementById('splash-screen');
