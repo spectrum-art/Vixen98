@@ -28,7 +28,10 @@ export function initializeUndergroundMap(container) {
         }
 
         layers[layerName] = layer;
-        layer.addTo(map);
+        
+        if (layerName !== 'Surface' && layerName !== 'Surface Labels') {
+            layer.addTo(map);
+        }
     });
 
     LAYER_ORDER.forEach((layerName) => {
@@ -68,5 +71,6 @@ export function initializeUndergroundMap(container) {
     }
 
     setTimeout(resizeMap, 100);
+
     window.addEventListener('resize', resizeMap);
 }

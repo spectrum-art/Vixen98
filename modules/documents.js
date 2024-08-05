@@ -15,9 +15,24 @@ const myDocumentsIcons = [
     { name: 'Placeholder', icon: '📄' }
 ];
 
-export function initializeDocuments() {
-    const window = createAppWindow(documentsConfig);
-    setupDocumentsApp(window);
+export function initializeDocuments({ subItem } = {}) {
+    switch (subItem) {
+        case 'Cookie Delivery Map':
+            openCookieDeliveryMap();
+            break;
+        case 'Underground Map':
+            openUndergroundMap();
+            break;
+        case 'Cookie Batch Log':
+            // Implement this function later
+            break;
+        case 'Placeholder':
+            // Implement this function later
+            break;
+        default:
+            const window = createAppWindow(documentsConfig);
+            setupDocumentsApp(window);
+    }
 }
 
 function setupDocumentsApp(window) {
@@ -85,7 +100,7 @@ function openUndergroundMap() {
     const desktop = document.getElementById('desktop');
     const desktopRect = desktop.getBoundingClientRect();
     const mapHeight = Math.floor(desktopRect.height * 0.95);
-    const mapWidth = mapHeight;
+    const mapWidth = mapHeight; // 1:1 aspect ratio
 
     const mapConfig = {
         title: 'Underground Map',
@@ -98,5 +113,8 @@ function openUndergroundMap() {
     };
     
     const window = createAppWindow(mapConfig);
-    initializeUndergroundMap(window.querySelector('#underground-map'));
+    setTimeout(() => {
+        const mapContainer = window.querySelector('#underground-map');
+        initializeUndergroundMap(mapContainer);
+    }, 0);
 }
