@@ -207,7 +207,7 @@ function bringToFront(windowElement) {
     }
 
     const appName = windowElement.getAttribute('data-app');
-    handleAppOpen(appName);
+    updateURL(appName);
 }
 
 function setupWindowControls(windowElement, config) {

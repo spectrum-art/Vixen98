@@ -1,4 +1,4 @@
-import { createAppWindow } from './windowManagement.js';
+import { createAppWindow, getWindowContent } from './windowManagement.js';
 import { initializeUndergroundMap } from './undergroundMap.js';
 
 const documentsConfig = {
@@ -17,11 +17,17 @@ const myDocumentsIcons = [
 
 export function initializeDocuments(params = {}) {
     console.log('Initializing Documents app with params:', params);
-    const window = createAppWindow(documentsConfig);
-    if (window) {
-        setupDocumentsApp(window);
+    const existingWindow = getWindowContent('Documents');
+    if (existingWindow) {
+        console.log('Documents window already exists, updating content');
+        setupDocumentsApp(existingWindow.closest('.window'));
     } else {
-        console.error('Failed to create Documents window');
+        const window = createAppWindow(documentsConfig);
+        if (window) {
+            setupDocumentsApp(window);
+        } else {
+            console.error('Failed to create Documents window');
+        }
     }
 }
 
