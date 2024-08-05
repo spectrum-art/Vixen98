@@ -62,7 +62,7 @@ export function initializeUndergroundMap(container) {
         container.style.height = `${newSize}px`;
         map.invalidateSize();
         
-        const zoom = Math.log2(newSize / 1000);
+        const zoom = Math.log2(newSize / 1000) - 0.1;
         
         map.setView([500, 500], zoom);
     }, 250);
@@ -114,4 +114,5 @@ export function initializeUndergroundMap(container) {
         }
     `;
     document.head.appendChild(style);
+    map.removeControl(map.attributionControl);
 }
