@@ -1,5 +1,5 @@
 import { EventBus } from './utils.js';
-import { handleAppOpen } from './routing.js';
+import { handleAppOpen, updateURL } from './routing.js';
 
 let windows = [];
 
