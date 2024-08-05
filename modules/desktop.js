@@ -49,7 +49,9 @@ function updateDesktopIcons() {
     const icons = document.querySelectorAll('.desktop-icon');
     icons.forEach((iconElement, index) => {
         const icon = desktopIcons[index];
-        const requiredLevel = appAccessLevels[icon.name] || 1;
-        iconElement.style.display = userAccessLevel >= requiredLevel ? 'flex' : 'none';
+        const { level: requiredLevel, hiddenIfLocked } = appAccessLevels[icon.name] || { level: 1, hiddenIfLocked: false };
+        const hasAccess = userAccessLevel >= requiredLevel;
+        iconElement.style.display = (hasAccess || !hiddenIfLocked) ? 'flex' : 'none';
+        iconElement.classList.toggle('locked', !hasAccess);
     });
 }

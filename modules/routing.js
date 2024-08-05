@@ -49,6 +49,10 @@ export function updateURL(appName, params = {}) {
 
 export function handleAppOpen(appName, params = {}) {
     updateURL(appName, params);
+    if (!checkAppAccess(appName)) {
+        showAccessDenied();
+        return;
+    }
     try {
         openApp(appName, params);
     } catch (error) {
@@ -57,7 +61,7 @@ export function handleAppOpen(appName, params = {}) {
     }
 }
 
-function showAccessDenied() {
+export function showAccessDenied() {
     EventBus.publish('showDialog', {
         title: 'Access Denied',
         message: 'You do not have permission to access this resource.',

@@ -1,4 +1,5 @@
 import { createAppWindow, getWindowContent } from './windowManagement.js';
+import { showAccessDenied } from './routing.js';
 import { initializeUndergroundMap } from './undergroundMap.js';
 
 const documentsConfig = {
@@ -43,14 +44,22 @@ function setupDocumentsApp(window) {
 }
 
 function createDocumentsAppHTML() {
+    const userAccessLevel = getAccessLevel();
     return `
         <div class="my-documents-icons">
-            ${myDocumentsIcons.map(icon => `
-                <div class="desktop-icon" data-name="${icon.name}">
-                    <div class="icon">${icon.icon}</div>
-                    <div class="label">${icon.name}</div>
-                </div>
-            `).join('')}
+            ${myDocumentsIcons.map(icon => {
+                const { level: requiredLevel, hiddenIfLocked } = appAccessLevels[icon.name] || { level: 1, hiddenIfLocked: false };
+                const hasAccess = userAccessLevel >= requiredLevel;
+                if (hasAccess || !hiddenIfLocked) {
+                    return `
+                        <div class="desktop-icon ${hasAccess ? '' : 'locked'}" data-name="${icon.name}">
+                            <div class="icon">${icon.icon}</div>
+                            <div class="label">${icon.name}</div>
+                        </div>
+                    `;
+                }
+                return '';
+            }).join('')}
         </div>
     `;
 }
@@ -60,12 +69,16 @@ function setupDocumentsEventListeners(content) {
     icons.forEach(icon => {
         icon.addEventListener('click', (e) => {
             const iconName = e.currentTarget.getAttribute('data-name');
-            if (iconName === 'Delivery Map') {
-                openDeliveryMap();
-            } else if (iconName === 'Underground Map') {
-                openUndergroundMap();
+            if (icon.classList.contains('locked')) {
+                showAccessDenied();
+            } else {
+                if (iconName === 'Delivery Map') {
+                    openDeliveryMap();
+                } else if (iconName === 'Underground Map') {
+                    openUndergroundMap();
+                }
+                // Add more conditions here for other icons if needed
             }
-            // Add more conditions here for other icons if needed
         });
     });
 }
