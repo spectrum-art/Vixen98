@@ -113,18 +113,18 @@ body, html {
 
 .desktop-icon.locked {
     position: relative;
+    opacity: 0.7;
 }
 
 .desktop-icon.locked::after {
     content: '❌';
-    opacity: 0.5;
+    opacity: 0.4;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 50px;
+    font-size: 60px;
     padding: 5px;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
 
 .desktop-icon.locked:hover {
