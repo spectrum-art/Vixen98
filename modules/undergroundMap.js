@@ -64,9 +64,7 @@ export function initializeUndergroundMap(container) {
         container.style.height = `${newSize}px`;
         map.invalidateSize();
         
-        const padding = Math.floor(newSize * 0.02);
         map.fitBounds([[0, 0], [1000, 1000]], {
-            padding: [padding, padding],
             animate: false
         });
     }, 250);
