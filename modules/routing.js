@@ -19,9 +19,9 @@ export function handleRouting() {
     }
 }
 
-function parseHash(hash) {
+export function parseHash(hash) {
     const [encodedAppName, paramString] = hash.split('?');
-    const appName = decodeURIComponent(encodedAppName);
+    const appName = decodeURIComponent(encodedAppName).replace(/%20/g, ' ');
     const params = {};
     if (paramString) {
         paramString.split('&').forEach(param => {
