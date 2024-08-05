@@ -1,6 +1,6 @@
 import { EventBus } from './utils.js';
 import { openApp } from '../main.js';
-import { appAccessLevels, getAccessLevel } from './auth.js';
+import { appAccessLevels, checkAppAccess } from './auth.js';
 import { updateURL } from './routing.js';
 
 const desktopIcons = [
