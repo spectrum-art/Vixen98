@@ -22,6 +22,8 @@ export function initializeUndergroundMap(container) {
         crs: L.CRS.Simple,
         minZoom: -2,
         maxZoom: 2,
+        zoomSnap: 0.1,
+        zoomDelta: 0.1,
         zoomControl: false,
         attributionControl: false
     });
@@ -62,9 +64,11 @@ export function initializeUndergroundMap(container) {
         container.style.height = `${newSize}px`;
         map.invalidateSize();
         
-        const zoom = Math.log2(newSize / 1000) - 0.3;
-        
-        map.setView([500, 500], zoom);
+        const padding = Math.floor(newSize * 0.02);
+        map.fitBounds([[0, 0], [1000, 1000]], {
+            padding: [padding, padding],
+            animate: false
+        });
     }, 250);
 
     resizeMap();
@@ -114,5 +118,4 @@ export function initializeUndergroundMap(container) {
         }
     `;
     document.head.appendChild(style);
-    map.removeControl(map.attributionControl);
 }
