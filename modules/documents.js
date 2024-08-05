@@ -99,22 +99,25 @@ function openUndergroundMap() {
     console.log('Opening Underground Map');
     const desktop = document.getElementById('desktop');
     const desktopRect = desktop.getBoundingClientRect();
-    const mapHeight = Math.floor(desktopRect.height * 0.95);
-    const mapWidth = mapHeight; // 1:1 aspect ratio
+    const mapSize = Math.min(desktopRect.width, desktopRect.height) * 0.95;
 
     const mapConfig = {
         title: 'Underground Map',
         content: '<div id="underground-map"></div>',
-        width: `${mapWidth}px`,
-        height: `${mapHeight}px`,
+        width: `${mapSize}px`,
+        height: `${mapSize + 30}px`,
         minWidth: '400px',
-        minHeight: '400px',
+        minHeight: '430px',
         className: 'underground-map-window'
     };
     
     const window = createAppWindow(mapConfig);
+    const mapContainer = window.querySelector('#underground-map');
+    
+    mapContainer.style.width = `${mapSize}px`;
+    mapContainer.style.height = `${mapSize}px`;
+
     setTimeout(() => {
-        const mapContainer = window.querySelector('#underground-map');
         initializeUndergroundMap(mapContainer);
-    }, 0);
+    }, 50);
 }

@@ -66,11 +66,29 @@ export function initializeUndergroundMap(container) {
     document.head.appendChild(style);
 
     function resizeMap() {
+        const newSize = Math.min(container.clientWidth, container.clientHeight);
+        container.style.width = `${newSize}px`;
+        container.style.height = `${newSize}px`;
         map.invalidateSize();
         map.fitBounds([[0, 0], [1000, 1000]], {animate: false});
     }
 
+    resizeMap();
     setTimeout(resizeMap, 100);
 
     window.addEventListener('resize', resizeMap);
+
+    const windowElement = container.closest('.window');
+    if (windowElement) {
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                    if (windowElement.classList.contains('active')) {
+                        setTimeout(resizeMap, 0);
+                    }
+                }
+            });
+        });
+        observer.observe(windowElement, { attributes: true });
+    }
 }
