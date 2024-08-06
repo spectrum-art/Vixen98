@@ -72,7 +72,8 @@ function openRegularApp(app, params) {
 }
 
 function openFolderApp(app, params) {
-    const folderContent = app.subApps.map(subAppName => apps[subAppName])
+    const folderContent = app.subApps
+        .map(subAppName => apps[subAppName])
         .filter(subApp => subApp && checkAppAccess(subApp.name))
         .map(subApp => `
             <div class="folder-icon" data-app="${subApp.name}">
@@ -86,7 +87,11 @@ function openFolderApp(app, params) {
         content: `<div class="folder-container">${folderContent}</div>`,
         width: '50%',
         height: '60%',
+        className: 'folder-window'
     });
+
+    const folderContainer = folderWindow.querySelector('.folder-container');
+    setupFolderLayout(folderContainer);
 
     folderWindow.querySelectorAll('.folder-icon').forEach(icon => {
         icon.addEventListener('click', () => {
@@ -94,6 +99,26 @@ function openFolderApp(app, params) {
             openApp(subAppName);
         });
     });
+
+    const resizeObserver = new ResizeObserver(() => {
+        setupFolderLayout(folderContainer);
+    });
+    resizeObserver.observe(folderContainer);
+}
+
+function setupFolderLayout(container) {
+    const icons = container.querySelectorAll('.folder-icon');
+    const containerWidth = container.clientWidth;
+    const iconWidth = 100; // Adjust this value based on your icon size
+    const iconsPerRow = Math.floor(containerWidth / iconWidth);
+    
+    icons.forEach((icon, index) => {
+        icon.style.position = 'absolute';
+        icon.style.left = `${(index % iconsPerRow) * iconWidth}px`;
+        icon.style.top = `${Math.floor(index / iconsPerRow) * iconWidth}px`;
+    });
+
+    container.style.height = `${Math.ceil(icons.length / iconsPerRow) * iconWidth}px`;
 }
 
 function openMapApp(app, params) {

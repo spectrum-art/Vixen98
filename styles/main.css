@@ -301,3 +301,43 @@ body, html {
 .window.maximized .window-resizer {
     display: none;
 }
+
+/* -------------- Folder Windows -------------- */
+
+.folder-window .window-content {
+    overflow: auto;
+}
+
+.folder-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.folder-icon {
+    width: 100px;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: absolute;
+    transition: all 0.3s ease;
+}
+
+.folder-icon .icon {
+    font-size: 48px;
+    margin-bottom: 5px;
+}
+
+.folder-icon .label {
+    text-align: center;
+    word-wrap: break-word;
+    max-width: 90px;
+    font-size: 12px;
+}
+
+.folder-icon:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
