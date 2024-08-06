@@ -1,7 +1,7 @@
 import { initializeDesktop } from './modules/desktop.js';
 import { initializeSystem } from './modules/system.js';
 import { initializeDocuments, openBatchLog, openPlaceholder } from './modules/documents.js';
-import { openDeliveryMap, openUndergroundMap } from './modules/maps.js';
+import { initializeMaps, openDeliveryMap, openUndergroundMap } from './modules/maps.js';
 import { initializeLemonList } from './modules/lemonList.js';
 import { initializeEncryption } from './modules/encryption.js';
 import { initializeAuth, checkStoredCredentials } from './modules/auth.js';
