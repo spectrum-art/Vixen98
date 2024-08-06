@@ -2,6 +2,7 @@ import { createAppWindow, getWindowContent } from './windowManagement.js';
 import { showAccessDenied } from './routing.js';
 import { initializeUndergroundMap } from './undergroundMap.js';
 import { appAccessLevels, getAccessLevel } from './auth.js';
+import { apps } from './apps.js';
 
 const documentsConfig = {
     title: 'Documents',
@@ -15,7 +16,7 @@ const documentsIcons = [
     { name: 'Placeholder', icon: '📄' }
 ];
 
-export function initializeDocuments(params = {}) {
+export function initialize(params = {}) {
     console.log('Initializing Documents app with params:', params);
     const existingWindow = getWindowContent('Documents');
     if (existingWindow) {

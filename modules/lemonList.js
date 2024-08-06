@@ -1,6 +1,7 @@
-import { EventBus, debounce } from './utils.js';
+import { debounce } from './utils.js';
 import { createAppWindow } from './windowManagement.js';
 import { generateDeepLink } from './routing.js';
+import { apps } from './apps.js';
 
 const lemonListConfig = {
     title: 'Lemon List',
@@ -55,7 +56,7 @@ const emojiTooltips = {
     '🚕': 'Taxi'
 };
 
-export function initializeLemonList(params = {}) {
+export function initialize(params = {}) {
     const window = createAppWindow(lemonListConfig);
     setupLemonListApp(window, params);
 }

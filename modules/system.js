@@ -1,4 +1,5 @@
 import { createAppWindow } from './windowManagement.js';
+import { apps } from './apps.js';
 
 const systemConfig = {
     title: 'System',
@@ -11,7 +12,7 @@ const systemConfig = {
     }
 };
 
-export function initializeSystem() {
+export function initialize() {
     const window = createAppWindow(systemConfig);
     setupSystemApp(window);
 }

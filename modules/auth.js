@@ -1,24 +1,12 @@
+import { apps } from './apps.js';
 import { EventBus } from './utils.js';
 
 const SALT = "server";
+const defaultAccess = 1;
 
 const accessLevelHashes = {
     2: '1b055790275fe1228786d33b8897a3fa6fb26191c1eafe3b2074b096899a821d',
     3: '98877553b2bed31cc19b5b3ae73c855831519154d83453cb897e120e062b21d3'
-};
-
-export const appAccessLevels = {
-    System: { level: 1, hiddenIfLocked: true },
-    Trash: { level: 1, hiddenIfLocked: true },
-    Documents: { level: 1, hiddenIfLocked: true },
-        'Cookie Batch Log': { level: 1, hiddenIfLocked: true },
-        Placeholder: { level: 1, hiddenIfLocked: true },
-    Maps: { level: 1, hiddenIfLocked: true },
-        'Cookie Delivery Map': { level: 1, hiddenIfLocked: true },
-        'Underground Map': { level: 1, hiddenIfLocked: true },
-    'Lemon List': { level: 1, hiddenIfLocked: true },
-    Encryption: { level: 1, hiddenIfLocked: true },
-    Propaganda: { level: 1, hiddenIfLocked: true }
 };
 
 export function initializeAuth() {
@@ -48,7 +36,7 @@ function validatePassword(password) {
             return generateToken(parseInt(accessLevel));
         }
     }
-    return generateToken(1);  // Default access level
+    return generateToken(defaultAccess);
 }
 
 function generateToken(accessLevel) {
@@ -69,7 +57,7 @@ export function verifyToken(token) {
     } catch (error) {
         console.error('Invalid token');
     }
-    return 1; // Default access level
+    return defaultAccess;
 }
 
 export function storeCredentials(token) {
@@ -101,7 +89,11 @@ export function getAccessLevel() {
 }
 
 export function checkAppAccess(appName) {
+    const app = apps[appName];
+    if (!app) {
+        console.error(`App not found: ${appName}`);
+        return false;
+    }
     const userAccessLevel = getAccessLevel();
-    const { level: requiredLevel } = appAccessLevels[appName] || { level: 1 };
-    return userAccessLevel >= requiredLevel;
+    return userAccessLevel >= app.accessLevel;
 }

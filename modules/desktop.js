@@ -1,17 +1,8 @@
+import { apps } from './apps.js';
 import { EventBus } from './utils.js';
 import { openApp } from '../main.js';
-import { appAccessLevels, checkAppAccess } from './auth.js';
+import { checkAppAccess } from './auth.js';
 import { updateURL, showAccessDenied } from './routing.js';
-
-const desktopIcons = [
-    { name: 'System', icon: '💻' },
-    { name: 'Trash', icon: '🗑️' },
-    { name: 'Documents', icon: '📁' },
-    { name: 'Encryption', icon: '🔒' },
-    { name: 'Lemon List', icon: '🍋' },
-    { name: 'Maps', icon: '🗺️' },
-    { name: 'Propaganda', icon: '🏛️' }
-];
 
 export function initializeDesktop() {
     createDesktopIcons();
@@ -23,24 +14,26 @@ export function initializeDesktop() {
 
 function createDesktopIcons() {
     const iconGrid = document.getElementById('icon-grid');
-    desktopIcons.forEach(icon => {
-        const iconElement = document.createElement('div');
-        iconElement.className = 'desktop-icon';
-        iconElement.setAttribute('data-name', icon.name);
-        iconElement.innerHTML = `
-            <div class="icon">${icon.icon}</div>
-            <div class="label">${icon.name}</div>
-        `;
-        iconElement.addEventListener('click', () => {
-            if (!iconElement.classList.contains('locked')) {
-                console.log('Desktop icon clicked:', icon.name);
-                openApp(icon.name);
-                updateURL(icon.name);
-            } else {
-                showAccessDenied();
-            }
-        });
-        iconGrid.appendChild(iconElement);
+    Object.values(apps).forEach(app => {
+        if (app.showOnDesktop) {
+            const iconElement = document.createElement('div');
+            iconElement.className = 'desktop-icon';
+            iconElement.setAttribute('data-name', app.name);
+            iconElement.innerHTML = `
+                <div class="icon">${app.icon}</div>
+                <div class="label">${app.name}</div>
+            `;
+            iconElement.addEventListener('click', () => {
+                if (!iconElement.classList.contains('locked')) {
+                    console.log('Desktop icon clicked:', app.name);
+                    openApp(app.name);
+                    updateURL(app.name);
+                } else {
+                    showAccessDenied();
+                }
+            });
+            iconGrid.appendChild(iconElement);
+        }
     });
 }
 
@@ -54,9 +47,11 @@ function updateDesktopIcons() {
     const icons = document.querySelectorAll('.desktop-icon');
     icons.forEach((iconElement) => {
         const iconName = iconElement.getAttribute('data-name');
-        const { hiddenIfLocked } = appAccessLevels[iconName] || { hiddenIfLocked: false };
-        const hasAccess = checkAppAccess(iconName);
-        iconElement.style.display = (hasAccess || !hiddenIfLocked) ? 'flex' : 'none';
-        iconElement.classList.toggle('locked', !hasAccess);
+        const app = Object.values(apps).find(app => app.name === iconName);
+        if (app) {
+            const hasAccess = checkAppAccess(app.name);
+            iconElement.style.display = (hasAccess || !app.hiddenIfLocked) ? 'flex' : 'none';
+            iconElement.classList.toggle('locked', !hasAccess);
+        }
     });
 }

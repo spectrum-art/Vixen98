@@ -1,13 +1,9 @@
 import { initializeDesktop } from './modules/desktop.js';
-import { initializeSystem } from './modules/system.js';
-import { initializeDocuments, openBatchLog, openPlaceholder } from './modules/documents.js';
-import { initializeMaps, openDeliveryMap, openUndergroundMap } from './modules/maps.js';
-import { initializeLemonList } from './modules/lemonList.js';
-import { initializeEncryption } from './modules/encryption.js';
 import { initializeAuth, checkStoredCredentials } from './modules/auth.js';
-import { initializepropaganda } from './modules/propaganda.js';
 import { initializeRouting } from './modules/routing.js';
-import { EventBus } from './modules/utils.js';
+import { apps } from './apps.js';
+import { EventBus } from './utils.js';
+import { createAppWindow } from './windowManagement.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     const splashScreen = document.getElementById('splash-screen');
@@ -41,44 +37,67 @@ document.addEventListener('DOMContentLoaded', function() {
 
 export function openApp(appName, params = {}) {
     console.log('Opening app:', appName, 'with params:', params);
-    switch(appName) {
-        case 'System':
-            initializeSystem();
-            break;
-        case 'Trash':
-            // Add initialization logic here later
-            break;
-        case 'Documents':
-            initializeDocuments(params);
-            break;
-        case 'Encryption':
-            initializeEncryption();
-            break;
-        case 'Lemon List':
-            initializeLemonList(params);
-            break;
-        case 'Maps':
-            initializeMaps(params);
-            break;
-        case 'Propaganda':
-            initializepropaganda();
-            break;
-        case 'Delivery Map':
-            openDeliveryMap();
-            break;
-        case 'Underground Map':
-            openUndergroundMap();
-            break;
-        case 'Cookie Batch Log':
-            openBatchLog();
-            break;
-        case 'Placeholder':
-            openPlaceholder();
-            break;                        
-        default:
-            console.error(`Unknown app: ${appName}`);
-            throw new Error(`Unknown app: ${appName}`);
+    const app = apps[appName];
+    if (!app) {
+        console.error(`Unknown app: ${appName}`);
+        throw new Error(`Unknown app: ${appName}`);
     }
+
+    switch(app.type) {
+        case 'app':
+            openRegularApp(app, params);
+            break;
+        case 'folder':
+            openFolderApp(app, params);
+            break;
+        case 'map':
+            openMapApp(app, params);
+            break;
+        default:
+            console.error(`Unknown app type: ${app.type}`);
+            throw new Error(`Unknown app type: ${app.type}`);
+    }
+}
+
+function openRegularApp(app, params) {
+    import(`./modules/${app.jsFiles[0]}`).then(module => {
+        if (typeof module.initialize === 'function') {
+            module.initialize(params);
+        } else {
+            console.error(`Initialize function not found for app: ${app.name}`);
+        }
+    }).catch(error => {
+        console.error(`Error loading app module: ${app.name}`, error);
+    });
+}
+
+function openFolderApp(app, params) {
+    const folderContent = app.subApps.map(subAppName => apps[subAppName])
+        .filter(subApp => subApp && checkAppAccess(subApp.name))
+        .map(subApp => `
+            <div class="folder-icon" data-app="${subApp.name}">
+                <div class="icon">${subApp.icon}</div>
+                <div class="label">${subApp.name}</div>
+            </div>
+        `).join('');
+
+    const folderWindow = createAppWindow({
+        title: app.name,
+        content: `<div class="folder-container">${folderContent}</div>`,
+        width: '50%',
+        height: '60%',
+    });
+
+    folderWindow.querySelectorAll('.folder-icon').forEach(icon => {
+        icon.addEventListener('click', () => {
+            const subAppName = icon.getAttribute('data-app');
+            openApp(subAppName);
+        });
+    });
+}
+
+function openMapApp(app, params) {
+    openRegularApp(app, params);
 }
 
 window.addEventListener('popstate', (event) => {

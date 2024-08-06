@@ -1,5 +1,5 @@
 import { createAppWindow } from './windowManagement.js';
-import { EventBus } from './utils.js';
+import { apps } from './apps.js';
 
 const propagandaConfig = {
     title: 'Propaganda',
@@ -10,7 +10,7 @@ const propagandaConfig = {
 
 let announcements = [];
 
-export function initializepropaganda() {
+export function initialize() {
     const window = createAppWindow(propagandaConfig);
     setuppropagandaApp(window);
 }

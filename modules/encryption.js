@@ -1,5 +1,5 @@
-import { EventBus } from './utils.js';
 import { createAppWindow, getWindowContent } from './windowManagement.js';
+import { apps } from './apps.js';
 
 const encryptionConfig = {
     title: 'Encryption',
@@ -8,7 +8,7 @@ const encryptionConfig = {
     content: '<div id="encryption-app"></div>',
 };
 
-export function initializeEncryption() {
+export function initialize() {
     const window = createAppWindow(encryptionConfig);
     setupEncryptionApp(window);
 }

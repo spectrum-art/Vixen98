@@ -1,3 +1,4 @@
+import { apps } from './apps.js';
 import { EventBus } from './utils.js';
 import { checkAppAccess } from './auth.js';
 import { openApp } from '../main.js';
@@ -11,7 +12,7 @@ export function handleRouting() {
     const hash = window.location.hash.slice(1);
     if (hash) {
         const [appName, params] = parseHash(hash);
-        if (checkAppAccess(appName)) {
+        if (apps[appName] && checkAppAccess(appName)) {
             handleAppOpen(appName, params);
         } else {
             showAccessDenied();
@@ -33,6 +34,10 @@ export function parseHash(hash) {
 }
 
 export function generateDeepLink(appName, params = {}) {
+    if (!apps[appName]) {
+        console.error(`Unknown app: ${appName}`);
+        return '';
+    }
     const encodedAppName = encodeURIComponent(appName);
     const paramString = Object.entries(params)
         .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)

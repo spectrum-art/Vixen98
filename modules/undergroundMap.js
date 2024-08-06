@@ -1,3 +1,5 @@
+import { apps } from './apps.js';
+
 const LAYER_ORDER = ['Base', 'Vendors', 'Entrances', 'Surface', 'Surface Labels'];
 
 function debounce(func, wait) {
@@ -12,7 +14,7 @@ function debounce(func, wait) {
     };
 }
 
-export function initializeUndergroundMap(container) {
+export function initialize(container) {
     const loadingIndicator = document.createElement('div');
     loadingIndicator.className = 'map-loading-indicator';
     loadingIndicator.textContent = 'Loading map...';

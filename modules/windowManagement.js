@@ -1,9 +1,16 @@
 import { EventBus } from './utils.js';
 import { updateURL } from './routing.js';
+import { apps } from './apps.js';
 
 let windows = [];
 
 export function createAppWindow(appConfig = {}) {
+    const app = apps[appConfig.title];
+    if (!app) {
+        console.error(`Unknown app: ${appConfig.title}`);
+        return null;
+    }
+
     const existingWindow = windows.find(w => w.appName === appConfig.title);
     if (existingWindow) {
         console.log(`Window for ${appConfig.title} already exists, bringing to front`);
@@ -18,7 +25,6 @@ export function createAppWindow(appConfig = {}) {
         height: '60%',
         minWidth: '300px',
         minHeight: '200px',
-        title: 'New Window',
         content: '',
         features: {
             resizable: true,
@@ -38,7 +44,7 @@ export function createAppWindow(appConfig = {}) {
 
     const windowElement = document.createElement('div');
     windowElement.className = 'window';
-    windowElement.setAttribute('data-app', config.title);
+    windowElement.setAttribute('data-app', app.name);
 
     windowElement.style.width = config.width;
     windowElement.style.height = config.height;
@@ -47,7 +53,7 @@ export function createAppWindow(appConfig = {}) {
 
     windowElement.innerHTML = `
         <div class="window-header">
-            <span class="window-title">${config.title}</span>
+            <span class="window-title">${app.name}</span>
             <div class="window-controls">
                 ${config.features.minimizable ? '<span class="window-minimize">🗕</span>' : ''}
                 ${config.features.maximizable ? '<span class="window-maximize">🗖</span>' : ''}
@@ -67,10 +73,10 @@ export function createAppWindow(appConfig = {}) {
         return null;
     }
     desktop.appendChild(windowElement);
-    windows.push({ appName: config.title, element: windowElement, config });
+    windows.push({ appName: app.name, element: windowElement, config });
 
     if (config.features.showInTaskbar) {
-        createTaskbarItem(config.title, windowElement);
+        createTaskbarItem(app.name, windowElement);
     }
     positionWindow(windowElement);
     if (config.features.draggable) makeDraggable(windowElement);
@@ -117,15 +123,8 @@ function createTaskbarItem(appName, windowElement) {
 }
 
 function getIconForApp(appName) {
-    const iconMap = {
-        'System': '💻',
-        'Trash': '🗑️',
-        'Documents': '📁',
-        'Encryption': '🔒',
-        'Lemon List': '🍋',
-        'Maps': '🗺️'
-    };
-    return iconMap[appName] || '📄';
+    const app = apps[appName];
+    return app ? app.icon : '📄';
 }
 
 function makeDraggable(element) {

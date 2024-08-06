@@ -1,6 +1,6 @@
 import { createAppWindow, getWindowContent } from './windowManagement.js';
 import { showAccessDenied } from './routing.js';
-import { initializeUndergroundMap } from './undergroundMap.js';
+import { initialize as initializeUndergroundMap } from './undergroundMap.js';
 import { appAccessLevels, getAccessLevel } from './auth.js';
 
 const mapsConfig = {
@@ -15,7 +15,7 @@ const mapsIcons = [
     { name: 'Underground', icon: '🐀' },
 ];
 
-export function initializeMaps(params = {}) {
+export function initialize(params = {}) {
     console.log('Initializing Maps app with params:', params);
     const existingWindow = getWindowContent('Maps');
     if (existingWindow) {
