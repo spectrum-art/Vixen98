@@ -2,11 +2,19 @@ import { debounce } from './utils.js';
 
 const LAYER_ORDER = ['Base', 'Vendors', 'Entrances', 'Surface', 'Surface Labels'];
 
-export function initialize(container) {
+export function initialize(container, params = {}) {
+    if (!container || !(container instanceof HTMLElement)) {
+        console.error('Invalid container provided to Underground Map initialize function');
+        return;
+    }
+
     const loadingIndicator = document.createElement('div');
     loadingIndicator.className = 'map-loading-indicator';
     loadingIndicator.textContent = 'Loading map...';
     container.appendChild(loadingIndicator);
+
+    container.style.width = '100%';
+    container.style.height = '100%';
 
     const map = L.map(container, {
         crs: L.CRS.Simple,

@@ -61,8 +61,15 @@ export function openApp(appName, params = {}) {
 
 function openRegularApp(app, params) {
     import(`./modules/${app.jsFiles[0]}`).then(module => {
+        const window = createAppWindow({
+            title: app.name,
+            content: `<div id="${app.name.toLowerCase().replace(/\s+/g, '-')}-container"></div>`,
+            width: '90%',
+            height: '90%',
+        });
+        const container = window.querySelector(`#${app.name.toLowerCase().replace(/\s+/g, '-')}-container`);
         if (typeof module.initialize === 'function') {
-            module.initialize(params);
+            module.initialize(container, params);
         } else {
             console.error(`Initialize function not found for app: ${app.name}`);
         }
@@ -122,8 +129,25 @@ function setupFolderLayout(container) {
 }
 
 function openMapApp(app, params) {
-    openRegularApp(app, params);
+    import(`./modules/${app.jsFiles[0]}`).then(module => {
+        const window = createAppWindow({
+            title: app.name,
+            content: `<div id="${app.name.toLowerCase().replace(/\s+/g, '-')}-container"></div>`,
+            width: '90%',
+            height: '90%',
+            className: 'map-window'
+        });
+        const container = window.querySelector(`#${app.name.toLowerCase().replace(/\s+/g, '-')}-container`);
+        if (typeof module.initialize === 'function') {
+            module.initialize(container, params);
+        } else {
+            console.error(`Initialize function not found for app: ${app.name}`);
+        }
+    }).catch(error => {
+        console.error(`Error loading app module: ${app.name}`, error);
+    });
 }
+
 
 window.addEventListener('popstate', (event) => {
     if (event.state && event.state.appName) {
