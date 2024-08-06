@@ -1,9 +1,9 @@
 import { initializeDesktop } from './modules/desktop.js';
 import { initializeAuth, checkStoredCredentials } from './modules/auth.js';
 import { initializeRouting } from './modules/routing.js';
-import { apps } from './apps.js';
-import { EventBus } from './utils.js';
-import { createAppWindow } from './windowManagement.js';
+import { apps } from './modules/apps.js';
+import { EventBus } from './modules/utils.js';
+import { createAppWindow } from './modules/windowManagement.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     const splashScreen = document.getElementById('splash-screen');
