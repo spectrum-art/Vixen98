@@ -38,7 +38,7 @@ export const apps = {
       cssFiles: ['cookieBatchLog.css'],
     },
     'Cookie Delivery Map': {
-      name: 'Cookie Delivery Map',
+      name: 'Cookie Deliveries',
       type: 'map',
       icon: '🍪',
       accessLevel: 1,
@@ -93,7 +93,7 @@ export const apps = {
       cssFiles: ['propaganda.css'],
     },
     'Underground Map': {
-      name: 'Underground Map',
+      name: 'Underground',
       type: 'map',
       icon: '🐀',
       accessLevel: 1,

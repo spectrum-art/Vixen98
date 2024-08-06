@@ -46,8 +46,8 @@ body, html {
 /* -------------- Desktop -------------- */
 
 #desktop-container {
-    width: 94vh;
-    height: 70.5vh;
+    width: 90vh;
+    height: 90vh;
     aspect-ratio: 4 / 3;
     background-color: #57abab;
     display: flex;
