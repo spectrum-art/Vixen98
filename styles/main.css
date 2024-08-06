@@ -29,8 +29,8 @@ body, html {
 }
 
 #splash-gif {
-    width: 94vh;
-    height: 70.5vh;
+    width: 120vh;
+    height: 90vh;
     object-fit: contain;
 }
 
@@ -78,8 +78,8 @@ body, html {
     position: relative;
     z-index: 1;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(16%, 1fr));
-    grid-auto-rows: 16%;
+    grid-template-columns: repeat(auto-fill, minmax(12.5%, 1fr));
+    grid-auto-rows: 12.5%;
     height: 100%;
     width: 100%;
 }
