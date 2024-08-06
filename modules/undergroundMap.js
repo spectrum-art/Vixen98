@@ -1,18 +1,6 @@
-import { apps } from './apps.js';
+import { debounce } from './utils.js';
 
 const LAYER_ORDER = ['Base', 'Vendors', 'Entrances', 'Surface', 'Surface Labels'];
-
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
 
 export function initialize(container) {
     const loadingIndicator = document.createElement('div');
