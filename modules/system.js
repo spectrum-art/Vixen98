@@ -3,8 +3,8 @@ import { apps } from './apps.js';
 
 const systemConfig = {
     title: 'System',
-    width: '600px',
-    height: '400px',
+    width: '450px',
+    height: '600px',
     content: '<div id="system-app"></div>',
     features: {
         resizable: false,
