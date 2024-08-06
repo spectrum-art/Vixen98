@@ -121,8 +121,9 @@ function getIconForApp(appName) {
         'System': '💻',
         'Trash': '🗑️',
         'Documents': '📁',
+        'Encryption': '🔒',
         'Lemon List': '🍋',
-        'Encryption': '🔒'
+        'Maps': '🗺️'
     };
     return iconMap[appName] || '📄';
 }

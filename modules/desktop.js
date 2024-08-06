@@ -7,8 +7,9 @@ const desktopIcons = [
     { name: 'System', icon: '💻' },
     { name: 'Trash', icon: '🗑️' },
     { name: 'Documents', icon: '📁' },
-    { name: 'Lemon List', icon: '🍋' },
     { name: 'Encryption', icon: '🔒' },
+    { name: 'Lemon List', icon: '🍋' },
+    { name: 'Maps', icon: '🗺️' },
     { name: 'Propaganda', icon: '🏛️' }
 ];
 

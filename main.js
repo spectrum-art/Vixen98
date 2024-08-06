@@ -1,6 +1,7 @@
 import { initializeDesktop } from './modules/desktop.js';
 import { initializeSystem } from './modules/system.js';
-import { initializeDocuments, openDeliveryMap, openUndergroundMap } from './modules/documents.js';
+import { initializeDocuments, openBatchLog, openPlaceholder } from './modules/documents.js';
+import { openDeliveryMap, openUndergroundMap } from './modules/maps.js';
 import { initializeLemonList } from './modules/lemonList.js';
 import { initializeEncryption } from './modules/encryption.js';
 import { initializeAuth, checkStoredCredentials } from './modules/auth.js';
@@ -50,11 +51,14 @@ export function openApp(appName, params = {}) {
         case 'Documents':
             initializeDocuments(params);
             break;
+        case 'Encryption':
+            initializeEncryption();
+            break;
         case 'Lemon List':
             initializeLemonList(params);
             break;
-        case 'Encryption':
-            initializeEncryption();
+        case 'Maps':
+            initializeMaps(params);
             break;
         case 'Propaganda':
             initializepropaganda();
@@ -62,14 +66,14 @@ export function openApp(appName, params = {}) {
         case 'Delivery Map':
             openDeliveryMap();
             break;
-        case 'Cookie Batch Log':
-            // Add initialization logic here later
-            break;
         case 'Underground Map':
             openUndergroundMap();
             break;
+        case 'Cookie Batch Log':
+            openBatchLog();
+            break;
         case 'Placeholder':
-            // Add initialization logic here later
+            openPlaceholder();
             break;                        
         default:
             console.error(`Unknown app: ${appName}`);

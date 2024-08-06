@@ -3,50 +3,50 @@ import { showAccessDenied } from './routing.js';
 import { initializeUndergroundMap } from './undergroundMap.js';
 import { appAccessLevels, getAccessLevel } from './auth.js';
 
-const documentsConfig = {
-    title: 'Documents',
+const mapsConfig = {
+    title: 'Maps',
     width: '50%',
     height: '40%',
-    content: '<div id="documents-app"></div>',
+    content: '<div id="maps-app"></div>',
 };
 
-const documentsIcons = [
-    { name: 'Cookie Batch Log', icon: '🍪' },
-    { name: 'Placeholder', icon: '📄' }
+const mapsIcons = [
+    { name: 'Cookie Deliveries', icon: '🍪' },
+    { name: 'Underground', icon: '🐀' },
 ];
 
-export function initializeDocuments(params = {}) {
-    console.log('Initializing Documents app with params:', params);
-    const existingWindow = getWindowContent('Documents');
+export function initializeMaps(params = {}) {
+    console.log('Initializing Maps app with params:', params);
+    const existingWindow = getWindowContent('Maps');
     if (existingWindow) {
-        console.log('Documents window already exists, updating content');
-        setupDocumentsApp(existingWindow.closest('.window'));
+        console.log('Maps window already exists, updating content');
+        setupMapsApp(existingWindow.closest('.window'));
     } else {
-        const window = createAppWindow(documentsConfig);
+        const window = createAppWindow(mapsConfig);
         if (window) {
-            setupDocumentsApp(window);
+            setupMapsApp(window);
         } else {
-            console.error('Failed to create Documents window');
+            console.error('Failed to create Maps window');
         }
     }
 }
 
-function setupDocumentsApp(window) {
-    const container = window.querySelector('#documents-app');
+function setupMapsApp(window) {
+    const container = window.querySelector('#maps-app');
     if (!container) {
-        console.error('Documents app container not found');
+        console.error('Maps app container not found');
         return;
     }
     
-    container.innerHTML = createDocumentsAppHTML();
-    setupDocumentsEventListeners(container);
+    container.innerHTML = createMapsAppHTML();
+    setupMapsEventListeners(container);
 }
 
-function createDocumentsAppHTML() {
+function createMapsAppHTML() {
     const userAccessLevel = getAccessLevel();
     return `
-        <div class="my-documents-icons">
-            ${documentsIcons.map(icon => {
+        <div class="maps-icons">
+            ${mapsIcons.map(icon => {
                 const { level: requiredLevel, hiddenIfLocked } = appAccessLevels[icon.name] || { level: 1, hiddenIfLocked: false };
                 const hasAccess = userAccessLevel >= requiredLevel;
                 if (hasAccess || !hiddenIfLocked) {
@@ -63,7 +63,7 @@ function createDocumentsAppHTML() {
     `;
 }
 
-function setupDocumentsEventListeners(content) {
+function setupMapsEventListeners(content) {
     const icons = content.querySelectorAll('.desktop-icon');
     icons.forEach(icon => {
         icon.addEventListener('click', (e) => {
@@ -71,10 +71,10 @@ function setupDocumentsEventListeners(content) {
             if (icon.classList.contains('locked')) {
                 showAccessDenied();
             } else {
-                if (iconName === 'Cookie Batch Log') {
-                    openBatchLog();
-                } else if (iconName === 'Placeholder') {
-                    openPlaceholder();
+                if (iconName === 'Cookie Deliveries') {
+                    openDeliveryMap();
+                } else if (iconName === 'Underground') {
+                    openUndergroundMap();
                 }
                 // Add more conditions here for other icons if needed
             }
@@ -82,8 +82,8 @@ function setupDocumentsEventListeners(content) {
     });
 }
 
-export function openBatchLog() {
-    console.log('Opening Cookie Batch Log');
+export function openDeliveryMap() {
+    console.log('Opening Delivery Map');
     const mapUrl = `https://gta-5-map.com/?\
         slideout=false&slideoutright=false&x=-120.1&y=80.5&zoom=3.4&embed=light\
         &notes=3EWfhJLeGcb,3nf05rUzzTS,61hDtXO1IAV,6KSIzbU0JCX,78yKmWHpAxr,8qmes9jiqky,\
@@ -92,7 +92,7 @@ export function openBatchLog() {
         JbMeXCoX67S,K0Gco51LKq8,KOFXc19AHzl,KuW1Kv0rFKa,tzvgY7VwaI`;
 
     const mapConfig = {
-        title: 'Cookie Batch Log',
+        title: 'Cookie Delivery Map',
         content: `<iframe src="${mapUrl}" 
             style="border: none; width: 100%; height: 100%;" 
             sandbox="allow-scripts allow-same-origin">
@@ -106,14 +106,14 @@ export function openBatchLog() {
     const window = createAppWindow(mapConfig);
 }
 
-export function openPlaceholder() {
-    console.log('Opening Placeholder');
+export function openUndergroundMap() {
+    console.log('Opening Underground Map');
     const desktop = document.getElementById('desktop');
     const desktopRect = desktop.getBoundingClientRect();
     const mapSize = Math.min(desktopRect.width, desktopRect.height) * 0.95;
 
     const mapConfig = {
-        title: 'Placeholder',
+        title: 'Underground Map',
         content: '<div id="underground-map"></div>',
         width: `${mapSize}px`,
         height: `${mapSize + 30}px`,
