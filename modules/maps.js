@@ -75,9 +75,9 @@ function setupMapsEventListeners(content) {
                 if (iconName === 'Cookie Deliveries') {
                     initializeDeliveryMap();
                 } else if (iconName === 'Underground') {
-                    initializeUndergroundMap();
+                    const mapContainer = document.getElementById('underground-map');
+                    initializeUndergroundMap(mapContainer);
                 }
-                // Add more conditions here for other icons if needed
             }
         });
     });
