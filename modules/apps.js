@@ -113,7 +113,7 @@ export const apps = {
     QDaddy: {
       name: 'QDaddy',
       type: 'app',
-      icon: '㊙️',
+      icon: '🚄',
       accessLevel: 1,
       showOnDesktop: true,
       jsFiles: ['propaganda.js'],
