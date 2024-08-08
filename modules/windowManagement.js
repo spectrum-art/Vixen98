@@ -3,6 +3,7 @@ import { updateURL } from './routing.js';
 import { apps, getAppById } from './apps.js';
 
 let windows = [];
+const WINDOW_OFFSET = 20;
 
 export function createAppWindow(appConfig = {}) {
     const app = getAppById(appConfig.id);
@@ -24,7 +25,6 @@ export function createAppWindow(appConfig = {}) {
     windowElement.className = 'window';
     windowElement.setAttribute('data-app-id', app.id);
 
-    // Apply window size
     windowElement.style.width = appConfig.width || '50%';
     windowElement.style.height = appConfig.height || '50%';
     windowElement.style.minWidth = appConfig.minWidth || '300px';
@@ -53,7 +53,7 @@ export function createAppWindow(appConfig = {}) {
     windows.push(windowObj);
 
     createTaskbarItem(app.id, windowElement);
-    positionWindow(windowElement);
+    positionWindowWithOffset(windowElement);
     makeDraggable(windowElement);
     makeResizable(windowElement);
     setupWindowControls(windowElement, windowObj);
@@ -64,16 +64,40 @@ export function createAppWindow(appConfig = {}) {
     return windowElement;
 }
 
-function positionWindow(windowElement) {
+function positionWindowWithOffset(windowElement) {
     const desktop = document.getElementById('desktop');
     const desktopRect = desktop.getBoundingClientRect();
-    const windowRect = windowElement.getBoundingClientRect();
+    
+    let left = Math.round((desktopRect.width - windowElement.offsetWidth) / 2);
+    let top = Math.round((desktopRect.height - windowElement.offsetHeight) / 2);
 
-    const left = Math.round((desktopRect.width - windowRect.width) / 2);
-    const top = Math.round((desktopRect.height - windowRect.height) / 2);
+    let offsetApplied = false;
+    do {
+        offsetApplied = false;
+        for (let w of windows) {
+            if (w.element !== windowElement) {
+                const rect = w.element.getBoundingClientRect();
+                if (Math.abs(rect.left - left) < WINDOW_OFFSET && Math.abs(rect.top - top) < WINDOW_OFFSET) {
+                    left += WINDOW_OFFSET;
+                    top += WINDOW_OFFSET;
+                    offsetApplied = true;
+                    break;
+                }
+            }
+        }
+    } while (offsetApplied && left + windowElement.offsetWidth < desktopRect.width && top + windowElement.offsetHeight < desktopRect.height);
+
+    left = Math.min(left, desktopRect.width - windowElement.offsetWidth);
+    top = Math.min(top, desktopRect.height - windowElement.offsetHeight);
+    left = Math.max(left, 0);
+    top = Math.max(top, 0);
 
     windowElement.style.left = `${left}px`;
     windowElement.style.top = `${top}px`;
+}
+
+function positionWindow(windowElement) {
+    positionWindowWithOffset(windowElement);
 }
 
 function createTaskbarItem(appId, windowElement) {

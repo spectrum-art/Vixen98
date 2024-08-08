@@ -11,10 +11,10 @@ export const apps = {
     jsFiles: ['system.js'],
     cssFiles: ['system.css'],
     window: {
-      width: '40%',
-      height: '60%',
-      minWidth: '400px',
-      minHeight: '600px'
+      width: '30%',
+      height: '40%',
+      minWidth: '300px',
+      minHeight: '400px'
     }
   },
   trash: {
