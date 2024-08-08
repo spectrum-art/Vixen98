@@ -5,15 +5,15 @@ import { apps, getAppById } from './apps.js';
 let windows = [];
 
 export function createAppWindow(appConfig = {}) {
-    const app = apps[appConfig.title];
+    const app = getAppById(appConfig.id);
     if (!app) {
-        console.error(`Unknown app: ${appConfig.title}`);
+        console.error(`Unknown app: ${appConfig.id}`);
         return null;
     }
 
-    const existingWindow = windows.find(w => w.appName === appConfig.title);
+    const existingWindow = windows.find(w => w.appId === app.id);
     if (existingWindow) {
-        console.log(`Window for ${appConfig.title} already exists, bringing to front`);
+        console.log(`Window for ${app.name} already exists, bringing to front`);
         bringToFront(existingWindow.element);
         return existingWindow.element;
     }
@@ -44,7 +44,7 @@ export function createAppWindow(appConfig = {}) {
 
     const windowElement = document.createElement('div');
     windowElement.className = 'window';
-    windowElement.setAttribute('data-app', app.name);
+    windowElement.setAttribute('data-app-id', app.id);
 
     windowElement.style.width = config.width;
     windowElement.style.height = config.height;
@@ -73,7 +73,7 @@ export function createAppWindow(appConfig = {}) {
         return null;
     }
     desktop.appendChild(windowElement);
-    windows.push({ appName: app.name, element: windowElement, config });
+    windows.push({ appId: app.id, element: windowElement, config });
 
     if (config.features.showInTaskbar) {
         createTaskbarItem(app.name, windowElement);

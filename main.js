@@ -90,6 +90,7 @@ function openFolderApp(app, params) {
         `).join('');
 
     const folderWindow = createAppWindow({
+        id: app.id,
         title: app.name,
         content: `<div class="folder-container">${folderContent}</div>`,
         width: '50%',
