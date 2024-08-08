@@ -79,8 +79,8 @@ export const apps = {
     window: {
       width: '90%',
       height: '90%',
-      minWidth: '600px',
-      minHeight: '400px'
+      minWidth: '900px',
+      minHeight: '900px'
     }
   },
   encryption: {
@@ -94,9 +94,9 @@ export const apps = {
     cssFiles: ['encryption.css'],
     window: {
       width: '50%',
-      height: '40%',
+      height: '30%',
       minWidth: '500px',
-      minHeight: '400px'
+      minHeight: '300px'
     }
   },
   lemonList: {
@@ -110,9 +110,9 @@ export const apps = {
     cssFiles: ['lemonList.css'],
     window: {
       width: '90%',
-      height: '75%',
-      minWidth: '600px',
-      minHeight: '400px'
+      height: '80%',
+      minWidth: '900px',
+      minHeight: '800px'
     }
   },
   maps: {
@@ -174,10 +174,10 @@ export const apps = {
     jsFiles: ['undergroundMap.js'],
     cssFiles: ['undergroundMap.css'],
     window: {
-      width: '90%',
-      height: '75%',
-      minWidth: '600px',
-      minHeight: '400px'
+      width: '75%',
+      height: '90%',
+      minWidth: '750px',
+      minHeight: '900px'
     }
   },
 };
