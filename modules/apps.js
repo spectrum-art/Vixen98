@@ -77,10 +77,10 @@ export const apps = {
     jsFiles: ['cookieDeliveryMap.js'],
     cssFiles: ['cookieDeliveryMap.css'],
     window: {
-      width: '90%',
-      height: '90%',
-      minWidth: '900px',
-      minHeight: '900px'
+      width: '80%',
+      height: '80%',
+      minWidth: '800px',
+      minHeight: '800px'
     }
   },
   encryption: {
@@ -174,10 +174,10 @@ export const apps = {
     jsFiles: ['undergroundMap.js'],
     cssFiles: ['undergroundMap.css'],
     window: {
-      width: '75%',
-      height: '90%',
-      minWidth: '750px',
-      minHeight: '900px'
+      width: '70%',
+      height: '95%',
+      minWidth: '700px',
+      minHeight: '950px'
     }
   },
 };
