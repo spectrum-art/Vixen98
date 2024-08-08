@@ -101,19 +101,10 @@ export const apps = {
       jsFiles: ['undergroundMap.js'],
       cssFiles: ['undergroundMap.css'],
     },
-    Alibi: {
+/*     Alibi: {
       name: 'Alibi',
       type: 'app',
       icon: '㊙️',
-      accessLevel: 1,
-      showOnDesktop: true,
-      jsFiles: ['propaganda.js'],
-      cssFiles: ['propaganda.css'],
-    },
-    QDaddy: {
-      name: 'QDaddy',
-      type: 'app',
-      icon: '🚄',
       accessLevel: 1,
       showOnDesktop: true,
       jsFiles: ['propaganda.js'],
@@ -128,7 +119,16 @@ export const apps = {
       jsFiles: ['propaganda.js'],
       cssFiles: ['propaganda.css'],
     },
-    Gossip: {
+    Cookbook: {
+      name: 'Cookbook',
+      type: 'app',
+      icon: '📖',
+      accessLevel: 1,
+      showOnDesktop: true,
+      jsFiles: ['propaganda.js'],
+      cssFiles: ['propaganda.css'],
+    }, */
+/*     Gossip: {
       name: 'Gossip',
       type: 'app',
       icon: '👄',
@@ -137,10 +137,10 @@ export const apps = {
       jsFiles: ['propaganda.js'],
       cssFiles: ['propaganda.css'],
     },
-    Cookbook: {
-      name: 'Cookbook',
+    QDaddy: {
+      name: 'QDaddy',
       type: 'app',
-      icon: '📖',
+      icon: '🚄',
       accessLevel: 1,
       showOnDesktop: true,
       jsFiles: ['propaganda.js'],
@@ -154,5 +154,5 @@ export const apps = {
       showOnDesktop: true,
       jsFiles: ['propaganda.js'],
       cssFiles: ['propaganda.css'],
-    },
+    }, */
   };
