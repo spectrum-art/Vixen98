@@ -1,4 +1,4 @@
-import { apps } from './apps.js';
+import { apps, getAppById } from './apps.js';
 import { EventBus } from './utils.js';
 import { checkAppAccess } from './auth.js';
 import { openApp } from '../main.js';
@@ -33,16 +33,17 @@ export function parseHash(hash) {
     return [appName, params];
 }
 
-export function generateDeepLink(appName, params = {}) {
-    if (!apps[appName]) {
-        console.error(`Unknown app: ${appName}`);
+export function generateDeepLink(appId, params = {}) {
+    const app = getAppById(appId);
+    if (!app) {
+        console.error(`Unknown app: ${appId}`);
         return '';
     }
-    const encodedAppName = encodeURIComponent(appName);
+    const encodedAppId = encodeURIComponent(appId);
     const paramString = Object.entries(params)
         .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
         .join('&');
-    return `${window.location.origin}/#${encodedAppName}${paramString ? `?${paramString}` : ''}`;
+    return `${window.location.origin}/#${encodedAppId}${paramString ? `?${paramString}` : ''}`;
 }
 
 export function updateURL(appName, params = {}) {

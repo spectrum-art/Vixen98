@@ -1,6 +1,6 @@
 import { EventBus } from './utils.js';
 import { updateURL } from './routing.js';
-import { apps } from './apps.js';
+import { apps, getAppById } from './apps.js';
 
 let windows = [];
 
@@ -122,8 +122,8 @@ function createTaskbarItem(appName, windowElement) {
     openWindows.appendChild(taskbarItem);
 }
 
-function getIconForApp(appName) {
-    const app = apps[appName];
+function getIconForApp(appId) {
+    const app = getAppById(appId);
     return app ? app.icon : '📄';
 }
 

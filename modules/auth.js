@@ -1,4 +1,4 @@
-import { apps } from './apps.js';
+import { apps, getAppById } from './apps.js';
 import { EventBus } from './utils.js';
 
 const SALT = "server";
@@ -88,10 +88,10 @@ export function getAccessLevel() {
     return token ? verifyToken(token) : 1;
 }
 
-export function checkAppAccess(appName) {
-    const app = apps[appName];
+export function checkAppAccess(appId) {
+    const app = getAppById(appId);
     if (!app) {
-        console.error(`App not found: ${appName}`);
+        console.error(`App not found: ${appId}`);
         return false;
     }
     const userAccessLevel = getAccessLevel();

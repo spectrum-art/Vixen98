@@ -1,9 +1,10 @@
-import { initializeDesktop } from './modules/desktop.js';
-import { initializeAuth, checkStoredCredentials, checkAppAccess } from './modules/auth.js';
-import { initializeRouting } from './modules/routing.js';
-import { apps } from './modules/apps.js';
-import { EventBus } from './modules/utils.js';
-import { createAppWindow } from './modules/windowManagement.js';
+// main.js
+
+import { apps, getAppById } from './apps.js';
+import { EventBus } from './utils.js';
+import { createAppWindow } from './windowManagement.js';
+import { checkAppAccess } from './auth.js';
+import { updateURL } from './routing.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     const splashScreen = document.getElementById('splash-screen');
@@ -35,12 +36,12 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeRouting();
 });
 
-export function openApp(appName, params = {}) {
-    console.log('Opening app:', appName, 'with params:', params);
-    const app = apps[appName];
+export function openApp(appId, params = {}) {
+    console.log('Opening app:', appId, 'with params:', params);
+    const app = getAppById(appId);
     if (!app) {
-        console.error(`Unknown app: ${appName}`);
-        throw new Error(`Unknown app: ${appName}`);
+        console.error(`Unknown app: ${appId}`);
+        throw new Error(`Unknown app: ${appId}`);
     }
 
     switch(app.type) {
@@ -63,11 +64,11 @@ function openRegularApp(app, params) {
     import(`./modules/${app.jsFiles[0]}`).then(module => {
         const window = createAppWindow({
             title: app.name,
-            content: `<div id="${app.name.toLowerCase().replace(/\s+/g, '-')}-container"></div>`,
+            content: `<div id="${app.id}-container"></div>`,
             width: '90%',
             height: '90%',
         });
-        const container = window.querySelector(`#${app.name.toLowerCase().replace(/\s+/g, '-')}-container`);
+        const container = window.querySelector(`#${app.id}-container`);
         if (typeof module.initialize === 'function') {
             module.initialize(container, params);
         } else {
@@ -80,10 +81,10 @@ function openRegularApp(app, params) {
 
 function openFolderApp(app, params) {
     const folderContent = app.subApps
-        .map(subAppName => apps[subAppName])
-        .filter(subApp => subApp && checkAppAccess(subApp.name))
+        .map(subAppId => getAppById(subAppId))
+        .filter(subApp => subApp && checkAppAccess(subApp.id))
         .map(subApp => `
-            <div class="folder-icon" data-app="${subApp.name}">
+            <div class="folder-icon" data-app-id="${subApp.id}">
                 <div class="icon">${subApp.icon}</div>
                 <div class="label">${subApp.name}</div>
             </div>
@@ -102,8 +103,8 @@ function openFolderApp(app, params) {
 
     folderWindow.querySelectorAll('.folder-icon').forEach(icon => {
         icon.addEventListener('click', () => {
-            const subAppName = icon.getAttribute('data-app');
-            openApp(subAppName);
+            const subAppId = icon.getAttribute('data-app-id');
+            openApp(subAppId);
         });
     });
 
@@ -111,6 +112,26 @@ function openFolderApp(app, params) {
         setupFolderLayout(folderContainer);
     });
     resizeObserver.observe(folderContainer);
+}
+
+function openMapApp(app, params) {
+    import(`./modules/${app.jsFiles[0]}`).then(module => {
+        const window = createAppWindow({
+            title: app.name,
+            content: `<div id="${app.id}-container"></div>`,
+            width: '90%',
+            height: '90%',
+            className: 'map-window'
+        });
+        const container = window.querySelector(`#${app.id}-container`);
+        if (typeof module.initialize === 'function') {
+            module.initialize(container, params);
+        } else {
+            console.error(`Initialize function not found for app: ${app.name}`);
+        }
+    }).catch(error => {
+        console.error(`Error loading app module: ${app.name}`, error);
+    });
 }
 
 function setupFolderLayout(container) {
@@ -128,30 +149,9 @@ function setupFolderLayout(container) {
     container.style.height = `${Math.ceil(icons.length / iconsPerRow) * iconWidth}px`;
 }
 
-function openMapApp(app, params) {
-    import(`./modules/${app.jsFiles[0]}`).then(module => {
-        const window = createAppWindow({
-            title: app.name,
-            content: `<div id="${app.name.toLowerCase().replace(/\s+/g, '-')}-container"></div>`,
-            width: '90%',
-            height: '90%',
-            className: 'map-window'
-        });
-        const container = window.querySelector(`#${app.name.toLowerCase().replace(/\s+/g, '-')}-container`);
-        if (typeof module.initialize === 'function') {
-            module.initialize(container, params);
-        } else {
-            console.error(`Initialize function not found for app: ${app.name}`);
-        }
-    }).catch(error => {
-        console.error(`Error loading app module: ${app.name}`, error);
-    });
-}
-
-
 window.addEventListener('popstate', (event) => {
-    if (event.state && event.state.appName) {
-        openApp(event.state.appName, event.state.params);
+    if (event.state && event.state.appId) {
+        openApp(event.state.appId, event.state.params);
     }
 });
 
