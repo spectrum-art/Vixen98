@@ -60,40 +60,81 @@ export function createAppWindow(appConfig = {}) {
 
     console.log('Window created:', windowElement);
     bringToFront(windowElement);
+
+    if (windows.length === 0) {
+        positionWindowWithOffset.baseLeft = WINDOW_OFFSET;
+        positionWindowWithOffset.baseTop = WINDOW_OFFSET;
+        positionWindowWithOffset.rowCount = 0;
+    }
     
     return windowElement;
 }
 
 function positionWindowWithOffset(windowElement) {
-    const desktop = document.getElementById('desktop');
-    const desktopRect = desktop.getBoundingClientRect();
-    
-    let left = Math.round((desktopRect.width - windowElement.offsetWidth) / 2);
-    let top = Math.round((desktopRect.height - windowElement.offsetHeight) / 2);
+    setTimeout(() => {
+        const desktop = document.getElementById('desktop');
+        const desktopRect = desktop.getBoundingClientRect();
+        const windowRect = windowElement.getBoundingClientRect();
+        
+        let baseLeft = WINDOW_OFFSET;
+        let baseTop = WINDOW_OFFSET;
+        let left = baseLeft;
+        let top = baseTop;
 
-    let offsetApplied = false;
-    do {
-        offsetApplied = false;
-        for (let w of windows) {
-            if (w.element !== windowElement) {
-                const rect = w.element.getBoundingClientRect();
-                if (Math.abs(rect.left - left) < WINDOW_OFFSET && Math.abs(rect.top - top) < WINDOW_OFFSET) {
-                    left += WINDOW_OFFSET;
-                    top += WINDOW_OFFSET;
-                    offsetApplied = true;
-                    break;
+        const maxOffsetsPerRow = 5;
+        let offsetCount = 0;
+        let rowCount = 0;
+
+        function resetToNextRow() {
+            rowCount++;
+            baseLeft += WINDOW_OFFSET;
+            baseTop = WINDOW_OFFSET;
+            left = baseLeft;
+            top = baseTop + (rowCount * WINDOW_OFFSET);
+            offsetCount = 0;
+        }
+
+        let positionFound = false;
+        while (!positionFound) {
+            positionFound = true;
+            for (let w of windows) {
+                if (w.element !== windowElement) {
+                    const rect = w.element.getBoundingClientRect();
+                    if (Math.abs(rect.left - left) < WINDOW_OFFSET && Math.abs(rect.top - top) < WINDOW_OFFSET) {
+                        positionFound = false;
+                        offsetCount++;
+                        if (offsetCount >= maxOffsetsPerRow) {
+                            resetToNextRow();
+                        } else {
+                            left += WINDOW_OFFSET;
+                            top += WINDOW_OFFSET;
+                        }
+                        break;
+                    }
                 }
             }
+
+            if (left + windowRect.width > desktopRect.width || top + windowRect.height > desktopRect.height) {
+                resetToNextRow();
+                positionFound = false;
+            }
+
+            if (rowCount > 10) {
+                console.warn("Max row count reached. Forcing position.");
+                positionFound = true;
+            }
         }
-    } while (offsetApplied && left + windowElement.offsetWidth < desktopRect.width && top + windowElement.offsetHeight < desktopRect.height);
 
-    left = Math.min(left, desktopRect.width - windowElement.offsetWidth);
-    top = Math.min(top, desktopRect.height - windowElement.offsetHeight);
-    left = Math.max(left, 0);
-    top = Math.max(top, 0);
+        left = Math.min(left, desktopRect.width - windowRect.width);
+        top = Math.min(top, desktopRect.height - windowRect.height);
+        left = Math.max(left, 0);
+        top = Math.max(top, 0);
 
-    windowElement.style.left = `${left}px`;
-    windowElement.style.top = `${top}px`;
+        windowElement.style.left = `${left}px`;
+        windowElement.style.top = `${top}px`;
+        
+        console.log(`Window positioned at (${left}, ${top}), Row: ${rowCount}`);
+    }, 0);
 }
 
 function positionWindow(windowElement) {
@@ -261,6 +302,12 @@ function closeWindow(windowObj) {
         bringToFront(topWindow.element);
     } else {
         window.history.pushState({}, '', window.location.origin + window.location.pathname);
+    }
+
+    if (windows.length === 0) {
+        positionWindowWithOffset.baseLeft = WINDOW_OFFSET;
+        positionWindowWithOffset.baseTop = WINDOW_OFFSET;
+        positionWindowWithOffset.rowCount = 0;
     }
 }
 
