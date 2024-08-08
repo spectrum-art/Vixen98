@@ -3,7 +3,7 @@
 import { apps, getAppById } from './modules/apps.js';
 import { EventBus } from './modules/utils.js';
 import { createAppWindow } from './modules/windowManagement.js';
-import { checkAppAccess } from './modules/auth.js';
+import { checkAppAccess, checkStoredCredentials } from './modules/auth.js';
 import { updateURL } from './modules/routing.js';
 
 document.addEventListener('DOMContentLoaded', function() {
