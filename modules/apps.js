@@ -159,9 +159,9 @@ export const apps = {
     cssFiles: ['propaganda.css'],
     window: {
       width: '40%',
-      height: '75%',
-      minWidth: '600px',
-      minHeight: '400px'
+      height: '80%',
+      minWidth: '400px',
+      minHeight: '800px'
     }
   },
   undergroundMap: {
