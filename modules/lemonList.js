@@ -1,42 +1,6 @@
-// lemonList.js
-
 import { debounce } from './utils.js';
-import { createAppWindow } from './windowManagement.js';
 import { generateDeepLink } from './routing.js';
-import { apps, getAppById } from './apps.js';
-
-const lemonListConfig = {
-    id: 'lemonList',
-    title: 'Lemon List',
-    width: '90%',
-    height: '90%',
-    content: '<div id="lemon-list-container"></div>',
-    features: {
-        resizable: false,
-        maximizable: false
-    },
-    styles: {
-        window: {
-            left: '50%',
-            top: '50%',
-            transform: 'translate(-50%, -50%)'
-        },
-        content: {
-            backgroundImage: 'url("images/lemonlistbg.png")',
-            backgroundSize: 'cover',
-            backgroundRepeat: 'no-repeat',
-            backgroundPosition: 'center',
-            fontFamily: '"Nanum Gothic Coding", monospace',
-            padding: '0',
-            boxSizing: 'border-box',
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column'
-        }
-    },
-    className: 'lemon-list-window'
-};
+import { getAppById } from './apps.js';
 
 let listings = [];
 let currentPage = 1;
@@ -65,7 +29,24 @@ export function initialize(container, params = {}) {
         return;
     }
 
+    applyStyles(container);
     setupLemonListApp(container, params);
+}
+
+function applyStyles(container) {
+    Object.assign(container.style, {
+        backgroundImage: 'url("images/lemonlistbg.png")',
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center',
+        fontFamily: '"Nanum Gothic Coding", monospace',
+        padding: '0',
+        boxSizing: 'border-box',
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column'
+    });
 }
 
 function setupLemonListApp(container, params) {
@@ -329,7 +310,8 @@ function shareCurrentSearch(container) {
         filters: activeFilters.join(',')
     };
 
-    const deepLink = generateDeepLink('lemonList', params);
+    const lemonListApp = getAppById('lemonList');
+    const deepLink = generateDeepLink(lemonListApp.id, params);
     
     if (navigator.clipboard) {
         navigator.clipboard.writeText(deepLink).then(() => {
@@ -342,7 +324,6 @@ function shareCurrentSearch(container) {
         fallbackCopy(deepLink);
     }
 }
-
 function fallbackCopy(text) {
     const textArea = document.createElement("textarea");
     textArea.value = text;
