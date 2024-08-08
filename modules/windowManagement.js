@@ -20,32 +20,11 @@ export function createAppWindow(appConfig = {}) {
 
     console.log('Creating app window with config:', appConfig);
 
-    const defaultConfig = {
-        width: '50%',
-        height: '60%',
-        minWidth: '300px',
-        minHeight: '200px',
-        content: '',
-        features: {
-            resizable: true,
-            minimizable: true,
-            maximizable: true,
-            closable: true,
-            draggable: true,
-            showInTaskbar: true
-        }
-    };
-
-    const config = {
-        ...defaultConfig,
-        ...appConfig,
-        features: { ...defaultConfig.features, ...appConfig.features }
-    };
-
     const windowElement = document.createElement('div');
     windowElement.className = 'window';
     windowElement.setAttribute('data-app-id', app.id);
 
+    // Apply window size
     windowElement.style.width = appConfig.width || '50%';
     windowElement.style.height = appConfig.height || '50%';
     windowElement.style.minWidth = appConfig.minWidth || '300px';
@@ -55,17 +34,13 @@ export function createAppWindow(appConfig = {}) {
         <div class="window-header">
             <span class="window-title">${app.name}</span>
             <div class="window-controls">
-                ${config.features.minimizable ? '<span class="window-minimize">🗕</span>' : ''}
-                ${config.features.maximizable ? '<span class="window-maximize">🗖</span>' : ''}
-                ${config.features.closable ? '<span class="window-close">❌</span>' : ''}
+                <span class="window-minimize">🗕</span>
+                <span class="window-maximize">🗖</span>
+                <span class="window-close">❌</span>
             </div>
         </div>
-        <div class="window-content">${config.content}</div>
+        <div class="window-content">${appConfig.content}</div>
     `;
-
-    if (config.className) {
-        windowElement.classList.add(config.className);
-    }
 
     const desktop = document.getElementById('desktop');
     if (!desktop) {
@@ -73,15 +48,15 @@ export function createAppWindow(appConfig = {}) {
         return null;
     }
     desktop.appendChild(windowElement);
-    windows.push({ appId: app.id, element: windowElement, config });
+    
+    const windowObj = { appId: app.id, element: windowElement };
+    windows.push(windowObj);
 
-    if (config.features.showInTaskbar) {
-        createTaskbarItem(app.name, windowElement);
-    }
+    createTaskbarItem(app.id, windowElement);
     positionWindow(windowElement);
-    if (config.features.draggable) makeDraggable(windowElement);
-    if (config.features.resizable) makeResizable(windowElement);
-    setupWindowControls(windowElement, config);
+    makeDraggable(windowElement);
+    makeResizable(windowElement);
+    setupWindowControls(windowElement, windowObj);
 
     console.log('Window created:', windowElement);
     bringToFront(windowElement);
@@ -101,14 +76,15 @@ function positionWindow(windowElement) {
     windowElement.style.top = `${top}px`;
 }
 
-function createTaskbarItem(appName, windowElement) {
+function createTaskbarItem(appId, windowElement) {
+    const app = getAppById(appId);
     const openWindows = document.getElementById('open-windows');
     const taskbarItem = document.createElement('div');
     taskbarItem.className = 'taskbar-item';
-    taskbarItem.setAttribute('data-icon', appName);
+    taskbarItem.setAttribute('data-app-id', appId);
     taskbarItem.innerHTML = `
-        <div class="taskbar-item-icon">${getIconForApp(appName)}</div>
-        <span>${appName}</span>
+        <div class="taskbar-item-icon">${app.icon}</div>
+        <span>${app.name}</span>
     `;
     taskbarItem.addEventListener('click', () => {
         if (windowElement.style.display === 'none') {
@@ -194,41 +170,35 @@ function bringToFront(windowElement) {
         const zIndex = parseInt(w.element.style.zIndex || '0');
         maxZIndex = Math.max(maxZIndex, zIndex);
         w.element.classList.remove('active');
-        const taskbarItem = document.querySelector(`[data-icon="${w.appName}"]`);
+        const taskbarItem = document.querySelector(`[data-app-id="${w.appId}"]`);
         if (taskbarItem) {
             taskbarItem.classList.remove('active');
         }
     });
     windowElement.style.zIndex = maxZIndex + 1;
     windowElement.classList.add('active');
-    const taskbarItem = document.querySelector(`[data-icon="${windowElement.getAttribute('data-app')}"]`);
+    const taskbarItem = document.querySelector(`[data-app-id="${windowElement.getAttribute('data-app-id')}"]`);
     if (taskbarItem) {
         taskbarItem.classList.add('active');
     }
 
-    const appName = windowElement.getAttribute('data-app');
-    updateURL(appName);
+    const appId = windowElement.getAttribute('data-app-id');
+    updateURL(appId);
 }
 
-function setupWindowControls(windowElement, config) {
+function setupWindowControls(windowElement, windowObj) {
     const minimizeBtn = windowElement.querySelector('.window-minimize');
     const maximizeBtn = windowElement.querySelector('.window-maximize');
     const closeBtn = windowElement.querySelector('.window-close');
     
-    if (minimizeBtn && config.features.minimizable) {
-        minimizeBtn.addEventListener('click', () => minimizeWindow(windowElement));
-    }
-    if (maximizeBtn && config.features.maximizable) {
-        maximizeBtn.addEventListener('click', () => maximizeWindow(windowElement));
-    }
-    if (closeBtn && config.features.closable) {
-        closeBtn.addEventListener('click', () => closeWindow(windowElement));
-    }
+    minimizeBtn.addEventListener('click', () => minimizeWindow(windowElement));
+    maximizeBtn.addEventListener('click', () => maximizeWindow(windowElement));
+    closeBtn.addEventListener('click', () => closeWindow(windowObj));
 }
 
 function minimizeWindow(windowElement) {
     windowElement.style.display = 'none';
-    const taskbarItem = document.querySelector(`[data-icon="${windowElement.getAttribute('data-app')}"]`);
+    const taskbarItem = document.querySelector(`[data-app-id="${windowElement.getAttribute('data-app-id')}"]`);
     if (taskbarItem) {
         taskbarItem.classList.remove('active');
     }
@@ -252,15 +222,15 @@ function maximizeWindow(windowElement) {
     }
 }
 
-function closeWindow(windowElement) {
-    const appName = windowElement.getAttribute('data-app');
+function closeWindow(windowObj) {
+    const { appId, element: windowElement } = windowObj;
     windowElement.remove();
-    const taskbarItem = document.querySelector(`[data-icon="${appName}"]`);
+    const taskbarItem = document.querySelector(`.taskbar-item[data-app-id="${appId}"]`);
     if (taskbarItem) {
         taskbarItem.remove();
     }
-    windows = windows.filter(w => w.appName !== appName);
-    EventBus.publish('windowClosed', appName);
+    windows = windows.filter(w => w.appId !== appId);
+    EventBus.publish('windowClosed', appId);
 
     if (windows.length > 0) {
         const topWindow = windows[windows.length - 1];
@@ -270,7 +240,7 @@ function closeWindow(windowElement) {
     }
 }
 
-export function getWindowContent(appName) {
-    const windowObj = windows.find(w => w.appName === appName);
+export function getWindowContent(appId) {
+    const windowObj = windows.find(w => w.appId === appId);
     return windowObj ? windowObj.element.querySelector('.window-content') : null;
 }
