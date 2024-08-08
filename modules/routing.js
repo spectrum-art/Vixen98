@@ -11,9 +11,10 @@ export function initializeRouting() {
 export function handleRouting() {
     const hash = window.location.hash.slice(1);
     if (hash) {
-        const [appName, params] = parseHash(hash);
-        if (apps[appName] && checkAppAccess(appName)) {
-            handleAppOpen(appName, params);
+        const [appId, params] = parseHash(hash);
+        const app = getAppById(appId);
+        if (app && checkAppAccess(appId)) {
+            handleAppOpen(appId, params);
         } else {
             showAccessDenied();
         }
@@ -53,17 +54,17 @@ export function updateURL(appName, params = {}) {
     }
 }
 
-export function handleAppOpen(appName, params = {}) {
-    updateURL(appName, params);
-    if (!checkAppAccess(appName)) {
+export function handleAppOpen(appId, params = {}) {
+    updateURL(appId, params);
+    if (!checkAppAccess(appId)) {
         showAccessDenied();
         return;
     }
     try {
-        openApp(appName, params);
+        openApp(appId, params);
     } catch (error) {
-        console.error(`Error opening app ${appName}:`, error);
-        showErrorDialog(`Failed to open ${appName}. Please try again.`);
+        console.error(`Error opening app ${appId}:`, error);
+        showErrorDialog(`Failed to open ${getAppById(appId)?.name || appId}. Please try again.`);
     }
 }
 
