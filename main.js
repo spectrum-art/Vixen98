@@ -1,10 +1,10 @@
 // main.js
 
-import { apps, getAppById } from './apps.js';
-import { EventBus } from './utils.js';
-import { createAppWindow } from './windowManagement.js';
-import { checkAppAccess } from './auth.js';
-import { updateURL } from './routing.js';
+import { apps, getAppById } from './modules/apps.js';
+import { EventBus } from './modules/utils.js';
+import { createAppWindow } from './modules/windowManagement.js';
+import { checkAppAccess } from './modules/auth.js';
+import { updateURL } from './modules/routing.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     const splashScreen = document.getElementById('splash-screen');
