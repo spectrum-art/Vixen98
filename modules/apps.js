@@ -11,10 +11,10 @@ export const apps = {
     jsFiles: ['system.js'],
     cssFiles: ['system.css'],
     window: {
-      width: '90%',
-      height: '90%',
-      minWidth: '600px',
-      minHeight: '400px'
+      width: '40%',
+      height: '60%',
+      minWidth: '400px',
+      minHeight: '600px'
     }
   },
   trash: {
@@ -28,10 +28,10 @@ export const apps = {
     cssFiles: ['trash.css'],
     subApps: [],
     window: {
-      width: '90%',
-      height: '90%',
-      minWidth: '600px',
-      minHeight: '400px'
+      width: '45%',
+      height: '45%',
+      minWidth: '450px',
+      minHeight: '450px'
     }
   },
   documents: {
@@ -45,10 +45,10 @@ export const apps = {
     cssFiles: ['documents.css'],
     subApps: ['cookieBatchLog', 'placeholder'],
     window: {
-      width: '90%',
-      height: '90%',
-      minWidth: '600px',
-      minHeight: '400px'
+      width: '45%',
+      height: '45%',
+      minWidth: '450px',
+      minHeight: '450px'
     }
   },
   cookieBatchLog: {
@@ -126,10 +126,10 @@ export const apps = {
     cssFiles: ['maps.css'],
     subApps: ['cookieDeliveryMap', 'undergroundMap'],
     window: {
-      width: '90%',
-      height: '90%',
-      minWidth: '600px',
-      minHeight: '400px'
+      width: '45%',
+      height: '45%',
+      minWidth: '450px',
+      minHeight: '450px'
     }
   },
   placeholder: {
