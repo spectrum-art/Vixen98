@@ -25,6 +25,9 @@ export function createAppWindow(appConfig = {}) {
     windowElement.className = 'window';
     windowElement.setAttribute('data-app-id', app.id);
 
+    windowElement.style.position = 'absolute';
+    windowElement.style.zIndex = windows.length + 1000;
+
     windowElement.style.width = appConfig.width || '50%';
     windowElement.style.height = appConfig.height || '50%';
     windowElement.style.minWidth = appConfig.minWidth || '300px';
@@ -47,6 +50,11 @@ export function createAppWindow(appConfig = {}) {
         console.error('Desktop element not found');
         return null;
     }
+    
+    if (getComputedStyle(desktop).position === 'static') {
+        desktop.style.position = 'relative';
+    }
+
     desktop.appendChild(windowElement);
     
     const windowObj = { appId: app.id, element: windowElement };
@@ -76,26 +84,14 @@ function positionWindowWithOffset(windowElement) {
         const desktopRect = desktop.getBoundingClientRect();
         const windowRect = windowElement.getBoundingClientRect();
         
-        let baseLeft = WINDOW_OFFSET;
-        let baseTop = WINDOW_OFFSET;
-        let left = baseLeft;
-        let top = baseTop;
+        let left = Math.round((desktopRect.width - windowRect.width) / 2);
+        let top = Math.round((desktopRect.height - windowRect.height) / 2);
 
-        const maxOffsetsPerRow = 5;
+        const maxOffsets = 10;
         let offsetCount = 0;
-        let rowCount = 0;
-
-        function resetToNextRow() {
-            rowCount++;
-            baseLeft += WINDOW_OFFSET;
-            baseTop = WINDOW_OFFSET;
-            left = baseLeft;
-            top = baseTop + (rowCount * WINDOW_OFFSET);
-            offsetCount = 0;
-        }
 
         let positionFound = false;
-        while (!positionFound) {
+        while (!positionFound && offsetCount < maxOffsets) {
             positionFound = true;
             for (let w of windows) {
                 if (w.element !== windowElement) {
@@ -103,25 +99,17 @@ function positionWindowWithOffset(windowElement) {
                     if (Math.abs(rect.left - left) < WINDOW_OFFSET && Math.abs(rect.top - top) < WINDOW_OFFSET) {
                         positionFound = false;
                         offsetCount++;
-                        if (offsetCount >= maxOffsetsPerRow) {
-                            resetToNextRow();
-                        } else {
-                            left += WINDOW_OFFSET;
-                            top += WINDOW_OFFSET;
-                        }
+                        left += WINDOW_OFFSET;
+                        top += WINDOW_OFFSET;
                         break;
                     }
                 }
             }
 
             if (left + windowRect.width > desktopRect.width || top + windowRect.height > desktopRect.height) {
-                resetToNextRow();
+                left = WINDOW_OFFSET * (offsetCount % 5);
+                top = WINDOW_OFFSET * Math.floor(offsetCount / 5);
                 positionFound = false;
-            }
-
-            if (rowCount > 10) {
-                console.warn("Max row count reached. Forcing position.");
-                positionFound = true;
             }
         }
 
@@ -133,7 +121,7 @@ function positionWindowWithOffset(windowElement) {
         windowElement.style.left = `${left}px`;
         windowElement.style.top = `${top}px`;
         
-        console.log(`Window positioned at (${left}, ${top}), Row: ${rowCount}`);
+        console.log(`Window positioned at (${left}, ${top}), Offsets: ${offsetCount}`);
     }, 0);
 }
 
