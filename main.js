@@ -62,12 +62,24 @@ export function openApp(appId, params = {}) {
 function openRegularApp(app, params) {
     import(`./modules/${app.jsFiles[0]}`).then(module => {
         const window = createAppWindow({
+            id: app.id,
             title: app.name,
             content: `<div id="${app.id}-container"></div>`,
             width: '90%',
             height: '90%',
         });
+
+        if (!window) {
+            console.error(`Failed to create window for app: ${app.name}`);
+            return;
+        }
+
         const container = window.querySelector(`#${app.id}-container`);
+        if (!container) {
+            console.error(`Container not found for app: ${app.name}`);
+            return;
+        }
+
         if (typeof module.initialize === 'function') {
             module.initialize(container, params);
         } else {
