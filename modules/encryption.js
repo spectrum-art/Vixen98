@@ -1,22 +1,13 @@
-import { createAppWindow, getWindowContent } from './windowManagement.js';
-import { apps } from './apps.js';
+export function initialize(container, params = {}) {
+    if (!container || !(container instanceof HTMLElement)) {
+        console.error('Invalid container provided to Encryption initialize function');
+        return;
+    }
 
-const encryptionConfig = {
-    title: 'Encryption',
-    width: '50%',
-    height: '41%',
-    content: '<div id="encryption-app"></div>',
-};
-
-export function initialize() {
-    const window = createAppWindow(encryptionConfig);
-    setupEncryptionApp(window);
+    setupEncryptionApp(container);
 }
 
-function setupEncryptionApp(window) {
-    const container = getWindowContent('Encryption');
-    if (!container) return;
-
+function setupEncryptionApp(container) {
     container.innerHTML = createEncryptionAppHTML();
     setupEventListeners(container);
     setupFileDrop(container);

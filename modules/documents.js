@@ -1,44 +1,24 @@
-import { createAppWindow, getWindowContent } from './windowManagement.js';
 import { showAccessDenied } from './routing.js';
-import { initializeUndergroundMap } from './undergroundMap.js';
-import { appAccessLevels, getAccessLevel } from './auth.js';
-import { apps } from './apps.js';
-
-const documentsConfig = {
-    title: 'Documents',
-    width: '50%',
-    height: '40%',
-    content: '<div id="documents-app"></div>',
-};
+import { getAccessLevel } from './auth.js';
+import { getAppById } from './apps.js';
+import { openApp } from './main.js';
 
 const documentsIcons = [
-    { name: 'Cookie Batch Log', icon: '🍪' },
-    { name: 'Placeholder', icon: '📄' }
+    { id: 'cookieBatchLog', name: 'Cookie Batch Log', icon: '🍪' },
+    { id: 'placeholder', name: 'Placeholder', icon: '📄' }
 ];
 
-export function initialize(params = {}) {
-    console.log('Initializing Documents app with params:', params);
-    const existingWindow = getWindowContent('Documents');
-    if (existingWindow) {
-        console.log('Documents window already exists, updating content');
-        setupDocumentsApp(existingWindow.closest('.window'));
-    } else {
-        const window = createAppWindow(documentsConfig);
-        if (window) {
-            setupDocumentsApp(window);
-        } else {
-            console.error('Failed to create Documents window');
-        }
-    }
-}
-
-function setupDocumentsApp(window) {
-    const container = window.querySelector('#documents-app');
-    if (!container) {
-        console.error('Documents app container not found');
+export function initialize(container, params = {}) {
+    if (!container || !(container instanceof HTMLElement)) {
+        console.error('Invalid container provided to Documents initialize function');
         return;
     }
-    
+
+    console.log('Initializing Documents app with params:', params);
+    setupDocumentsApp(container);
+}
+
+function setupDocumentsApp(container) {
     container.innerHTML = createDocumentsAppHTML();
     setupDocumentsEventListeners(container);
 }
@@ -48,11 +28,11 @@ function createDocumentsAppHTML() {
     return `
         <div class="my-documents-icons">
             ${documentsIcons.map(icon => {
-                const { level: requiredLevel, hiddenIfLocked } = appAccessLevels[icon.name] || { level: 1, hiddenIfLocked: false };
-                const hasAccess = userAccessLevel >= requiredLevel;
-                if (hasAccess || !hiddenIfLocked) {
+                const app = getAppById(icon.id);
+                const hasAccess = userAccessLevel >= app.accessLevel;
+                if (hasAccess || !app.hiddenIfLocked) {
                     return `
-                        <div class="desktop-icon ${hasAccess ? '' : 'locked'}" data-name="${icon.name}">
+                        <div class="desktop-icon ${hasAccess ? '' : 'locked'}" data-app-id="${icon.id}">
                             <div class="icon">${icon.icon}</div>
                             <div class="label">${icon.name}</div>
                         </div>
@@ -64,72 +44,16 @@ function createDocumentsAppHTML() {
     `;
 }
 
-function setupDocumentsEventListeners(content) {
-    const icons = content.querySelectorAll('.desktop-icon');
+function setupDocumentsEventListeners(container) {
+    const icons = container.querySelectorAll('.desktop-icon');
     icons.forEach(icon => {
         icon.addEventListener('click', (e) => {
-            const iconName = e.currentTarget.getAttribute('data-name');
+            const appId = e.currentTarget.getAttribute('data-app-id');
             if (icon.classList.contains('locked')) {
                 showAccessDenied();
             } else {
-                if (iconName === 'Cookie Batch Log') {
-                    openBatchLog();
-                } else if (iconName === 'Placeholder') {
-                    openPlaceholder();
-                }
-                // Add more conditions here for other icons if needed
+                openApp(appId);
             }
         });
     });
-}
-
-export function openBatchLog() {
-    console.log('Opening Cookie Batch Log');
-    const mapUrl = `https://gta-5-map.com/?\
-        slideout=false&slideoutright=false&x=-120.1&y=80.5&zoom=3.4&embed=light\
-        &notes=3EWfhJLeGcb,3nf05rUzzTS,61hDtXO1IAV,6KSIzbU0JCX,78yKmWHpAxr,8qmes9jiqky,\
-        9LdfkbPEQUp,Akr3xVeFxPx,BzSCrsUcHX0,CAecif3MPtL,CxmrjyVaMdb,ErAwcUUL4Jv,FqeP7JRiEfO,\
-        Gg4LUImN5RM,GZAFGvIkhQl,HD2hOgesZEE,Hpc1RWCbYNJ,HxWPJdFD5zG,I02HCZZmolC,I6nFz53EbKo,\
-        JbMeXCoX67S,K0Gco51LKq8,KOFXc19AHzl,KuW1Kv0rFKa,tzvgY7VwaI`;
-
-    const mapConfig = {
-        title: 'Cookie Batch Log',
-        content: `<iframe src="${mapUrl}" 
-            style="border: none; width: 100%; height: 100%;" 
-            sandbox="allow-scripts allow-same-origin">
-        </iframe>`,
-        width: '90%',
-        height: '90%',
-        minWidth: '400px',
-        minHeight: '300px',
-    };
-    
-    const window = createAppWindow(mapConfig);
-}
-
-export function openPlaceholder() {
-    console.log('Opening Placeholder');
-    const desktop = document.getElementById('desktop');
-    const desktopRect = desktop.getBoundingClientRect();
-    const mapSize = Math.min(desktopRect.width, desktopRect.height) * 0.95;
-
-    const mapConfig = {
-        title: 'Placeholder',
-        content: '<div id="underground-map"></div>',
-        width: `${mapSize}px`,
-        height: `${mapSize + 30}px`,
-        minWidth: '400px',
-        minHeight: '430px',
-        className: 'underground-map-window'
-    };
-    
-    const window = createAppWindow(mapConfig);
-    const mapContainer = window.querySelector('#underground-map');
-    
-    mapContainer.style.width = `${mapSize}px`;
-    mapContainer.style.height = `${mapSize}px`;
-
-    setTimeout(() => {
-        initializeUndergroundMap(mapContainer);
-    }, 50);
 }

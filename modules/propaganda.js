@@ -1,29 +1,20 @@
-import { createAppWindow } from './windowManagement.js';
-import { apps } from './apps.js';
-
-const propagandaConfig = {
-    title: 'Propaganda',
-    width: '50%',
-    height: '70%',
-    content: '<div id="propaganda-app"></div>',
-};
-
 let announcements = [];
 
-export function initialize() {
-    const window = createAppWindow(propagandaConfig);
-    setuppropagandaApp(window);
+export function initialize(container, params = {}) {
+    if (!container || !(container instanceof HTMLElement)) {
+        console.error('Invalid container provided to Propaganda initialize function');
+        return;
+    }
+
+    setupPropagandaApp(container);
 }
 
-function setuppropagandaApp(window) {
-    const container = window.querySelector('#propaganda-app');
-    if (!container) return;
-    
-    container.innerHTML = createpropagandaHTML();
+function setupPropagandaApp(container) {
+    container.innerHTML = createPropagandaHTML();
     loadAnnouncements(container);
 }
 
-function createpropagandaHTML() {
+function createPropagandaHTML() {
     return `
         <div class="announcements-container">
             <div id="announcements-list"></div>
