@@ -97,7 +97,17 @@ function openFolderApp(app, params) {
         className: 'folder-window'
     });
 
+    if (!folderWindow) {
+        console.error(`Failed to create window for folder app: ${app.name}`);
+        return;
+    }
+
     const folderContainer = folderWindow.querySelector('.folder-container');
+    if (!folderContainer) {
+        console.error(`Folder container not found in window for app: ${app.name}`);
+        return;
+    }
+
     setupFolderLayout(folderContainer);
 
     folderWindow.querySelectorAll('.folder-icon').forEach(icon => {
