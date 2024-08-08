@@ -1,13 +1,16 @@
+// lemonList.js
+
 import { debounce } from './utils.js';
 import { createAppWindow } from './windowManagement.js';
 import { generateDeepLink } from './routing.js';
-import { apps } from './apps.js';
+import { apps, getAppById } from './apps.js';
 
 const lemonListConfig = {
+    id: 'lemonList',
     title: 'Lemon List',
     width: '90%',
     height: '90%',
-    content: '<div id="lemon-list-app"></div>',
+    content: '<div id="lemon-list-container"></div>',
     features: {
         resizable: false,
         maximizable: false
@@ -56,16 +59,16 @@ const emojiTooltips = {
     '🚕': 'Taxi'
 };
 
-export function initialize(params = {}) {
-    const window = createAppWindow(lemonListConfig);
-    setupLemonListApp(window, params);
+export function initialize(container, params = {}) {
+    if (!container || !(container instanceof HTMLElement)) {
+        console.error('Invalid container provided to Lemon List initialize function');
+        return;
+    }
+
+    setupLemonListApp(container, params);
 }
 
-function setupLemonListApp(window, params) {
-    applyStyles(window);
-    const container = window.querySelector('#lemon-list-app');
-    if (!container) return;
-
+function setupLemonListApp(container, params) {
     container.innerHTML = createLemonListContent();
     addShareSearchButton(container);
 
@@ -88,23 +91,6 @@ function setupLemonListApp(window, params) {
         displayListings(container);
         setupEventListeners(container);
     });
-}
-
-function applyStyles(window) {
-    Object.assign(window.style, lemonListConfig.styles.window);
-    window.classList.add(lemonListConfig.className);
-
-    const windowContent = window.querySelector('.window-content');
-    if (windowContent) {
-        Object.assign(windowContent.style, lemonListConfig.styles.content);
-    }
-
-    const lemonListApp = window.querySelector('#lemon-list-app');
-    if (lemonListApp) {
-        lemonListApp.style.flexGrow = '1';
-        lemonListApp.style.display = 'flex';
-        lemonListApp.style.flexDirection = 'column';
-    }
 }
 
 function createLemonListContent() {
@@ -343,7 +329,7 @@ function shareCurrentSearch(container) {
         filters: activeFilters.join(',')
     };
 
-    const deepLink = generateDeepLink('Lemon List', params);
+    const deepLink = generateDeepLink('lemonList', params);
     
     if (navigator.clipboard) {
         navigator.clipboard.writeText(deepLink).then(() => {
