@@ -46,10 +46,10 @@ export function createAppWindow(appConfig = {}) {
     windowElement.className = 'window';
     windowElement.setAttribute('data-app-id', app.id);
 
-    windowElement.style.width = config.width;
-    windowElement.style.height = config.height;
-    windowElement.style.minWidth = config.minWidth;
-    windowElement.style.minHeight = config.minHeight;
+    windowElement.style.width = appConfig.width || '50%';
+    windowElement.style.height = appConfig.height || '50%';
+    windowElement.style.minWidth = appConfig.minWidth || '300px';
+    windowElement.style.minHeight = appConfig.minHeight || '200px';
 
     windowElement.innerHTML = `
         <div class="window-header">

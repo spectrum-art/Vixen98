@@ -10,6 +10,12 @@ export const apps = {
     showOnDesktop: true,
     jsFiles: ['system.js'],
     cssFiles: ['system.css'],
+    window: {
+      width: '90%',
+      height: '90%',
+      minWidth: '600px',
+      minHeight: '400px'
+    }
   },
   trash: {
     id: 'trash',
@@ -21,6 +27,12 @@ export const apps = {
     jsFiles: ['trash.js'],
     cssFiles: ['trash.css'],
     subApps: [],
+    window: {
+      width: '90%',
+      height: '90%',
+      minWidth: '600px',
+      minHeight: '400px'
+    }
   },
   documents: {
     id: 'documents',
@@ -32,6 +44,12 @@ export const apps = {
     jsFiles: ['documents.js'],
     cssFiles: ['documents.css'],
     subApps: ['cookieBatchLog', 'placeholder'],
+    window: {
+      width: '90%',
+      height: '90%',
+      minWidth: '600px',
+      minHeight: '400px'
+    }
   },
   cookieBatchLog: {
     id: 'cookieBatchLog',
@@ -42,6 +60,12 @@ export const apps = {
     showOnDesktop: false,
     jsFiles: ['cookieBatchLog.js'],
     cssFiles: ['cookieBatchLog.css'],
+    window: {
+      width: '90%',
+      height: '90%',
+      minWidth: '600px',
+      minHeight: '400px'
+    }
   },
   cookieDeliveryMap: {
     id: 'cookieDeliveryMap',
@@ -52,6 +76,12 @@ export const apps = {
     showOnDesktop: false,
     jsFiles: ['cookieDeliveryMap.js'],
     cssFiles: ['cookieDeliveryMap.css'],
+    window: {
+      width: '90%',
+      height: '90%',
+      minWidth: '600px',
+      minHeight: '400px'
+    }
   },
   encryption: {
     id: 'encryption',
@@ -62,6 +92,12 @@ export const apps = {
     showOnDesktop: true,
     jsFiles: ['encryption.js'],
     cssFiles: ['encryption.css'],
+    window: {
+      width: '90%',
+      height: '90%',
+      minWidth: '600px',
+      minHeight: '400px'
+    }
   },
   lemonList: {
     id: 'lemonList',
@@ -72,6 +108,12 @@ export const apps = {
     showOnDesktop: true,
     jsFiles: ['lemonList.js'],
     cssFiles: ['lemonList.css'],
+    window: {
+      width: '90%',
+      height: '90%',
+      minWidth: '600px',
+      minHeight: '400px'
+    }
   },
   maps: {
     id: 'maps',
@@ -83,6 +125,12 @@ export const apps = {
     jsFiles: ['maps.js'],
     cssFiles: ['maps.css'],
     subApps: ['cookieDeliveryMap', 'undergroundMap'],
+    window: {
+      width: '90%',
+      height: '90%',
+      minWidth: '600px',
+      minHeight: '400px'
+    }
   },
   placeholder: {
     id: 'placeholder',
@@ -93,6 +141,12 @@ export const apps = {
     showOnDesktop: false,
     jsFiles: ['placeholder.js'],
     cssFiles: ['placeholder.css'],
+    window: {
+      width: '90%',
+      height: '90%',
+      minWidth: '600px',
+      minHeight: '400px'
+    }
   },
   propaganda: {
     id: 'propaganda',
@@ -103,6 +157,12 @@ export const apps = {
     showOnDesktop: true,
     jsFiles: ['propaganda.js'],
     cssFiles: ['propaganda.css'],
+    window: {
+      width: '90%',
+      height: '90%',
+      minWidth: '600px',
+      minHeight: '400px'
+    }
   },
   undergroundMap: {
     id: 'undergroundMap',
@@ -113,6 +173,12 @@ export const apps = {
     showOnDesktop: false,
     jsFiles: ['undergroundMap.js'],
     cssFiles: ['undergroundMap.css'],
+    window: {
+      width: '90%',
+      height: '90%',
+      minWidth: '600px',
+      minHeight: '400px'
+    }
   },
 };
 
@@ -126,6 +192,12 @@ export const getAppById = (id) => apps[id];
       showOnDesktop: true,
       jsFiles: ['propaganda.js'],
       cssFiles: ['propaganda.css'],
+      window: {
+        width: '90%',
+        height: '90%',
+        minWidth: '600px',
+        minHeight: '400px'
+      }
     },
     GeoQuesting: {
       name: 'GeoQuesting',
@@ -135,6 +207,12 @@ export const getAppById = (id) => apps[id];
       showOnDesktop: true,
       jsFiles: ['propaganda.js'],
       cssFiles: ['propaganda.css'],
+      window: {
+        width: '90%',
+        height: '90%',
+        minWidth: '600px',
+        minHeight: '400px'
+      }
     },
     Cookbook: {
       name: 'Cookbook',
@@ -144,8 +222,14 @@ export const getAppById = (id) => apps[id];
       showOnDesktop: true,
       jsFiles: ['propaganda.js'],
       cssFiles: ['propaganda.css'],
-    }, */
-/*     Gossip: {
+      window: {
+        width: '90%',
+        height: '90%',
+        minWidth: '600px',
+        minHeight: '400px'
+      }
+    },
+     Gossip: {
       name: 'Gossip',
       type: 'app',
       icon: '👄',
@@ -153,6 +237,12 @@ export const getAppById = (id) => apps[id];
       showOnDesktop: true,
       jsFiles: ['propaganda.js'],
       cssFiles: ['propaganda.css'],
+      window: {
+        width: '90%',
+        height: '90%',
+        minWidth: '600px',
+        minHeight: '400px'
+      }
     },
     QDaddy: {
       name: 'QDaddy',
@@ -162,6 +252,12 @@ export const getAppById = (id) => apps[id];
       showOnDesktop: true,
       jsFiles: ['propaganda.js'],
       cssFiles: ['propaganda.css'],
+      window: {
+        width: '90%',
+        height: '90%',
+        minWidth: '600px',
+        minHeight: '400px'
+      }
     },
     Stocks: {
       name: 'Stocks',
@@ -171,6 +267,12 @@ export const getAppById = (id) => apps[id];
       showOnDesktop: true,
       jsFiles: ['propaganda.js'],
       cssFiles: ['propaganda.css'],
+      window: {
+        width: '90%',
+        height: '90%',
+        minWidth: '600px',
+        minHeight: '400px'
+      }
     }, */
 
 // export const getAppById = (id) => Object.values(apps).find(app => app.id === id);

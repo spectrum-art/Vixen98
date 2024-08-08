@@ -61,13 +61,14 @@ export function openApp(appId, params = {}) {
 
 function openRegularApp(app, params) {
     import(`./modules/${app.jsFiles[0]}`).then(module => {
-        const window = createAppWindow({
+        const windowConfig = {
             id: app.id,
             title: app.name,
             content: `<div id="${app.id}-container"></div>`,
-            width: '90%',
-            height: '90%',
-        });
+            ...app.window
+        };
+
+        const window = createAppWindow(windowConfig);
 
         if (!window) {
             console.error(`Failed to create window for app: ${app.name}`);
@@ -105,8 +106,7 @@ function openFolderApp(app, params) {
         id: app.id,
         title: app.name,
         content: `<div class="folder-container">${folderContent}</div>`,
-        width: '50%',
-        height: '60%',
+        ...app.window,
         className: 'folder-window'
     });
 
@@ -142,8 +142,7 @@ function openMapApp(app, params) {
             id: app.id,
             title: app.name,
             content: `<div id="${app.id}-container"></div>`,
-            width: '90%',
-            height: '90%',
+            ...app.window,
             className: 'map-window'
         });
 
