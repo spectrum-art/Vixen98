@@ -1,33 +1,23 @@
-import { createAppWindow } from './windowManagement.js';
-import { apps } from './apps.js';
-
-const systemConfig = {
-    title: 'System',
-    width: '450px',
-    height: '600px',
-    content: '<div id="system-app"></div>',
-    features: {
-        resizable: false,
-        maximizable: false
+export function initialize(container, params = {}) {
+    if (!container || !(container instanceof HTMLElement)) {
+        console.error('Invalid container provided to System initialize function');
+        return;
     }
-};
 
-export function initialize() {
-    const window = createAppWindow(systemConfig);
-    setupSystemApp(window);
+    setupSystemApp(container);
 }
 
-function setupSystemApp(window) {
-    const container = window.querySelector('#system-app');
-    if (!container) return;
-    
+function setupSystemApp(container) {
     container.innerHTML = createSystemAppHTML();
     
     const okButton = container.querySelector('#system-ok-button');
     okButton.addEventListener('click', () => {
-        const closeButton = window.querySelector('.window-close');
-        if (closeButton) {
-            closeButton.click();
+        const windowElement = container.closest('.window');
+        if (windowElement) {
+            const closeButton = windowElement.querySelector('.window-close');
+            if (closeButton) {
+                closeButton.click();
+            }
         }
     });
 }
