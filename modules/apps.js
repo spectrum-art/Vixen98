@@ -116,6 +116,8 @@ export const apps = {
   },
 };
 
+export const getAppById = (id) => apps[id];
+
 /*     Alibi: {
       name: 'Alibi',
       type: 'app',
@@ -171,4 +173,4 @@ export const apps = {
       cssFiles: ['propaganda.css'],
     }, */
 
-export const getAppById = (id) => Object.values(apps).find(app => app.id === id);
+// export const getAppById = (id) => Object.values(apps).find(app => app.id === id);
