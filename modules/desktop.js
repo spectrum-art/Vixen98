@@ -1,7 +1,7 @@
 import { apps } from './apps.js';
 import { EventBus } from './utils.js';
 import { openApp } from '../main.js';
-import { checkAppAccess, checkStoredCredentials } from './auth.js';
+import { checkAppAccess } from './auth.js';
 import { updateURL, showAccessDenied } from './routing.js';
 
 function createDesktopIcons() {
