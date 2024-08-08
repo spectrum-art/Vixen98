@@ -93,9 +93,9 @@ export const apps = {
     jsFiles: ['encryption.js'],
     cssFiles: ['encryption.css'],
     window: {
-      width: '90%',
-      height: '90%',
-      minWidth: '600px',
+      width: '50%',
+      height: '40%',
+      minWidth: '500px',
       minHeight: '400px'
     }
   },
@@ -110,7 +110,7 @@ export const apps = {
     cssFiles: ['lemonList.css'],
     window: {
       width: '90%',
-      height: '90%',
+      height: '75%',
       minWidth: '600px',
       minHeight: '400px'
     }
@@ -158,8 +158,8 @@ export const apps = {
     jsFiles: ['propaganda.js'],
     cssFiles: ['propaganda.css'],
     window: {
-      width: '90%',
-      height: '90%',
+      width: '40%',
+      height: '75%',
       minWidth: '600px',
       minHeight: '400px'
     }
@@ -175,7 +175,7 @@ export const apps = {
     cssFiles: ['undergroundMap.css'],
     window: {
       width: '90%',
-      height: '90%',
+      height: '75%',
       minWidth: '600px',
       minHeight: '400px'
     }
