@@ -195,7 +195,8 @@ export const apps = {
       height: '90%',
       minWidth: '600px',
       minHeight: '400px'
-    },
+    }
+  },
 };
 
 export const getAppById = (id) => apps[id];
