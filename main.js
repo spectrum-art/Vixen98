@@ -59,6 +59,15 @@ export function openApp(appId, params = {}) {
     }
 }
 
+function loadAppCSS(app, window) {
+    app.cssFiles.forEach(cssFile => {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = `styles/${cssFile}`;
+        window.querySelector('.window-content').appendChild(link);
+    });
+}
+
 function openRegularApp(app, params) {
     import(`./modules/${app.jsFiles[0]}`).then(module => {
         const windowConfig = {
@@ -74,6 +83,8 @@ function openRegularApp(app, params) {
             console.error(`Failed to create window for app: ${app.name}`);
             return;
         }
+
+        loadAppCSS(app, window);
 
         const container = window.querySelector(`#${app.id}-container`);
         if (!container) {
@@ -151,6 +162,8 @@ function openMapApp(app, params) {
             return;
         }
 
+        loadAppCSS(app, window);
+
         const container = window.querySelector(`#${app.id}-container`);
         if (!container) {
             console.error(`Container not found for map app: ${app.name}`);
@@ -170,7 +183,7 @@ function openMapApp(app, params) {
 function setupFolderLayout(container) {
     const icons = container.querySelectorAll('.folder-icon');
     const containerWidth = container.clientWidth;
-    const iconWidth = 100; // Adjust this value based on your icon size
+    const iconWidth = 100;
     const iconsPerRow = Math.floor(containerWidth / iconWidth);
     
     icons.forEach((icon, index) => {
