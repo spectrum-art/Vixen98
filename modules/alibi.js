@@ -1,3 +1,5 @@
+import { faker } from '@faker-js/faker';
+
 const activityTypes = {
     WORK: 'WORK',
     SOCIAL: 'SOCIAL',
@@ -124,17 +126,19 @@ function createAlibiAppHTML() {
         <div class="option-column">
           <h4>Time of Day</h4>
           <div id="time-checkboxes"></div>
+          <div id="witness-checkbox" class="witness-option">
+            <label>
+              <input type="checkbox" id="generate-witness" checked>
+              <strong>Generate Witness?</strong>
+            </label>
+          </div>
         </div>
         <div class="option-column">
           <h4>Type of Activity</h4>
           <div id="activity-checkboxes"></div>
         </div>
       </div>
-      <div class="button-container">
-        <button id="generate-button">Generate Alibi</button>
-        <button id="lucky-button">I'm Feeling Lucky!</button>
-      </div>
-      <div id="alibi-result"></div>
+      <!-- ... rest of the content ... -->
     </div>
   `;
 }
@@ -278,6 +282,22 @@ function setupEventListeners(container) {
   generateButton.addEventListener('click', () => generateAlibi(container, false));
 }
 
+function generatePhoneNumber() {
+    const areaCode = '420';
+    const prefixRanges = [[310, 323], [818, 830], [588, 599], [300, 308], [960, 968]];
+    const lineRanges = [[7865, 8000], [4315, 4370], [7125, 7255], [1785, 1844]];
+  
+    const randomRange = (ranges) => {
+      const range = ranges[Math.floor(Math.random() * ranges.length)];
+      return Math.floor(Math.random() * (range[1] - range[0] + 1)) + range[0];
+    };
+  
+    const prefix = randomRange(prefixRanges);
+    const lineNumber = randomRange(lineRanges);
+  
+    return `(${areaCode}) ${prefix}-${lineNumber.toString().padStart(4, '0')}`;
+  }
+
 function generateAlibi(container, isRandom) {
     const selectedDistricts = isRandom ? districts : getSelectedOptions(container, '#district-checkboxes');
     const selectedTimes = isRandom ? ['morning', 'day', 'afternoon', 'evening', 'night', 'late night'] : getSelectedOptions(container, '#time-checkboxes');
@@ -306,8 +326,17 @@ function generateAlibi(container, isRandom) {
   
     const timeRanges = getTimeRanges(container, selectedTimes);
     const randomTime = getRandomTimeFromRanges(timeRanges);
+
+    const generateWitness = container.querySelector('#generate-witness').checked;
+    let witnessInfo = '';
+
+    if (generateWitness) {
+        const witnessName = faker.name.fullName();
+        const witnessPhone = generatePhoneNumber();
+        witnessInfo = `\nWitness: ${witnessName} (${witnessPhone})`;
+    }
   
-    const alibi = `At ${randomTime}, you were at ${location.name} (${location.area}), ${activity}.`;
+    const alibi = `At ${randomTime}, you were at ${location.name} (${location.area}), ${activity}. Witness: ${witnessInfo}`;
     displayAlibi(container, alibi);
   }
 
