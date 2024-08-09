@@ -180,26 +180,28 @@ export const apps = {
       minHeight: '950px'
     }
   },
+
+  Alibi: {
+    id: 'alibi',
+    name: 'Alibi',
+    type: 'app',
+    icon: '㊙️',
+    accessLevel: 1,
+    showOnDesktop: true,
+    jsFiles: ['alibi.js'],
+    cssFiles: ['alibi.css'],
+    window: {
+      width: '50%',
+      height: '50%',
+      minWidth: '500px',
+      minHeight: '500px'
+    }
+  },
 };
 
 export const getAppById = (id) => apps[id];
 
-/*     Alibi: {
-      name: 'Alibi',
-      type: 'app',
-      icon: '㊙️',
-      accessLevel: 1,
-      showOnDesktop: true,
-      jsFiles: ['propaganda.js'],
-      cssFiles: ['propaganda.css'],
-      window: {
-        width: '90%',
-        height: '90%',
-        minWidth: '600px',
-        minHeight: '400px'
-      }
-    },
-    GeoQuesting: {
+/*  GeoQuesting: {
       name: 'GeoQuesting',
       type: 'app',
       icon: '🧭',
