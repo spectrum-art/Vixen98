@@ -370,6 +370,6 @@ function getRandomTimeFromRanges(ranges) {
 }
 
 function displayAlibi(container, alibi) {
-  const alibiResult = container.querySelector('#alibi-result');
-  alibiResult.textContent = alibi;
-}
+    const alibiResult = container.querySelector('#alibi-result');
+    alibiResult.innerHTML = alibi.replace(/\n/g, '<br>');
+  }

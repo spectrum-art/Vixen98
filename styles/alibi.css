@@ -91,3 +91,18 @@
     min-width: 200px;
     margin-right: 20px;
   }
+
+  .witness-option {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid #ccc;
+  }
+  
+  .witness-option label {
+    display: flex;
+    align-items: center;
+  }
+  
+  .witness-option input[type="checkbox"] {
+    margin-right: 5px;
+  }
