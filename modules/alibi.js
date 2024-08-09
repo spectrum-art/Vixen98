@@ -89,25 +89,29 @@ const activities = {
 let districts = [];
 let locations = [];
 
-export function initialize(container, params = {}) {
-  if (!container || !(container instanceof HTMLElement)) {
-    console.error('Invalid container provided to Alibi initialize function');
-    return;
+export async function initialize(container, params = {}) {
+    if (!container || !(container instanceof HTMLElement)) {
+      console.error('Invalid container provided to Alibi initialize function');
+      return;
+    }
+  
+    console.log('Initializing Alibi app with params:', params);
+    await setupAlibiApp(container);
   }
 
-  console.log('Initializing Alibi app with params:', params);
-  setupAlibiApp(container);
-}
-
-function setupAlibiApp(container) {
-  container.innerHTML = createAlibiAppHTML();
-  loadData().then(() => {
-    setupDistrictCheckboxes(container);
-    setupTimeCheckboxes(container);
-    setupActivityCheckboxes(container);
-    setupEventListeners(container);
-  });
-}
+async function setupAlibiApp(container) {
+    container.innerHTML = createAlibiAppHTML();
+    try {
+      await loadData();
+      setupDistrictCheckboxes(container);
+      setupTimeCheckboxes(container);
+      setupActivityCheckboxes(container);
+      setupEventListeners(container);
+    } catch (error) {
+      console.error('Error setting up Alibi app:', error);
+      container.innerHTML = '<p>Error loading Alibi app. Please try again later.</p>';
+    }
+  }
 
 function createAlibiAppHTML() {
   return `
