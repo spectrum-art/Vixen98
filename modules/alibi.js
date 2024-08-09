@@ -111,7 +111,8 @@ function createAlibiAppHTML() {
   return `
     <div class="alibi-app">
       <div class="sidebar">
-        <h3>Select Districts</h3>
+        <h3>㊙️Generate an Alibi㊙️</h3>
+        <h1>Select one or more areas, a time of day, and a type of activity. Or, generate a random alibi if you're feeling lucky.
         <div id="district-checkboxes"></div>
       </div>
       <div class="main-content">
@@ -135,8 +136,8 @@ function createAlibiAppHTML() {
             <option value="education">Education</option>
           </select>
         </div>
-        <button id="lucky-button">I'm Feeling Lucky</button>
         <button id="generate-button">Generate Alibi</button>
+        <button id="lucky-button">I'm Feeling Lucky!</button>
         <div id="alibi-result"></div>
       </div>
     </div>
@@ -214,7 +215,6 @@ function parseCSVLine(line) {
   }
 
 function assignActivityTypes(locationName) {
-  // This is a simplified assignment. You may want to create a more sophisticated mapping.
   const types = [];
   if (locationName.includes('Bank')) types.push(activityTypes.LEGAL, activityTypes.WORK);
   if (locationName.includes('Beach') || locationName.includes('Park')) types.push(activityTypes.LEISURE, activityTypes.SOCIAL);
@@ -224,7 +224,6 @@ function assignActivityTypes(locationName) {
   if (locationName.includes('Restaurant') || locationName.includes('Café')) types.push(activityTypes.FOOD);
   if (locationName.includes('Shop') || locationName.includes('Store')) types.push(activityTypes.SHOPPING);
   
-  // Add some default types if none were assigned
   if (types.length === 0) {
     types.push(activityTypes.TRAVEL, activityTypes.SOCIAL, activityTypes.LEISURE);
   }
@@ -277,7 +276,7 @@ function generateAlibi(container, isRandom) {
   const activityType = getActivityTypeForAlibi(alibiType);
   const activity = getRandomActivity(activityType);
 
-  const alibi = `At ${timeOfDay}, you were at ${location.name} (${location.area}) ${activity}.`;
+  const alibi = `On the ${timeOfDay} in question, I was at ${location.name} (${location.area}), ${activity}.`;
   displayAlibi(container, alibi);
 }
 
