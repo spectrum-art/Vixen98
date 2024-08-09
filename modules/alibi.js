@@ -144,41 +144,74 @@ function createAlibiAppHTML() {
 }
 
 async function loadData() {
-  try {
-    const [districtsData, locationsData] = await Promise.all([
-      fetch('../data/alibiDistricts.csv').then(response => response.text()),
-      fetch('../data/alibiLocations.csv').then(response => response.text())
-    ]);
-
-    districts = parseDistrictsCSV(districtsData);
-    locations = parseLocationsCSV(locationsData);
-  } catch (error) {
-    console.error('Error loading data:', error);
+    try {
+      const [districtsResponse, locationsResponse] = await Promise.all([
+        fetch('../data/alibiDistricts.csv'),
+        fetch('../data/alibiLocations.csv')
+      ]);
+  
+      if (!districtsResponse.ok || !locationsResponse.ok) {
+        throw new Error('Failed to fetch CSV files');
+      }
+  
+      const districtsData = await districtsResponse.text();
+      const locationsData = await locationsResponse.text();
+  
+      districts = parseDistrictsCSV(districtsData);
+      locations = parseLocationsCSV(locationsData);
+  
+      console.log('Districts loaded:', districts.length);
+      console.log('Locations loaded:', locations.length);
+    } catch (error) {
+      console.error('Error loading data:', error);
+    }
   }
-}
 
 function parseDistrictsCSV(csv) {
-  const lines = csv.split('\n').slice(1); // Skip header
-  return lines.reduce((acc, line) => {
-    const [district, neighborhood] = line.split(',').map(item => item.trim());
-    if (district && !acc.includes(district)) {
-      acc.push(district);
+  const lines = csv.split('\n').filter(line => line.trim() !== '');
+  const districts = new Set();
+  let currentDistrict = '';
+
+  lines.forEach(line => {
+    const [first, second] = parseCSVLine(line);
+    if (first && !second) {
+      currentDistrict = first.trim();
+      districts.add(currentDistrict);
     }
-    return acc;
-  }, []);
+  });
+
+  return Array.from(districts);
 }
 
 function parseLocationsCSV(csv) {
-  const lines = csv.split('\n').slice(1); // Skip header
-  return lines.map(line => {
-    const [name, area] = line.split(',').map(item => item.trim());
+  const lines = csv.split('\n').filter(line => line.trim() !== '');
+  return lines.slice(1).map(line => {
+    const [name, area] = parseCSVLine(line);
     return {
-      name,
-      area,
-      activityTypes: assignActivityTypes(name)
+      name: name.trim(),
+      area: area.trim(),
+      activityTypes: assignActivityTypes(name.trim())
     };
-  });
+});
 }
+
+function parseCSVLine(line) {
+    const result = [];
+    let startIndex = 0;
+    let inQuotes = false;
+  
+    for (let i = 0; i < line.length; i++) {
+      if (line[i] === '"') {
+        inQuotes = !inQuotes;
+      } else if (line[i] === ',' && !inQuotes) {
+        result.push(line.slice(startIndex, i).replace(/^"|"$/g, '').trim());
+        startIndex = i + 1;
+      }
+    }
+  
+    result.push(line.slice(startIndex).replace(/^"|"$/g, '').trim());
+    return result;
+  }
 
 function assignActivityTypes(locationName) {
   // This is a simplified assignment. You may want to create a more sophisticated mapping.
