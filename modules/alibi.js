@@ -112,7 +112,7 @@ function createAlibiAppHTML() {
     <div class="alibi-app">
       <div class="sidebar">
         <h3>㊙️Generate an Alibi㊙️</h3>
-        <h1>Select one or more areas, a time of day, and a type of activity. Or, generate a random alibi if you're feeling lucky.
+        <p>Select one or more areas, a time of day, and a type of activity. Or, generate a random alibi if you're feeling lucky.</p>
         <div id="district-checkboxes"></div>
       </div>
       <div class="main-content">
