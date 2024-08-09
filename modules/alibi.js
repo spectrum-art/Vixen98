@@ -100,49 +100,68 @@ export function initialize(container, params = {}) {
 }
 
 function setupAlibiApp(container) {
-  container.innerHTML = createAlibiAppHTML();
-  loadData().then(() => {
-    populateDistrictCheckboxes(container);
-    setupEventListeners(container);
+    container.innerHTML = createAlibiAppHTML();
+    loadData().then(() => {
+      populateDistrictCheckboxes(container);
+      populateActivityCheckboxes(container);
+      setupEventListeners(container);
+    });
+  }
+  
+function populateActivityCheckboxes(container) {
+  const checkboxContainer = container.querySelector('#activity-checkboxes');
+  Object.keys(activityTypes).forEach(type => {
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = `activity-${type.toLowerCase()}`;
+    checkbox.value = type;
+    checkbox.checked = true;
+
+    const label = document.createElement('label');
+    label.htmlFor = checkbox.id;
+    label.textContent = type.charAt(0) + type.slice(1).toLowerCase().replace('_', ' ');
+
+    const wrapper = document.createElement('div');
+    wrapper.appendChild(checkbox);
+    wrapper.appendChild(label);
+
+    checkboxContainer.appendChild(wrapper);
   });
 }
 
 function createAlibiAppHTML() {
-  return `
-    <div class="alibi-app">
-      <div class="sidebar">
-        <h3>㊙️Generate an Alibi㊙️</h3>
-        <p>Select one or more areas, a time of day, and a type of activity. Or, generate a random alibi if you're feeling lucky.</p>
-        <div id="district-checkboxes"></div>
-      </div>
-      <div class="main-content">
-        <div class="options">
-          <select id="time-of-day">
-            <option value="morning">Morning</option>
-            <option value="afternoon">Afternoon</option>
-            <option value="evening">Evening</option>
-            <option value="night">Night</option>
-          </select>
-          <select id="alibi-type">
-            <option value="work">Work-related</option>
-            <option value="social">Social</option>
-            <option value="food">Food</option>
-            <option value="shopping">Shopping</option>
-            <option value="leisure">Leisure</option>
-            <option value="travel">Travel</option>
-            <option value="minor_crime">Minor Crime</option>
-            <option value="medical">Medical</option>
-            <option value="legal">Legal</option>
-            <option value="education">Education</option>
-          </select>
+    return `
+      <div class="alibi-app">
+        <div class="sidebar">
+          <h3>㊙️Generate an Alibi㊙️</h3>
+          <p>Select one or more areas, a time of day, and a type of activity. Or, generate a random alibi if you're feeling lucky.</p>
+          <div id="district-checkboxes"></div>
         </div>
-        <button id="generate-button">Generate Alibi</button>
-        <button id="lucky-button">I'm Feeling Lucky!</button>
-        <div id="alibi-result"></div>
+        <div class="main-content">
+          <div class="options">
+            <div class="option-column">
+              <h3>Time of Day</h3>
+              <div id="time-checkboxes">
+                <label><input type="checkbox" value="morning" checked> Morning</label>
+                <label><input type="checkbox" value="afternoon" checked> Afternoon</label>
+                <label><input type="checkbox" value="evening" checked> Evening</label>
+                <label><input type="checkbox" value="night" checked> Night</label>
+              </div>
+            </div>
+            <div class="option-column">
+              <h3>Activity Type</h3>
+              <div id="activity-checkboxes"></div>
+            </div>
+          </div>
+          <div class="button-container">
+            <button id="generate-button">Generate Alibi</button>
+            <button id="lucky-button">I'm Feeling Lucky!</button>
+          </div>
+          <div id="alibi-result"></div>
+        </div>
       </div>
-    </div>
-  `;
-}
+    `;
+  }
 
 async function loadData() {
     try {
@@ -259,9 +278,12 @@ function setupEventListeners(container) {
 }
 
 function generateAlibi(container, isRandom) {
-  const selectedDistricts = isRandom ? districts : getSelectedDistricts(container);
-  const timeOfDay = isRandom ? getRandomTimeOfDay() : container.querySelector('#time-of-day').value;
-  const alibiType = isRandom ? getRandomAlibiType() : container.querySelector('#alibi-type').value;
+  const selectedDistricts = isRandom ? districts : getSelectedOptions(container, '#district-checkboxes');
+  const selectedTimes = isRandom ? ['morning', 'afternoon', 'evening', 'night'] : getSelectedOptions(container, '#time-checkboxes');
+  const selectedActivityTypes = isRandom ? Object.keys(activityTypes) : getSelectedOptions(container, '#activity-checkboxes');
+
+  const timeOfDay = selectedTimes[Math.floor(Math.random() * selectedTimes.length)];
+  const alibiType = selectedActivityTypes[Math.floor(Math.random() * selectedActivityTypes.length)];
 
   const filteredLocations = locations.filter(location => 
     selectedDistricts.some(district => location.area.includes(district))
@@ -280,17 +302,8 @@ function generateAlibi(container, isRandom) {
   displayAlibi(container, alibi);
 }
 
-function getSelectedDistricts(container) {
-  return Array.from(container.querySelectorAll('#district-checkboxes input:checked')).map(cb => cb.value);
-}
-
-function getRandomTimeOfDay() {
-  const times = ['morning', 'afternoon', 'evening', 'night'];
-  return times[Math.floor(Math.random() * times.length)];
-}
-
-function getRandomAlibiType() {
-  return Object.keys(activityTypes)[Math.floor(Math.random() * Object.keys(activityTypes).length)];
+function getSelectedOptions(container, selector) {
+  return Array.from(container.querySelectorAll(`${selector} input:checked`)).map(cb => cb.value);
 }
 
 function getActivityTypeForAlibi(alibiType) {
