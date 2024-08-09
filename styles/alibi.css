@@ -21,7 +21,8 @@
   .options-container {
     display: flex;
     overflow-x: auto;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
+    padding-left: 75px;
   }
   
   .option-column:last-child {
