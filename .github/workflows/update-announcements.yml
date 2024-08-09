@@ -18,13 +18,12 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Debug information
+    - name: Install dependencies and run script
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT_FOR_UPDATES }}
       run: |
-        echo "GITHUB_EVENT_PATH: $GITHUB_EVENT_PATH"
-        cat $GITHUB_EVENT_PATH
-
-    - name: Update announcements file
-      run: |
+        python -m pip install --upgrade pip
+        pip install PyGithub
         python .github/scripts/update_announcements.py
     
     - name: Commit and push if changed
