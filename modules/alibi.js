@@ -114,7 +114,7 @@ async function setupAlibiApp(container) {
 function createAlibiAppHTML() {
   return `
     <div class="alibi-app">
-      <h3>㊙️Generate an Alibi㊙️</h3>
+      <h3>㊙️ Generate an Alibi ㊙️</h3>
       <p>Select one or more areas, times of day, and types of activity. Or, generate a random alibi if you're feeling lucky.</p>
       <div class="options-container">
         <div class="option-column">
