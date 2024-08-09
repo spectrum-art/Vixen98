@@ -237,10 +237,12 @@ function parseCSVLine(line) {
 function setupTimeCheckboxes(container) {
   const checkboxContainer = container.querySelector('#time-checkboxes');
   const times = [
-    { value: 'morning', label: 'Morning', range: [5, 11] },
-    { value: 'afternoon', label: 'Afternoon', range: [12, 17] },
-    { value: 'evening', label: 'Evening', range: [18, 22] },
-    { value: 'night', label: 'Night', range: [23, 4] }
+    { value: 'morning', label: 'Morning', range: [5, 8] },
+    { value: 'day', label: 'Day', range: [9, 12] },
+    { value: 'afternoon', label: 'Afternoon', range: [13, 16] },
+    { value: 'evening', label: 'Evening', range: [17, 20] },
+    { value: 'night', label: 'Night', range: [21, 0] },
+    { value: 'late night', label: 'Late Night', range: [1, 4] }
   ];
   times.forEach(time => {
     const checkbox = createCheckbox(time.value, time.label);
@@ -278,7 +280,7 @@ function setupEventListeners(container) {
 
 function generateAlibi(container, isRandom) {
     const selectedDistricts = isRandom ? districts : getSelectedOptions(container, '#district-checkboxes');
-    const selectedTimes = isRandom ? ['morning', 'afternoon', 'evening', 'night'] : getSelectedOptions(container, '#time-checkboxes');
+    const selectedTimes = isRandom ? ['morning', 'day', 'afternoon', 'evening', 'night', 'late night'] : getSelectedOptions(container, '#time-checkboxes');
     const selectedActivityTypes = isRandom ? Object.keys(activityTypes) : getSelectedOptions(container, '#activity-checkboxes');
   
     console.log('Selected Districts:', selectedDistricts);
