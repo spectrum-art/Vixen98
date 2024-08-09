@@ -1,17 +1,15 @@
-import { EventBus } from './utils.js';
-
 const activityTypes = {
-  WORK: 0,
-  SOCIAL: 1,
-  FOOD: 2,
-  SHOPPING: 3,
-  LEISURE: 4,
-  TRAVEL: 5,
-  MINOR_CRIME: 6,
-  MEDICAL: 7,
-  LEGAL: 8,
-  EDUCATION: 9
-};
+    WORK: 'WORK',
+    SOCIAL: 'SOCIAL',
+    FOOD: 'FOOD',
+    SHOPPING: 'SHOPPING',
+    LEISURE: 'LEISURE',
+    TRAVEL: 'TRAVEL',
+    MINOR_CRIME: 'MINOR_CRIME',
+    MEDICAL: 'MEDICAL',
+    LEGAL: 'LEGAL',
+    EDUCATION: 'EDUCATION'
+  };
 
 const activities = {
   [activityTypes.WORK]: [
@@ -188,7 +186,7 @@ function parseLocationsCSV(csv) {
     return {
       name: name.trim(),
       area: area.trim(),
-      activityTypes: assignActivityTypes(name.trim())
+/*       activityTypes: assignActivityTypes(name.trim()) */
     };
   });
 }
@@ -211,7 +209,7 @@ function parseCSVLine(line) {
   return result;
 }
 
-function assignActivityTypes(locationName) {
+/* function assignActivityTypes(locationName) {
   const types = [];
   if (locationName.includes('Bank')) types.push(activityTypes.LEGAL, activityTypes.WORK);
   if (locationName.includes('Beach') || locationName.includes('Park')) types.push(activityTypes.LEISURE, activityTypes.SOCIAL);
@@ -226,7 +224,7 @@ function assignActivityTypes(locationName) {
   }
   
   return types;
-}
+} */
 
 function setupDistrictCheckboxes(container) {
   const checkboxContainer = container.querySelector('#district-checkboxes');
@@ -252,12 +250,12 @@ function setupTimeCheckboxes(container) {
 }
 
 function setupActivityCheckboxes(container) {
-  const checkboxContainer = container.querySelector('#activity-checkboxes');
-  Object.entries(activityTypes).forEach(([type, value]) => {
-    const checkbox = createCheckbox(value, type.charAt(0) + type.slice(1).toLowerCase().replace('_', ' '));
-    checkboxContainer.appendChild(checkbox);
-  });
-}
+    const checkboxContainer = container.querySelector('#activity-checkboxes');
+    Object.keys(activityTypes).forEach(type => {
+      const checkbox = createCheckbox(type, type.charAt(0) + type.slice(1).toLowerCase().replace('_', ' '));
+      checkboxContainer.appendChild(checkbox);
+    });
+  }
 
 function createCheckbox(value, label) {
   const wrapper = document.createElement('div');
@@ -279,42 +277,50 @@ function setupEventListeners(container) {
 }
 
 function generateAlibi(container, isRandom) {
-  const selectedDistricts = isRandom ? districts : getSelectedOptions(container, '#district-checkboxes');
-  const selectedTimes = isRandom ? ['morning', 'afternoon', 'evening', 'night'] : getSelectedOptions(container, '#time-checkboxes');
-  const selectedActivityTypes = isRandom ? Object.values(activityTypes) : getSelectedOptions(container, '#activity-checkboxes');
-
-  const filteredLocations = locations.filter(location => 
-    selectedDistricts.some(district => location.area.includes(district))
-  );
-
-  if (filteredLocations.length === 0) {
-    displayAlibi(container, "No suitable locations found. Please select more districts.");
-    return;
+    const selectedDistricts = isRandom ? districts : getSelectedOptions(container, '#district-checkboxes');
+    const selectedTimes = isRandom ? ['morning', 'afternoon', 'evening', 'night'] : getSelectedOptions(container, '#time-checkboxes');
+    const selectedActivityTypes = isRandom ? Object.keys(activityTypes) : getSelectedOptions(container, '#activity-checkboxes');
+  
+    console.log('Selected Districts:', selectedDistricts);
+    console.log('Selected Times:', selectedTimes);
+    console.log('Selected Activity Types:', selectedActivityTypes);
+  
+    const filteredLocations = locations.filter(location => 
+      selectedDistricts.some(district => location.area.includes(district))
+    );
+  
+    if (filteredLocations.length === 0) {
+      displayAlibi(container, "No suitable locations found. Please select more districts.");
+      return;
+    }
+  
+    const location = filteredLocations[Math.floor(Math.random() * filteredLocations.length)];
+    const activityType = selectedActivityTypes[Math.floor(Math.random() * selectedActivityTypes.length)];
+    
+    console.log('Selected Location:', location);
+    console.log('Selected Activity Type:', activityType);
+  
+    const activity = getRandomActivity(activityType);
+  
+    const timeRanges = getTimeRanges(container, selectedTimes);
+    const randomTime = getRandomTimeFromRanges(timeRanges);
+  
+    const alibi = `At ${randomTime}, you were at ${location.name} (${location.area}), ${activity}.`;
+    displayAlibi(container, alibi);
   }
-
-  const location = filteredLocations[Math.floor(Math.random() * filteredLocations.length)];
-  const activityType = getActivityTypeForAlibi(selectedActivityTypes[Math.floor(Math.random() * selectedActivityTypes.length)]);
-  const activity = getRandomActivity(activityType);
-
-  const timeRanges = getTimeRanges(container, selectedTimes);
-  const randomTime = getRandomTimeFromRanges(timeRanges);
-
-  const alibi = `At ${randomTime}, you were at ${location.name} (${location.area}), ${activity}.`;
-  displayAlibi(container, alibi);
-}
 
 function getSelectedOptions(container, selector) {
   return Array.from(container.querySelectorAll(`${selector} input:checked`)).map(cb => cb.value);
 }
 
-function getActivityTypeForAlibi(alibiType) {
-  return activityTypes[alibiType.toUpperCase()];
-}
-
 function getRandomActivity(activityType) {
-  const activitiesForType = activities[activityType];
-  return activitiesForType[Math.floor(Math.random() * activitiesForType.length)];
-}
+    const activitiesForType = activities[activityType];
+    if (!activitiesForType || activitiesForType.length === 0) {
+      console.error(`No activities found for type: ${activityType}`);
+      return "doing something";  // fallback activity
+    }
+    return activitiesForType[Math.floor(Math.random() * activitiesForType.length)];
+  }
 
 function getTimeRanges(container, selectedTimes) {
   return Array.from(container.querySelectorAll('#time-checkboxes input:checked'))
