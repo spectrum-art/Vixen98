@@ -1,5 +1,3 @@
-import { faker } from '@faker-js/faker';
-
 const activityTypes = {
     WORK: 'WORK',
     SOCIAL: 'SOCIAL',
