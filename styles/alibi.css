@@ -54,12 +54,16 @@
   }
 
   input[type="checkbox"] {
-    width: 13px;
-    height: 13px;
-    margin-right: 5px;
-    vertical-align: middle;
-    -webkit-appearance: checkbox;
-    appearance: checkbox;
+    width: 13px !important;
+    height: 13px !important;
+    margin-right: 5px !important;
+    vertical-align: middle !important;
+    -webkit-appearance: checkbox !important;
+    appearance: checkbox !important;
+    opacity: 1 !important;
+    position: static !important;
+    border: 2px solid red !important;
+    background-color: yellow !important;
   }
   
   label {

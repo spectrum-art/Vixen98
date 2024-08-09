@@ -226,13 +226,15 @@ function parseCSVLine(line) {
   return types;
 } */
 
-function setupDistrictCheckboxes(container) {
-  const checkboxContainer = container.querySelector('#district-checkboxes');
-  districts.forEach(district => {
-    const checkbox = createCheckbox(district, district);
-    checkboxContainer.appendChild(checkbox);
-  });
-}
+  function setupDistrictCheckboxes(container) {
+    console.log('Setting up district checkboxes');
+    const checkboxContainer = container.querySelector('#district-checkboxes');
+    districts.forEach(district => {
+      const checkbox = createCheckbox(district, district);
+      checkboxContainer.appendChild(checkbox);
+      console.log('Added checkbox:', district);
+    });
+  }
 
 function setupTimeCheckboxes(container) {
   const checkboxContainer = container.querySelector('#time-checkboxes');
