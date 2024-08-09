@@ -101,6 +101,12 @@ function loadFaker() {
     });
   }
 
+  let fakerLoaded = false;
+
+window.addEventListener('fakerloaded', function() {
+  fakerLoaded = true;
+});
+
   export async function initialize(container, params = {}) {
     if (!container || !(container instanceof HTMLElement)) {
       console.error('Invalid container provided to Alibi initialize function');
@@ -362,7 +368,7 @@ function generateAlibi(container, isRandom) {
         witnessName = 'John Doe';
       }
       const witnessPhone = generatePhoneNumber();
-      witnessInfo = `\nWitness: ${witnessName} (${witnessPhone})`;
+      witnessInfo = `\nWitness: ${witnessName} - ${witnessPhone}`;
     }
   
     const alibi = `At ${randomTime}, you were at ${location.name} (${location.area}), ${activity}.${witnessInfo}`;
