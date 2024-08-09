@@ -191,10 +191,10 @@ export const apps = {
     jsFiles: ['alibi.js'],
     cssFiles: ['alibi.css'],
     window: {
-      width: '90%',
-      height: '90%',
-      minWidth: '600px',
-      minHeight: '400px'
+      width: '50%',
+      height: '50%',
+      minWidth: '500px',
+      minHeight: '500px'
     }
   },
 };
