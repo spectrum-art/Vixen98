@@ -1,5 +1,3 @@
-// alibi.js
-
 import { EventBus } from './utils.js';
 
 const activityTypes = {
