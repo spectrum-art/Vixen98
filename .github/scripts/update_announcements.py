@@ -1,6 +1,18 @@
 import json
 import os
-from github import Github
+import sys
+
+print(f"Python version: {sys.version}")
+print(f"Python path: {sys.executable}")
+
+try:
+    from github import Github
+    print("Successfully imported Github from PyGithub")
+except ImportError as e:
+    print(f"Error importing Github: {e}")
+    print("Installed packages:")
+    os.system('pip list')
+    raise
 
 # Initialize GitHub client
 g = Github(os.environ['GITHUB_TOKEN'])
