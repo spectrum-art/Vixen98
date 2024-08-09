@@ -111,35 +111,39 @@ async function setupAlibiApp(container) {
     }
   }
 
-function createAlibiAppHTML() {
-  return `
-    <div class="alibi-app">
-      <h3>㊙️ Generate an Alibi ㊙️</h3>
-      <p>Select one or more areas, times of day, and types of activity. Or, generate a random alibi if you're feeling lucky.</p>
-      <div class="options-container">
-        <div class="option-column">
-          <h4>Area</h4>
-          <div id="district-checkboxes"></div>
-        </div>
-        <div class="option-column">
-          <h4>Time of Day</h4>
-          <div id="time-checkboxes"></div>
-          <div id="witness-checkbox" class="witness-option">
-            <label>
-              <input type="checkbox" id="generate-witness" checked>
-              <strong>Generate Witness?</strong>
-            </label>
+  function createAlibiAppHTML() {
+    return `
+      <div class="alibi-app">
+        <h3>㊙️ Generate an Alibi ㊙️</h3>
+        <p>Select one or more areas, times of day, and types of activity. Or, generate a random alibi if you're feeling lucky.</p>
+        <div class="options-container">
+          <div class="option-column">
+            <h4>Area</h4>
+            <div id="district-checkboxes"></div>
+          </div>
+          <div class="option-column">
+            <h4>Time of Day</h4>
+            <div id="time-checkboxes"></div>
+            <div id="witness-checkbox" class="witness-option">
+              <label>
+                <input type="checkbox" id="generate-witness" checked>
+                <strong>Generate Witness?</strong>
+              </label>
+            </div>
+          </div>
+          <div class="option-column">
+            <h4>Type of Activity</h4>
+            <div id="activity-checkboxes"></div>
           </div>
         </div>
-        <div class="option-column">
-          <h4>Type of Activity</h4>
-          <div id="activity-checkboxes"></div>
+        <div class="button-container">
+          <button id="generate-button">Generate Alibi</button>
+          <button id="lucky-button">I'm Feeling Lucky!</button>
         </div>
+        <div id="alibi-result"></div>
       </div>
-      <!-- ... rest of the content ... -->
-    </div>
-  `;
-}
+    `;
+  }
 
 async function loadData() {
   try {
