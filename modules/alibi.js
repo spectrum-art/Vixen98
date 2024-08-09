@@ -101,64 +101,78 @@ export function initialize(container, params = {}) {
 
 function setupAlibiApp(container) {
     container.innerHTML = createAlibiAppHTML();
-    loadData().then(() => {
-      populateDistrictCheckboxes(container);
-      populateActivityCheckboxes(container);
-      setupEventListeners(container);
+    setupDistrictCheckboxes(container);
+    setupTimeCheckboxes(container);
+    setupActivityCheckboxes(container);
+    setupEventListeners(container);
+  }
+  
+  function setupDistrictCheckboxes(container) {
+    const checkboxContainer = container.querySelector('#district-checkboxes');
+    districts.forEach(district => {
+      const checkbox = createCheckbox(district, district);
+      checkboxContainer.appendChild(checkbox);
     });
   }
   
-function populateActivityCheckboxes(container) {
-  const checkboxContainer = container.querySelector('#activity-checkboxes');
-  Object.keys(activityTypes).forEach(type => {
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.id = `activity-${type.toLowerCase()}`;
-    checkbox.value = type;
-    checkbox.checked = true;
-
-    const label = document.createElement('label');
-    label.htmlFor = checkbox.id;
-    label.textContent = type.charAt(0) + type.slice(1).toLowerCase().replace('_', ' ');
-
+  function setupTimeCheckboxes(container) {
+    const checkboxContainer = container.querySelector('#time-checkboxes');
+    const times = [
+      { value: 'morning', label: 'Morning', range: [5, 11] },
+      { value: 'afternoon', label: 'Afternoon', range: [12, 17] },
+      { value: 'evening', label: 'Evening', range: [18, 22] },
+      { value: 'night', label: 'Night', range: [23, 4] }
+    ];
+    times.forEach(time => {
+      const checkbox = createCheckbox(time.value, time.label);
+      checkbox.querySelector('input').dataset.range = JSON.stringify(time.range);
+      checkboxContainer.appendChild(checkbox);
+    });
+  }
+  
+  function setupActivityCheckboxes(container) {
+    const checkboxContainer = container.querySelector('#activity-checkboxes');
+    Object.entries(activityTypes).forEach(([type, value]) => {
+      const checkbox = createCheckbox(value, type.charAt(0) + type.slice(1).toLowerCase().replace('_', ' '));
+      checkboxContainer.appendChild(checkbox);
+    });
+  }
+  
+  function createCheckbox(value, label) {
     const wrapper = document.createElement('div');
-    wrapper.appendChild(checkbox);
-    wrapper.appendChild(label);
-
-    checkboxContainer.appendChild(wrapper);
-  });
-}
+    wrapper.innerHTML = `
+      <label>
+        <input type="checkbox" value="${value}" checked>
+        ${label}
+      </label>
+    `;
+    return wrapper;
+  }
 
 function createAlibiAppHTML() {
     return `
       <div class="alibi-app">
-        <div class="sidebar">
-          <h3>㊙️Generate an Alibi㊙️</h3>
-          <p>Select one or more areas, a time of day, and a type of activity. Or, generate a random alibi if you're feeling lucky.</p>
-          <div id="district-checkboxes"></div>
-        </div>
-        <div class="main-content">
-          <div class="options">
-            <div class="option-column">
-              <h3>Time of Day</h3>
-              <div id="time-checkboxes">
-                <label><input type="checkbox" value="morning" checked> Morning</label>
-                <label><input type="checkbox" value="afternoon" checked> Afternoon</label>
-                <label><input type="checkbox" value="evening" checked> Evening</label>
-                <label><input type="checkbox" value="night" checked> Night</label>
-              </div>
-            </div>
-            <div class="option-column">
-              <h3>Activity Type</h3>
-              <div id="activity-checkboxes"></div>
-            </div>
+        <h3>㊙️Generate an Alibi㊙️</h3>
+        <p>Select one or more areas, times of day, and types of activity. Or, generate a random alibi if you're feeling lucky.</p>
+        <div class="options-container">
+          <div class="option-column">
+            <h4>Area</h4>
+            <div id="district-checkboxes"></div>
           </div>
-          <div class="button-container">
-            <button id="generate-button">Generate Alibi</button>
-            <button id="lucky-button">I'm Feeling Lucky!</button>
+          <div class="option-column">
+            <h4>Time of Day</h4>
+            <div id="time-checkboxes"></div>
           </div>
-          <div id="alibi-result"></div>
+          <div class="option-column">
+            <h4>Type of Activity</h4>
+            <div id="activity-checkboxes"></div>
+          </div>
         </div>
+        <div class="button-container">
+          <button id="generate-button">Generate Alibi</button>
+          <button id="lucky-button">I'm Feeling Lucky!</button>
+        </div>
+        <div id="alibi-result"></div>
       </div>
     `;
   }
@@ -250,25 +264,6 @@ function assignActivityTypes(locationName) {
   return types;
 }
 
-function populateDistrictCheckboxes(container) {
-  const checkboxContainer = container.querySelector('#district-checkboxes');
-  districts.forEach(district => {
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.id = `district-${district.replace(/\s+/g, '-').toLowerCase()}`;
-    checkbox.value = district;
-    checkbox.checked = true;
-
-    const label = document.createElement('label');
-    label.htmlFor = checkbox.id;
-    label.textContent = district;
-
-    checkboxContainer.appendChild(checkbox);
-    checkboxContainer.appendChild(label);
-    checkboxContainer.appendChild(document.createElement('br'));
-  });
-}
-
 function setupEventListeners(container) {
   const luckyButton = container.querySelector('#lucky-button');
   const generateButton = container.querySelector('#generate-button');
@@ -278,29 +273,45 @@ function setupEventListeners(container) {
 }
 
 function generateAlibi(container, isRandom) {
-  const selectedDistricts = isRandom ? districts : getSelectedOptions(container, '#district-checkboxes');
-  const selectedTimes = isRandom ? ['morning', 'afternoon', 'evening', 'night'] : getSelectedOptions(container, '#time-checkboxes');
-  const selectedActivityTypes = isRandom ? Object.keys(activityTypes) : getSelectedOptions(container, '#activity-checkboxes');
-
-  const timeOfDay = selectedTimes[Math.floor(Math.random() * selectedTimes.length)];
-  const alibiType = selectedActivityTypes[Math.floor(Math.random() * selectedActivityTypes.length)];
-
-  const filteredLocations = locations.filter(location => 
-    selectedDistricts.some(district => location.area.includes(district))
-  );
-
-  if (filteredLocations.length === 0) {
-    displayAlibi(container, "No suitable locations found. Please select more districts.");
-    return;
+    const selectedDistricts = isRandom ? districts : getSelectedOptions(container, '#district-checkboxes');
+    const selectedTimes = isRandom ? ['morning', 'afternoon', 'evening', 'night'] : getSelectedOptions(container, '#time-checkboxes');
+    const selectedActivityTypes = isRandom ? Object.values(activityTypes) : getSelectedOptions(container, '#activity-checkboxes');
+  
+    const filteredLocations = locations.filter(location => 
+      selectedDistricts.some(district => location.area.includes(district))
+    );
+  
+    if (filteredLocations.length === 0) {
+      displayAlibi(container, "No suitable locations found. Please select more districts.");
+      return;
+    }
+  
+    const location = filteredLocations[Math.floor(Math.random() * filteredLocations.length)];
+    const activityType = getActivityTypeForAlibi(selectedActivityTypes[Math.floor(Math.random() * selectedActivityTypes.length)]);
+    const activity = getRandomActivity(activityType);
+  
+    const timeRanges = getTimeRanges(container, selectedTimes);
+    const randomTime = getRandomTimeFromRanges(timeRanges);
+  
+    const alibi = `At ${randomTime}, you were at ${location.name} (${location.area}), ${activity}.`;
+    displayAlibi(container, alibi);
   }
-
-  const location = filteredLocations[Math.floor(Math.random() * filteredLocations.length)];
-  const activityType = getActivityTypeForAlibi(alibiType);
-  const activity = getRandomActivity(activityType);
-
-  const alibi = `On the ${timeOfDay} in question, I was at ${location.name} (${location.area}), ${activity}.`;
-  displayAlibi(container, alibi);
-}
+  
+  function getTimeRanges(container, selectedTimes) {
+    return Array.from(container.querySelectorAll('#time-checkboxes input:checked'))
+      .filter(cb => selectedTimes.includes(cb.value))
+      .map(cb => JSON.parse(cb.dataset.range));
+  }
+  
+  function getRandomTimeFromRanges(ranges) {
+    const flattenedRanges = ranges.flatMap(range => {
+      const [start, end] = range;
+      return Array.from({length: end - start + 1}, (_, i) => (start + i) % 24);
+    });
+    const randomHour = flattenedRanges[Math.floor(Math.random() * flattenedRanges.length)];
+    const randomMinute = Math.floor(Math.random() * 60);
+    return `${randomHour.toString().padStart(2, '0')}:${randomMinute.toString().padStart(2, '0')}`;
+  }
 
 function getSelectedOptions(container, selector) {
   return Array.from(container.querySelectorAll(`${selector} input:checked`)).map(cb => cb.value);
