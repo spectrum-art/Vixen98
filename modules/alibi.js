@@ -354,7 +354,13 @@ function generateAlibi(container, isRandom) {
     let witnessInfo = '';
   
     if (generateWitness) {
-      const witnessName = faker.person.fullName();
+      let witnessName;
+      if (typeof window.faker !== 'undefined' && window.faker.person && typeof window.faker.person.fullName === 'function') {
+        witnessName = window.faker.person.fullName();
+      } else {
+        console.warn('Faker not available or API has changed. Using fallback for name generation.');
+        witnessName = 'John Doe';
+      }
       const witnessPhone = generatePhoneNumber();
       witnessInfo = `\nWitness: ${witnessName} (${witnessPhone})`;
     }
