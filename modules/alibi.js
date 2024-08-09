@@ -87,14 +87,35 @@ const activities = {
 let districts = [];
 let locations = [];
 
-export async function initialize(container, params = {}) {
+function loadFaker() {
+    return new Promise((resolve, reject) => {
+      if (typeof faker !== 'undefined') {
+        resolve(faker);
+      } else {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/@faker-js/faker/dist/faker.min.js';
+        script.onload = () => resolve(faker);
+        script.onerror = reject;
+        document.head.appendChild(script);
+      }
+    });
+  }
+
+  export async function initialize(container, params = {}) {
     if (!container || !(container instanceof HTMLElement)) {
       console.error('Invalid container provided to Alibi initialize function');
       return;
     }
   
     console.log('Initializing Alibi app with params:', params);
-    await setupAlibiApp(container);
+    
+    try {
+      await loadFaker();
+      await setupAlibiApp(container);
+    } catch (error) {
+      console.error('Error initializing Alibi app:', error);
+      container.innerHTML = '<p>Error loading Alibi app. Please try again later.</p>';
+    }
   }
 
 async function setupAlibiApp(container) {
