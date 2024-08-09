@@ -2,6 +2,7 @@ import json
 import os
 import sys
 from github import Github
+from datetime import datetime
 
 print(f"Python version: {sys.version}")
 print(f"Python path: {sys.executable}")
@@ -28,11 +29,25 @@ with open(os.environ['GITHUB_EVENT_PATH'], 'r') as event_file:
 # Extract information from the issue body
 issue_body = event_data['issue']['body']
 lines = issue_body.split('\n')
+
+# Parse the data correctly
+title = lines[0].strip()
+date = lines[1].strip()
+url = lines[2].strip()
+body = '\n'.join(lines[4:]).strip()  # Skip the empty line after URL
+
+# Format the date correctly
+try:
+    parsed_date = datetime.strptime(date, "%Y-%m-%d")
+    formatted_date = parsed_date.strftime("%Y-%m-%d")
+except ValueError:
+    formatted_date = date  # Keep the original if parsing fails
+
 announcement = {
-    'title': event_data['issue']['title'],
-    'date': event_data['issue']['created_at'],
-    'url': event_data['issue']['html_url'],
-    'body': '\n'.join(lines)
+    'title': title,
+    'date': formatted_date,
+    'url': url,
+    'body': body
 }
 
 # Read the existing announcements file
