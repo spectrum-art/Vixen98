@@ -331,14 +331,14 @@ function generateAlibi(container, isRandom) {
 
     const generateWitness = container.querySelector('#generate-witness').checked;
     let witnessInfo = '';
-
+  
     if (generateWitness) {
-        const witnessName = faker.name.fullName();
-        const witnessPhone = generatePhoneNumber();
-        witnessInfo = `\nWitness: ${witnessName} (${witnessPhone})`;
+      const witnessName = faker.person.fullName();
+      const witnessPhone = generatePhoneNumber();
+      witnessInfo = `\nWitness: ${witnessName} (${witnessPhone})`;
     }
   
-    const alibi = `At ${randomTime}, you were at ${location.name} (${location.area}), ${activity}. Witness: ${witnessInfo}`;
+    const alibi = `At ${randomTime}, you were at ${location.name} (${location.area}), ${activity}.${witnessInfo}`;
     displayAlibi(container, alibi);
   }
 
