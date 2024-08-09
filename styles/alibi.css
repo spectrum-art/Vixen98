@@ -1,6 +1,6 @@
 .alibi-app {
-    font-family: Arial, sans-serif;
-    font-size: 14pt;
+    font-family: "Pixelated MS Sans Serif", Arial;
+    font-size: 13pt;
     padding: 20px;
     height: 100%;
     display: flex;
@@ -14,6 +14,7 @@
   
   p {
     text-align: center;
+    font-size: 11pt;
     margin-bottom: 20px;
   }
   
@@ -55,7 +56,7 @@
   button {
     margin: 0 10px;
     padding: 10px 20px;
-    font-size: 14pt;
+    font-size: 10pt;
     cursor: pointer;
   }
   
