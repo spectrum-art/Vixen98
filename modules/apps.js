@@ -181,7 +181,7 @@ export const apps = {
     }
   },
 
-  Alibi: {
+  alibi: {
     id: 'alibi',
     name: 'Alibi',
     type: 'app',
@@ -191,12 +191,11 @@ export const apps = {
     jsFiles: ['alibi.js'],
     cssFiles: ['alibi.css'],
     window: {
-      width: '50%',
-      height: '50%',
-      minWidth: '500px',
-      minHeight: '500px'
-    }
-  },
+      width: '90%',
+      height: '90%',
+      minWidth: '600px',
+      minHeight: '400px'
+    },
 };
 
 export const getAppById = (id) => apps[id];
