@@ -1,5 +1,5 @@
 import { initializeDesktop } from './modules/desktop.js';
-import { initializeDefaultCredentials, checkStoredCredentials } from './modules/auth.js';
+import { initializeAuth, initializeDefaultCredentials, checkStoredCredentials } from './modules/auth.js';
 import { initializeRouting } from './modules/routing.js';
 import { apps, getAppById } from './modules/apps.js';
 import { EventBus } from './modules/utils.js';
