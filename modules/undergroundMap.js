@@ -158,5 +158,5 @@ export function initialize(container, params = {}) {
         }
     `;
     document.head.appendChild(style);
-    map.setMaxBounds([[-3750, -3750], [3750, 3750]]);
+//    map.setMaxBounds([[-3750, -3750], [3750, 3750]]);
 }
