@@ -1,4 +1,4 @@
-import { apps } from './apps.js';
+import { apps, getAppById } from './apps.js';
 import { EventBus } from './utils.js';
 import { openApp } from '../main.js';
 import { checkAppAccess } from './auth.js';
