@@ -24,8 +24,8 @@ export function initialize(container, params = {}) {
         crs: L.CRS.Simple,
         minZoom: MIN_ZOOM,
         maxZoom: MAX_ZOOM,
-        zoomSnap: 1,
-        zoomDelta: 1,
+        zoomSnap: 0.25,
+        zoomDelta: 0.25,
         wheelPxPerZoomLevel: 120,
         zoomAnimation: true,
         markerZoomAnimation: true,
@@ -36,12 +36,17 @@ export function initialize(container, params = {}) {
     const layers = {};
     const controls = L.control.layers(null, null, { position: 'topright' }).addTo(map);
 
-    // Add tile layers
+    const southWest = map.unproject([0, ORIGINAL_IMAGE_SIZE], MAX_ZOOM);
+    const northEast = map.unproject([ORIGINAL_IMAGE_SIZE, 0], MAX_ZOOM);
+    const bounds = new L.LatLngBounds(southWest, northEast);
+
     TILE_LAYERS.forEach((layerName, index) => {
         const layer = L.gridLayer({
-            tileSize: ORIGINAL_IMAGE_SIZE / Math.pow(2, MAX_ZOOM),
             minZoom: MIN_ZOOM,
             maxZoom: MAX_ZOOM,
+            tileSize: ORIGINAL_IMAGE_SIZE / Math.pow(2, MAX_ZOOM),
+            noWrap: true,
+            bounds: bounds,
             opacity: layerName === 'Surface' ? 0.5 : 1,
             className: `underground-layer-${layerName.toLowerCase()}`
         });
@@ -70,7 +75,6 @@ export function initialize(container, params = {}) {
         controls.addOverlay(layer, layerName);
     });
 
-    // Add pin layers
     PIN_LAYERS.forEach(layerName => {
         const markerGroup = L.layerGroup();
 
@@ -78,7 +82,8 @@ export function initialize(container, params = {}) {
             .then(response => response.json())
             .then(data => {
                 data.forEach(pin => {
-                    const marker = L.marker([pin.y, pin.x], {
+                    const latlng = map.unproject([pin.x, pin.y], MAX_ZOOM);
+                    const marker = L.marker(latlng, {
                         icon: L.divIcon({
                             html: pin.icon,
                             className: 'map-pin',
@@ -95,15 +100,18 @@ export function initialize(container, params = {}) {
         controls.addOverlay(markerGroup, layerName);
     });
 
-    const mapSize = ORIGINAL_IMAGE_SIZE;
-    map.setView([mapSize / 2, mapSize / 2], MIN_ZOOM);
-    map.setMaxBounds([[0, 0], [mapSize, mapSize]]);
+    map.fitBounds(bounds);
+    map.setMaxBounds([[-3750, -3750], [3750, 3750]]);
 
     const resizeMap = debounce(() => {
-        const newSize = Math.min(container.clientWidth, container.clientHeight);
-        container.style.width = `${newSize}px`;
-        container.style.height = `${newSize}px`;
+        const windowElement = container.closest('.window');
+        if (windowElement) {
+            const newSize = Math.min(windowElement.clientWidth, windowElement.clientHeight);
+            container.style.width = `${newSize}px`;
+            container.style.height = `${newSize}px`;
+        }
         map.invalidateSize({ animate: false, pan: false });
+        map.fitBounds(bounds);
     }, 250);
 
     resizeMap();
@@ -159,12 +167,9 @@ export function initialize(container, params = {}) {
     `;
     document.head.appendChild(style);
 
-    // Force removal of loading indicator after a timeout
     setTimeout(() => {
         if (container.contains(loadingIndicator)) {
             container.removeChild(loadingIndicator);
         }
     }, 5000);
-
-    map.setMaxBounds([[-3750, -3750], [3750, 3750]]);
 }
