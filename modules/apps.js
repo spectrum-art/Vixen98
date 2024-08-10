@@ -172,9 +172,9 @@ export const apps = {
     jsFiles: ['undergroundMap.js'],
     cssFiles: ['undergroundMap.css'],
     window: {
-      width: '70%',
+      width: '67%',
       height: '95%',
-      minWidth: '700px',
+      minWidth: '670px',
       minHeight: '950px'
     }
   },
