@@ -110,6 +110,8 @@ export function checkStoredCredentials() {
 }
 
 function clearStoredCredentials() {
+    console.log(localStorage.getItem('accessToken'));
+    console.log(localStorage.getItem('lastLogin'));
     console.log('Clearing stored credentials');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('lastLogin');
