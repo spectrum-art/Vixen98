@@ -1,6 +1,9 @@
 import { debounce } from './utils.js';
 
-const LAYER_ORDER = ['Base', 'Vendors', 'Entrances', 'Surface', 'Surface Labels'];
+const TILE_LAYERS = ['Base', 'Surface'];
+const PIN_LAYERS = ['Vendors', 'Entrances', 'Surface Labels'];
+const MAX_ZOOM = 4;
+const MIN_ZOOM = 0;
 
 export function initialize(container, params = {}) {
     if (!container || !(container instanceof HTMLElement)) {
@@ -18,53 +21,91 @@ export function initialize(container, params = {}) {
 
     const map = L.map(container, {
         crs: L.CRS.Simple,
-        minZoom: -2,
-        maxZoom: 2,
-        zoomSnap: 0.1,
-        zoomDelta: 0.1,
-        zoomControl: false,
+        minZoom: MIN_ZOOM,
+        maxZoom: MAX_ZOOM,
+        zoomSnap: 0.25,
+        zoomDelta: 0.25,
+        wheelPxPerZoomLevel: 120,
+        zoomAnimation: true,
+        zoomAnimationThreshold: 4,
+        fadeAnimation: true,
+        markerZoomAnimation: true,
+        preferCanvas: true,
         attributionControl: false
     });
 
     const layers = {};
     const controls = L.control.layers(null, null, { position: 'topright' }).addTo(map);
 
-    L.imageOverlay('/images/black_pixel.png', [[0, 0], [1000, 1000]], {
-        interactive: false,
-        className: 'black-background-layer'
-    }).addTo(map);
+    TILE_LAYERS.forEach((layerName, index) => {
+        const layer = L.gridLayer({
+            minZoom: MIN_ZOOM,
+            maxZoom: MAX_ZOOM,
+            opacity: layerName === 'Surface' ? 0.5 : 1,
+            className: `underground-layer-${layerName.toLowerCase()}`
+        });
 
-    [...LAYER_ORDER].reverse().forEach((layerName) => {
-        const imageUrl = layerName === 'Surface Labels' 
-            ? '/images/SewerMapSurfaceLabels.png'
-            : `/images/SewerMap${layerName}.png`;
-        
-        const layer = L.imageOverlay(imageUrl, [[0, 0], [1000, 1000]]);
-        
-        if (layerName === 'Surface') {
-            layer.setOpacity(0.5);
-        }
+        layer.createTile = function(coords) {
+            const tile = document.createElement('img');
+            const size = this.getTileSize();
+            tile.width = size.x;
+            tile.height = size.y;
+            
+            if (coords.z < 2) {
+                tile.src = `/images/underground_map/${layerName}/zoom_${coords.z}.png`;
+            } else {
+                const quadrant = 
+                    (coords.x % 2 === 0 ? 'left' : 'right') + 
+                    (coords.y % 2 === 0 ? 'top' : 'bottom');
+                tile.src = `/images/underground_map/${layerName}/zoom_${coords.z}_${quadrant}.png`;
+            }
 
+            return tile;
+        };
+
+        layer.addTo(map);
         layers[layerName] = layer;
-        
-        if (layerName !== 'Surface' && layerName !== 'Surface Labels') {
-            layer.addTo(map);
-        }
+        controls.addOverlay(layer, layerName);
     });
 
-    LAYER_ORDER.forEach((layerName) => {
-        controls.addOverlay(layers[layerName], layerName);
+    PIN_LAYERS.forEach(layerName => {
+        const markerGroup = L.markerClusterGroup({
+            maxClusterRadius: 50,
+            spiderfyOnMaxZoom: false,
+            showCoverageOnHover: false,
+            zoomToBoundsOnClick: true
+        });
+
+        fetch(`/data/${layerName.toLowerCase().replace(' ', '_')}.json`)
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(pin => {
+                    const marker = L.marker([pin.y, pin.x], {
+                        icon: L.divIcon({
+                            html: pin.icon,
+                            className: 'map-pin',
+                            iconSize: [20, 20]
+                        })
+                    });
+                    marker.bindTooltip(pin.label);
+                    markerGroup.addLayer(marker);
+                });
+            })
+            .catch(error => console.error(`Error loading ${layerName} data:`, error));
+
+        layers[layerName] = markerGroup;
+        controls.addOverlay(markerGroup, layerName);
     });
+
+    const mapSize = 6500 * Math.pow(2, MAX_ZOOM - MIN_ZOOM);
+    map.setView([mapSize / 2, mapSize / 2], MIN_ZOOM);
+    map.setMaxBounds([[0, 0], [mapSize, mapSize]]);
 
     const resizeMap = debounce(() => {
         const newSize = Math.min(container.clientWidth, container.clientHeight);
         container.style.width = `${newSize}px`;
         container.style.height = `${newSize}px`;
-        map.invalidateSize();
-        
-        map.fitBounds([[0, 0], [1000, 1000]], {
-            animate: false
-        });
+        map.invalidateSize({ animate: false, pan: false });
     }, 250);
 
     resizeMap();
@@ -86,7 +127,7 @@ export function initialize(container, params = {}) {
         observer.observe(windowElement, { attributes: true });
     }
 
-    map.whenReady(() => {
+    map.on('load', () => {
         container.removeChild(loadingIndicator);
     });
 
@@ -109,9 +150,13 @@ export function initialize(container, params = {}) {
         .leaflet-control-layers-selector:not(:checked) + span {
             color: #808080;
         }
-        .black-background-layer {
-            z-index: -1;
+        .map-pin {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
         }
     `;
     document.head.appendChild(style);
+    map.setMaxBounds([[-3750, -3750], [3750, 3750]]);
 }

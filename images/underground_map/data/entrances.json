@@ -1,0 +1,38 @@
+[
+    {
+      "x": 1408,
+      "y": 356,
+      "icon": "🟢",
+      "label": "Strawberry"
+    },
+    {
+      "x": 4252,
+      "y": 300,
+      "icon": "🟢",
+      "label": "Davis"
+    },
+    {
+      "x": 5250,
+      "y": 2620,
+      "icon": "🟢",
+      "label": "Roy Lowenstein"
+    },
+    {
+      "x": 1040,
+      "y": 4824,
+      "icon": "🟢",
+      "label": "Forum"
+    },
+    {
+      "x": 2800,
+      "y": 5565,
+      "icon": "🟢",
+      "label": "Grove"
+    },
+    {
+      "x": 5224,
+      "y": 5764,
+      "icon": "🟢",
+      "label": "Dutch London"
+    }
+  ]

@@ -1,0 +1,116 @@
+[
+    {
+      "x": 2110,
+      "y": 980,
+      "icon": "⛽",
+      "label": "Gas Station"
+    },
+    {
+      "x": 1340,
+      "y": 1950,
+      "icon": "👠",
+      "label": "Vanilla Unicorn"
+    },
+    {
+      "x": 1630,
+      "y": 2245,
+      "icon": "💵",
+      "label": "Cash Exchange"
+    },
+    {
+      "x": 1070,
+      "y": 2760,
+      "icon": "🛒",
+      "label": "Convenience Store"
+    },
+    {
+      "x": 1560,
+      "y": 2760,
+      "icon": "👕",
+      "label": "Clothing Store"
+    },
+    {
+      "x": 1880,
+      "y": 3340,
+      "icon": "🥫",
+      "label": "Grocery Store"
+    },
+    {
+      "x": 2855,
+      "y": 1550,
+      "icon": "✳️",
+      "label": "Hospital"
+    },
+    {
+      "x": 3350,
+      "y": 2050,
+      "icon": "🅿️",
+      "label": "Hospital Garage"
+    },
+    {
+      "x": 1620,
+      "y": 2530,
+      "icon": "🅿️",
+      "label": "Davis PD Garage"
+    },
+    {
+      "x": 2900,
+      "y": 2810,
+      "icon": "💻",
+      "label": "PC Store"
+    },
+    {
+      "x": 3950,
+      "y": 2950,
+      "icon": "🏛️",
+      "label": "City Hall"
+    },
+    {
+      "x": 2425,
+      "y": 3600,
+      "icon": "🧺",
+      "label": "Laundromat"
+    },
+    {
+      "x": 2500,
+      "y": 3800,
+      "icon": "⚡",
+      "label": "EV Charging Station"
+    },
+    {
+      "x": 3500,
+      "y": 3600,
+      "icon": "🚒",
+      "label": "Fire Department"
+    },
+    {
+      "x": 3410,
+      "y": 4270,
+      "icon": "✂️",
+      "label": "Barbershop"
+    },
+    {
+      "x": 3540,
+      "y": 4270,
+      "icon": "💍",
+      "label": "Pawn Shop"
+    },
+    {
+      "x": 3910,
+      "y": 5870,
+      "icon": "💵",
+      "label": "Cash Exchange"
+    },
+    {
+      "x": 2220,
+      "y": 3830,
+      "icon": "🚗",
+      "label": "Mosley's"
+    },
+    {
+      "x": 2600,
+      "y": 5380,
+      "icon": "🛒",
+      "label": "Convenience Store"
+    }
+  ]
