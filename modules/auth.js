@@ -65,22 +65,54 @@ export function storeCredentials(token) {
     localStorage.setItem('lastLogin', Date.now().toString());
 }
 
+function isValidToken(token) {
+    // Add more comprehensive checks if needed
+    return typeof token === 'string' && token.length > 0;
+}
+
+function isValidTimestamp(timestamp) {
+    const parsedTimestamp = parseInt(timestamp);
+    return !isNaN(parsedTimestamp) && parsedTimestamp > 0;
+}
+
 export function checkStoredCredentials() {
-    const token = localStorage.getItem('accessToken');
-    const lastLogin = localStorage.getItem('lastLogin');
-    const currentTime = Date.now();
+    try {
+        const token = localStorage.getItem('accessToken');
+        const lastLogin = localStorage.getItem('lastLogin');
+        const currentTime = Date.now();
 
-    if (token && lastLogin && (currentTime - parseInt(lastLogin) < 12 * 60 * 60 * 1000)) {
-        const accessLevel = verifyToken(token);
-        if (accessLevel > 1) {
-            EventBus.publish('accessLevelChanged', accessLevel);
-            return true;
+        if (!isValidToken(token) || !isValidTimestamp(lastLogin)) {
+            console.warn('Invalid stored credentials detected');
+            clearStoredCredentials();
+            return false;
         }
-    }
 
+        const loginTimestamp = parseInt(lastLogin);
+        if (currentTime - loginTimestamp < 12 * 60 * 60 * 1000) {
+            const accessLevel = verifyToken(token);
+            if (accessLevel > 1) {
+                EventBus.publish('accessLevelChanged', accessLevel);
+                return true;
+            } else {
+                console.warn('Invalid access level detected');
+            }
+        } else {
+            console.log('Stored credentials have expired');
+        }
+
+        clearStoredCredentials();
+        return false;
+    } catch (error) {
+        console.error('Error checking stored credentials:', error);
+        clearStoredCredentials();
+        return false;
+    }
+}
+
+function clearStoredCredentials() {
+    console.log('Clearing stored credentials');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('lastLogin');
-    return false;
 }
 
 export function getAccessLevel() {
