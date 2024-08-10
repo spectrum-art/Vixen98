@@ -58,14 +58,23 @@ export function initialize(container, params = {}) {
             tile.height = size.y;
             
             const zoom = coords.z;
+            let src;
             if (zoom < 2) {
-                tile.src = `/images/underground_map/${layerName}/zoom_${zoom}.png`;
+                src = `/images/underground_map/${layerName}/zoom_${zoom}.png`;
             } else {
                 const quadrant = 
                     (coords.y % 2 === 0 ? 'top' : 'bottom') + 
                     (coords.x % 2 === 0 ? 'left' : 'right');
-                tile.src = `/images/underground_map/${layerName}/zoom_${zoom}_${quadrant}.png`;
+                src = `/images/underground_map/${layerName}/zoom_${zoom}_${quadrant}.png`;
             }
+            
+            console.log(`Loading tile: ${src}, Coords: ${JSON.stringify(coords)}, Size: ${size.x}x${size.y}`);
+            tile.src = src;
+
+            tile.onerror = function() {
+                console.error(`Failed to load tile: ${src}`);
+                tile.style.background = 'red';
+            };
 
             return tile;
         };
