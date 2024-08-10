@@ -36,6 +36,7 @@ export function initialize(container, params = {}) {
     const layers = {};
     const controls = L.control.layers(null, null, { position: 'topright' }).addTo(map);
 
+    // Add tile layers
     TILE_LAYERS.forEach((layerName, index) => {
         const layer = L.gridLayer({
             tileSize: ORIGINAL_IMAGE_SIZE / Math.pow(2, MAX_ZOOM),
@@ -51,7 +52,7 @@ export function initialize(container, params = {}) {
             tile.width = size.x;
             tile.height = size.y;
             
-            const zoom = this._getZoomForUrl();
+            const zoom = coords.z;
             if (zoom < 2) {
                 tile.src = `/images/underground_map/${layerName}/zoom_${zoom}.png`;
             } else {
@@ -69,6 +70,7 @@ export function initialize(container, params = {}) {
         controls.addOverlay(layer, layerName);
     });
 
+    // Add pin layers
     PIN_LAYERS.forEach(layerName => {
         const markerGroup = L.layerGroup();
 
@@ -124,7 +126,9 @@ export function initialize(container, params = {}) {
     }
 
     map.on('load', () => {
-        container.removeChild(loadingIndicator);
+        if (container.contains(loadingIndicator)) {
+            container.removeChild(loadingIndicator);
+        }
     });
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -155,6 +159,7 @@ export function initialize(container, params = {}) {
     `;
     document.head.appendChild(style);
 
+    // Force removal of loading indicator after a timeout
     setTimeout(() => {
         if (container.contains(loadingIndicator)) {
             container.removeChild(loadingIndicator);
