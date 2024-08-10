@@ -1,5 +1,3 @@
-// apps.js
-
 export const apps = {
   system: {
     id: 'system',
