@@ -2,7 +2,7 @@ import { apps, getAppById } from './apps.js';
 import { EventBus } from './utils.js';
 
 const SALT = "server";
-const defaultAccess = 1;
+const DEFAULT_ACCESS_LEVEL = 1;
 
 const accessLevelHashes = {
     2: '1b055790275fe1228786d33b8897a3fa6fb26191c1eafe3b2074b096899a821d',
@@ -11,6 +11,7 @@ const accessLevelHashes = {
 
 export function initializeAuth() {
     document.getElementById('start-button').addEventListener('click', handleStartButtonClick);
+    initializeDefaultCredentials();
     checkStoredCredentials();
 }
 
@@ -36,10 +37,10 @@ function validatePassword(password) {
             return generateToken(parseInt(accessLevel));
         }
     }
-    return generateToken(defaultAccess);
+    return generateToken(DEFAULT_ACCESS_LEVEL);
 }
 
-function generateToken(accessLevel) {
+export function generateToken(accessLevel) {
     const payload = {
         accessLevel: accessLevel,
         exp: Date.now() + 86400000 // 24 hours
@@ -57,7 +58,7 @@ export function verifyToken(token) {
     } catch (error) {
         console.error('Invalid token');
     }
-    return defaultAccess;
+    return DEFAULT_ACCESS_LEVEL;
 }
 
 export function storeCredentials(token) {
@@ -66,7 +67,6 @@ export function storeCredentials(token) {
 }
 
 function isValidToken(token) {
-    // Add more comprehensive checks if needed
     return typeof token === 'string' && token.length > 0;
 }
 
@@ -75,51 +75,59 @@ function isValidTimestamp(timestamp) {
     return !isNaN(parsedTimestamp) && parsedTimestamp > 0;
 }
 
+export function initializeDefaultCredentials() {
+    if (!localStorage.getItem('accessToken')) {
+        const defaultToken = generateToken(DEFAULT_ACCESS_LEVEL);
+        storeCredentials(defaultToken);
+        console.log('Default credentials initialized');
+    }
+}
+
 export function checkStoredCredentials() {
     try {
         const token = localStorage.getItem('accessToken');
         const lastLogin = localStorage.getItem('lastLogin');
         const currentTime = Date.now();
 
-        console.log('Checking stored credentials:', { token: token ? 'exists' : 'null', lastLogin: lastLogin ? 'exists' : 'null' });
+        console.log('Checking stored credentials:', { 
+            token: token ? 'exists' : 'null', 
+            lastLogin: lastLogin ? 'exists' : 'null' 
+        });
 
-        if (token === null && lastLogin === null) {
-            console.log('No stored credentials found. This may be a new session.');
-            return false;
+        if (!token || !lastLogin) {
+            console.log('Incomplete credentials found. Reinitializing defaults.');
+            initializeDefaultCredentials();
+            return true; // Credentials are now valid, even if they're default
         }
 
         if (!isValidToken(token) || !isValidTimestamp(lastLogin)) {
             console.warn('Invalid stored credentials detected');
             clearStoredCredentials();
-            return false;
+            initializeDefaultCredentials();
+            return true;
         }
 
         const loginTimestamp = parseInt(lastLogin);
-        if (currentTime - loginTimestamp < 12 * 60 * 60 * 1000) {
+        if (currentTime - loginTimestamp < 24 * 60 * 60 * 1000) { // 24 hours
             const accessLevel = verifyToken(token);
-            if (accessLevel > 1) {
-                console.log('Valid credentials found. Access level:', accessLevel);
-                EventBus.publish('accessLevelChanged', accessLevel);
-                return true;
-            } else {
-                console.warn('Invalid access level detected');
-            }
+            console.log('Valid credentials found. Access level:', accessLevel);
+            EventBus.publish('accessLevelChanged', accessLevel);
+            return true;
         } else {
             console.log('Stored credentials have expired');
+            clearStoredCredentials();
+            initializeDefaultCredentials();
+            return true;
         }
-
-        clearStoredCredentials();
-        return false;
     } catch (error) {
         console.error('Error checking stored credentials:', error);
         clearStoredCredentials();
-        return false;
+        initializeDefaultCredentials();
+        return true;
     }
 }
 
 function clearStoredCredentials() {
-    console.log(localStorage.getItem('accessToken'));
-    console.log(localStorage.getItem('lastLogin'));
     console.log('Clearing stored credentials');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('lastLogin');
@@ -127,7 +135,7 @@ function clearStoredCredentials() {
 
 export function getAccessLevel() {
     const token = localStorage.getItem('accessToken');
-    return token ? verifyToken(token) : 1;
+    return token ? verifyToken(token) : DEFAULT_ACCESS_LEVEL;
 }
 
 export function checkAppAccess(appId) {

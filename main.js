@@ -1,5 +1,5 @@
 import { initializeDesktop } from './modules/desktop.js';
-import { initializeAuth, checkStoredCredentials, checkAppAccess } from './modules/auth.js';
+import { initializeDefaultCredentials, checkStoredCredentials } from './modules/auth.js';
 import { initializeRouting } from './modules/routing.js';
 import { apps, getAppById } from './modules/apps.js';
 import { EventBus } from './modules/utils.js';
@@ -10,8 +10,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const splashGif = document.getElementById('splash-gif');
     const desktopContainer = document.getElementById('desktop-container');
     
-    console.log('DOM content loaded, initializing modules');
-
     function removeSplashScreen() {
         splashScreen.classList.add('fade-out');
         splashScreen.addEventListener('animationend', function() {
@@ -25,7 +23,8 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(removeSplashScreen, 8500);
     }
 
-    // Only check stored credentials once
+    console.log('DOM content loaded, initializing modules');
+    initializeDefaultCredentials();
     if (checkStoredCredentials()) {
         console.log('Valid credentials found, removing splash screen');
         removeSplashScreen();
@@ -38,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeAuth();
     initializeRouting();
 });
+
 export function openApp(appId, params = {}) {
     console.log('Opening app:', appId, 'with params:', params);
     const app = getAppById(appId);
