@@ -81,6 +81,13 @@ export function checkStoredCredentials() {
         const lastLogin = localStorage.getItem('lastLogin');
         const currentTime = Date.now();
 
+        console.log('Checking stored credentials:', { token: token ? 'exists' : 'null', lastLogin: lastLogin ? 'exists' : 'null' });
+
+        if (token === null && lastLogin === null) {
+            console.log('No stored credentials found. This may be a new session.');
+            return false;
+        }
+
         if (!isValidToken(token) || !isValidTimestamp(lastLogin)) {
             console.warn('Invalid stored credentials detected');
             clearStoredCredentials();
@@ -91,6 +98,7 @@ export function checkStoredCredentials() {
         if (currentTime - loginTimestamp < 12 * 60 * 60 * 1000) {
             const accessLevel = verifyToken(token);
             if (accessLevel > 1) {
+                console.log('Valid credentials found. Access level:', accessLevel);
                 EventBus.publish('accessLevelChanged', accessLevel);
                 return true;
             } else {
@@ -107,6 +115,12 @@ export function checkStoredCredentials() {
         clearStoredCredentials();
         return false;
     }
+}
+
+function clearStoredCredentials() {
+    console.log('Clearing stored credentials');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('lastLogin');
 }
 
 function clearStoredCredentials() {

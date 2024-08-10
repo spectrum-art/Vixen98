@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const splashGif = document.getElementById('splash-gif');
     const desktopContainer = document.getElementById('desktop-container');
     
+    console.log('DOM content loaded, initializing modules');
+
     function removeSplashScreen() {
         splashScreen.classList.add('fade-out');
         splashScreen.addEventListener('animationend', function() {
@@ -23,18 +25,19 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(removeSplashScreen, 8500);
     }
 
+    // Only check stored credentials once
     if (checkStoredCredentials()) {
+        console.log('Valid credentials found, removing splash screen');
         removeSplashScreen();
     } else {
+        console.log('No valid credentials, starting splash screen');
         startSplashScreen();
     }
 
-    console.log('DOM content loaded, initializing modules');
     initializeDesktop();
     initializeAuth();
     initializeRouting();
 });
-
 export function openApp(appId, params = {}) {
     console.log('Opening app:', appId, 'with params:', params);
     const app = getAppById(appId);
