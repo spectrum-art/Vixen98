@@ -4,6 +4,7 @@ const TILE_LAYERS = ['Base', 'Surface'];
 const PIN_LAYERS = ['Vendors', 'Entrances', 'Surface Labels'];
 const MAX_ZOOM = 4;
 const MIN_ZOOM = 0;
+const ORIGINAL_IMAGE_SIZE = 6500;
 
 export function initialize(container, params = {}) {
     if (!container || !(container instanceof HTMLElement)) {
@@ -23,12 +24,10 @@ export function initialize(container, params = {}) {
         crs: L.CRS.Simple,
         minZoom: MIN_ZOOM,
         maxZoom: MAX_ZOOM,
-        zoomSnap: 0.25,
-        zoomDelta: 0.25,
+        zoomSnap: 1,
+        zoomDelta: 1,
         wheelPxPerZoomLevel: 120,
         zoomAnimation: true,
-        zoomAnimationThreshold: 4,
-        fadeAnimation: true,
         markerZoomAnimation: true,
         preferCanvas: true,
         attributionControl: false
@@ -39,6 +38,7 @@ export function initialize(container, params = {}) {
 
     TILE_LAYERS.forEach((layerName, index) => {
         const layer = L.gridLayer({
+            tileSize: ORIGINAL_IMAGE_SIZE / Math.pow(2, MAX_ZOOM),
             minZoom: MIN_ZOOM,
             maxZoom: MAX_ZOOM,
             opacity: layerName === 'Surface' ? 0.5 : 1,
@@ -51,13 +51,14 @@ export function initialize(container, params = {}) {
             tile.width = size.x;
             tile.height = size.y;
             
-            if (coords.z < 2) {
-                tile.src = `/images/underground_map/${layerName}/zoom_${coords.z}.png`;
+            const zoom = this._getZoomForUrl();
+            if (zoom < 2) {
+                tile.src = `/images/underground_map/${layerName}/zoom_${zoom}.png`;
             } else {
                 const quadrant = 
                     (coords.y % 2 === 0 ? 'top' : 'bottom') + 
                     (coords.x % 2 === 0 ? 'left' : 'right');
-                tile.src = `/images/underground_map/${layerName}/zoom_${coords.z}_${quadrant}.png`;
+                tile.src = `/images/underground_map/${layerName}/zoom_${zoom}_${quadrant}.png`;
             }
 
             return tile;
@@ -69,12 +70,7 @@ export function initialize(container, params = {}) {
     });
 
     PIN_LAYERS.forEach(layerName => {
-        const markerGroup = L.markerClusterGroup({
-            maxClusterRadius: 50,
-            spiderfyOnMaxZoom: false,
-            showCoverageOnHover: false,
-            zoomToBoundsOnClick: true
-        });
+        const markerGroup = L.layerGroup();
 
         fetch(`/data/${layerName.toLowerCase().replace(' ', '_')}.json`)
             .then(response => response.json())
@@ -97,7 +93,7 @@ export function initialize(container, params = {}) {
         controls.addOverlay(markerGroup, layerName);
     });
 
-    const mapSize = 6500 * Math.pow(2, MAX_ZOOM - MIN_ZOOM);
+    const mapSize = ORIGINAL_IMAGE_SIZE;
     map.setView([mapSize / 2, mapSize / 2], MIN_ZOOM);
     map.setMaxBounds([[0, 0], [mapSize, mapSize]]);
 
@@ -158,5 +154,12 @@ export function initialize(container, params = {}) {
         }
     `;
     document.head.appendChild(style);
-//    map.setMaxBounds([[-3750, -3750], [3750, 3750]]);
+
+    setTimeout(() => {
+        if (container.contains(loadingIndicator)) {
+            container.removeChild(loadingIndicator);
+        }
+    }, 5000);
+
+    map.setMaxBounds([[-3750, -3750], [3750, 3750]]);
 }
