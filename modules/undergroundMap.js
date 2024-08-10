@@ -55,8 +55,8 @@ export function initialize(container, params = {}) {
                 tile.src = `/images/underground_map/${layerName}/zoom_${coords.z}.png`;
             } else {
                 const quadrant = 
-                    (coords.x % 2 === 0 ? 'left' : 'right') + 
-                    (coords.y % 2 === 0 ? 'top' : 'bottom');
+                    (coords.y % 2 === 0 ? 'top' : 'bottom') + 
+                    (coords.x % 2 === 0 ? 'left' : 'right');
                 tile.src = `/images/underground_map/${layerName}/zoom_${coords.z}_${quadrant}.png`;
             }
 
