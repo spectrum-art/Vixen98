@@ -3,7 +3,7 @@ import { debounce } from './utils.js';
 const TILE_LAYERS = ['Base', 'Surface'];
 const PIN_LAYERS = ['Vendors', 'Entrances', 'Surface Labels'];
 const MAX_ZOOM = 2;
-const MIN_ZOOM = 0;
+const MIN_ZOOM = -1;
 const ORIGINAL_IMAGE_SIZE = 6500;
 
 export function initialize(container, params = {}) {
@@ -102,7 +102,7 @@ export function initialize(container, params = {}) {
         const maxSize = Math.max(size.x, size.y);
         
         let resolution;
-        if (maxSize <= 1625 || zoom === 0) {
+        if (maxSize <= 1625 || zoom <= 0) {
             resolution = 'quarter';
         } else if (maxSize <= 3250 || zoom === 1) {
             resolution = 'half';
@@ -126,6 +126,7 @@ export function initialize(container, params = {}) {
             container.style.height = `${newSize}px`;
         }
         map.invalidateSize({ animate: false, pan: false });
+        
         map.fitBounds(bounds);
         updateImageResolution();
     }, 250);
@@ -183,7 +184,7 @@ export function initialize(container, params = {}) {
     `;
     document.head.appendChild(style);
 
-    setTimeout(() => {
+    `psetTimeout(() => {
         if (container.contains(loadingIndicator)) {
             container.removeChild(loadingIndicator);
         }
