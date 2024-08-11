@@ -92,7 +92,7 @@ export function initialize(container, params = {}) {
                     });
                     
                     if (layerName === 'Vendors' || layerName === 'Entrances') {
-                        const labelDirection = pin.x < ORIGINAL_IMAGE_SIZE / 2 ? 'right' : 'left';
+                        const labelDirection = pin.x > ORIGINAL_IMAGE_SIZE / 2 ? 'right' : 'left';
                         const labelOffset = labelDirection === 'right' ? [10, 0] : [-10, 0];
                         
                         marker.bindTooltip(pin.label, {
