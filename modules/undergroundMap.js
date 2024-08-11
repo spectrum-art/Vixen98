@@ -39,7 +39,7 @@ export function initialize(container, params = {}) {
     const southWest = map.unproject([0, ORIGINAL_IMAGE_SIZE], MAX_ZOOM);
     const northEast = map.unproject([ORIGINAL_IMAGE_SIZE, 0], MAX_ZOOM);
     const bounds = new L.LatLngBounds(southWest, northEast);
-s
+
     TILE_LAYERS.forEach((layerName, index) => {
         const layer = L.imageOverlay(`/images/${layerName}_quarter.png`, bounds, {
             opacity: layerName === 'Surface' ? 0.5 : 1,
