@@ -206,5 +206,5 @@ export function initialize(container, params = {}) {
         if (container.contains(loadingIndicator)) {
             container.removeChild(loadingIndicator);
         }
-    }, 5000);
+    }, 2500);
 }

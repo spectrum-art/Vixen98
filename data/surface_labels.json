@@ -48,7 +48,7 @@
       "label": "Hospital Garage"
     },
     {
-      "x": 1620,
+      "x": 3620,
       "y": 2530,
       "icon": "🅿️",
       "label": "Davis PD Garage"
@@ -96,14 +96,14 @@
       "label": "Pawn Shop"
     },
     {
-      "x": 3910,
-      "y": 5870,
+      "x": 5870,
+      "y": 3910,
       "icon": "💵",
       "label": "Cash Exchange"
     },
     {
       "x": 2220,
-      "y": 3830,
+      "y": 4830,
       "icon": "🚗",
       "label": "Mosley's"
     },
