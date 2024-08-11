@@ -2,7 +2,7 @@ import { debounce } from './utils.js';
 
 const TILE_LAYERS = ['Base', 'Surface'];
 const PIN_LAYERS = ['Vendors', 'Entrances', 'Surface Labels'];
-const MAX_ZOOM = 4;
+const MAX_ZOOM = 2;
 const MIN_ZOOM = 0;
 const ORIGINAL_IMAGE_SIZE = 6500;
 
@@ -24,8 +24,8 @@ export function initialize(container, params = {}) {
         crs: L.CRS.Simple,
         minZoom: MIN_ZOOM,
         maxZoom: MAX_ZOOM,
-        zoomSnap: 0.25,
-        zoomDelta: 0.25,
+        zoomSnap: 1,
+        zoomDelta: 1,
         wheelPxPerZoomLevel: 120,
         zoomAnimation: true,
         markerZoomAnimation: true,
@@ -39,45 +39,12 @@ export function initialize(container, params = {}) {
     const southWest = map.unproject([0, ORIGINAL_IMAGE_SIZE], MAX_ZOOM);
     const northEast = map.unproject([ORIGINAL_IMAGE_SIZE, 0], MAX_ZOOM);
     const bounds = new L.LatLngBounds(southWest, northEast);
-
+s
     TILE_LAYERS.forEach((layerName, index) => {
-        const layer = L.gridLayer({
-            minZoom: MIN_ZOOM,
-            maxZoom: MAX_ZOOM,
-            tileSize: ORIGINAL_IMAGE_SIZE / Math.pow(2, MAX_ZOOM),
-            noWrap: true,
-            bounds: bounds,
+        const layer = L.imageOverlay(`/images/${layerName}_quarter.png`, bounds, {
             opacity: layerName === 'Surface' ? 0.5 : 1,
             className: `underground-layer-${layerName.toLowerCase()}`
         });
-
-        layer.createTile = function(coords) {
-            const tile = document.createElement('img');
-            const size = this.getTileSize();
-            tile.width = size.x;
-            tile.height = size.y;
-            
-            const zoom = coords.z;
-            let src;
-            if (zoom < 2) {
-                src = `/images/underground_map/${layerName}/zoom_${zoom}.png`;
-            } else {
-                const quadrant = 
-                    (coords.y % 2 === 0 ? 'top' : 'bottom') + 
-                    (coords.x % 2 === 0 ? 'left' : 'right');
-                src = `/images/underground_map/${layerName}/zoom_${zoom}_${quadrant}.png`;
-            }
-            
-            console.log(`Loading tile: ${src}, Coords: ${JSON.stringify(coords)}, Size: ${size.x}x${size.y}`);
-            tile.src = src;
-
-            tile.onerror = function() {
-                console.error(`Failed to load tile: ${src}`);
-                tile.style.background = 'red';
-            };
-
-            return tile;
-        };
 
         layer.addTo(map);
         layers[layerName] = layer;
@@ -110,7 +77,32 @@ export function initialize(container, params = {}) {
     });
 
     map.fitBounds(bounds);
-    map.setMaxBounds([[-3750, -3750], [3750, 3750]]);
+    map.setMaxBounds(bounds.pad(0.5));
+
+    function updateImageResolution() {
+        const zoom = map.getZoom();
+        const size = map.getSize();
+        const maxSize = Math.max(size.x, size.y);
+        
+        let resolution;
+        if (maxSize <= 1625 || zoom === 0) {
+            resolution = 'quarter';
+        } else if (maxSize <= 3250 || zoom === 1) {
+            resolution = 'half';
+        } else {
+            resolution = 'full';
+        }
+
+        TILE_LAYERS.forEach(layerName => {
+            const newUrl = `/images/${layerName}_${resolution}.png`;
+            if (layers[layerName].getUrl() !== newUrl) {
+                layers[layerName].setUrl(newUrl);
+            }
+        });
+    }
+
+    map.on('zoomend resize', updateImageResolution);
+    updateImageResolution();
 
     const resizeMap = debounce(() => {
         const windowElement = container.closest('.window');
@@ -121,6 +113,7 @@ export function initialize(container, params = {}) {
         }
         map.invalidateSize({ animate: false, pan: false });
         map.fitBounds(bounds);
+        updateImageResolution();
     }, 250);
 
     resizeMap();
