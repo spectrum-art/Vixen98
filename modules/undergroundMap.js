@@ -92,7 +92,15 @@ export function initialize(container, params = {}) {
                     });
                     
                     if (layerName === 'Vendors' || layerName === 'Entrances') {
-                        marker.bindTooltip(pin.label, {permanent: true, direction: 'top', offset: [0, -10]});
+                        const labelDirection = pin.x < ORIGINAL_IMAGE_SIZE / 2 ? 'right' : 'left';
+                        const labelOffset = labelDirection === 'right' ? [10, 0] : [-10, 0];
+                        
+                        marker.bindTooltip(pin.label, {
+                            permanent: true,
+                            direction: labelDirection,
+                            offset: labelOffset,
+                            className: 'underground-map-label'
+                        });
                     }
                     
                     markerGroup.addLayer(marker);
@@ -203,6 +211,15 @@ export function initialize(container, params = {}) {
             align-items: center;
             justify-content: center;
             font-size: 16px;
+        }
+        .underground-map-label {
+            background-color: transparent;
+            border: none;
+            box-shadow: none;
+            font-family: inherit;
+            font-size: inherit;
+            color: inherit;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8), -1px -1px 2px rgba(0, 0, 0, 0.8), 1px -1px 2px rgba(0, 0, 0, 0.8), -1px 1px 2px rgba(0, 0, 0, 0.8);
         }
     `;
     document.head.appendChild(style);
