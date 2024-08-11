@@ -94,7 +94,7 @@ export function initialize(container, params = {}) {
         }
 
         TILE_LAYERS.forEach(layerName => {
-            const newUrl = `/images/${layerName}_${resolution}.png`;
+            const newUrl = `/images/underground_map/${layerName}_${resolution}.png`;
             if (layers[layerName].getUrl() !== newUrl) {
                 layers[layerName].setUrl(newUrl);
             }
