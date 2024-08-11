@@ -127,9 +127,9 @@ export function initialize(container, params = {}) {
         console.log(`Current zoom: ${zoom}, Map size: ${size.x}x${size.y}, Max size: ${maxSize}`);
 
         let resolution;
-        if (maxSize <= 1625 || zoom <= 0) {
+        if (zoom <= 0) {
             resolution = 'quarter';
-        } else if (maxSize <= 3250 || zoom === 1) {
+        } else if (zoom === 1) {
             resolution = 'half';
         } else {
             resolution = 'full';
@@ -144,7 +144,12 @@ export function initialize(container, params = {}) {
         });
     }
 
-    map.on('zoomend resize', updateImageResolution);
+    map.on('zoomend', function() {
+        console.log('Zoom ended, current zoom:', map.getZoom());
+        updateImageResolution();
+    });
+
+    map.on('resize', updateImageResolution);
     updateImageResolution();
 
     const resizeMap = debounce(() => {
