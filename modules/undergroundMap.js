@@ -40,12 +40,29 @@ export function initialize(container, params = {}) {
     const northEast = map.unproject([ORIGINAL_IMAGE_SIZE, 0], MAX_ZOOM);
     const bounds = new L.LatLngBounds(southWest, northEast);
 
-    TILE_LAYERS.forEach((layerName, index) => {
-        const layer = L.imageOverlay(`/images/${layerName}_quarter.png`, bounds, {
+    function createCustomOverlay(layerName, initialResolution = 'quarter') {
+        const img = new Image();
+        img.src = `/images/${layerName}_${initialResolution}.png`;
+        img.className = `underground-layer-${layerName.toLowerCase()}`;
+        
+        const overlay = L.imageOverlay(img.src, bounds, {
             opacity: layerName === 'Surface' ? 0.5 : 1,
             className: `underground-layer-${layerName.toLowerCase()}`
         });
 
+        overlay.updateResolution = function(resolution) {
+            const newSrc = `/images/underground_map/${layerName}_${resolution}.png`;
+            if (img.src !== newSrc) {
+                img.src = newSrc;
+                this.setUrl(newSrc);
+            }
+        };
+
+        return overlay;
+    }
+
+    TILE_LAYERS.forEach((layerName) => {
+        const layer = createCustomOverlay(layerName);
         layer.addTo(map);
         layers[layerName] = layer;
         controls.addOverlay(layer, layerName);
@@ -94,10 +111,7 @@ export function initialize(container, params = {}) {
         }
 
         TILE_LAYERS.forEach(layerName => {
-            const newUrl = `/images/underground_map/${layerName}_${resolution}.png`;
-            if (layers[layerName].getUrl() !== newUrl) {
-                layers[layerName].setUrl(newUrl);
-            }
+            layers[layerName].updateResolution(resolution);
         });
     }
 
