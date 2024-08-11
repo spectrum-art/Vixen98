@@ -221,9 +221,10 @@ export function initialize(container, params = {}) {
             background-color: transparent;
             border: none;
             box-shadow: none;
-            font-family: inherit;
+            font-family: "Pixelated MS Sans Serif", Arial;
+            color: white;
+            font-weight: bold;
             font-size: inherit;
-            color: inherit;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8), -1px -1px 2px rgba(0, 0, 0, 0.8), 1px -1px 2px rgba(0, 0, 0, 0.8), -1px 1px 2px rgba(0, 0, 0, 0.8);
         }
     `;
