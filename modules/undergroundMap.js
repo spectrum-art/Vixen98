@@ -43,7 +43,7 @@ export function initialize(container, params = {}) {
 
     function createCustomOverlay(layerName, initialResolution = 'quarter', defaultVisible = true) {
         const img = new Image();
-        img.src = `/images/underground_map/${layerName}_${initialResolution}.png`;
+        img.src = `/images/${layerName}_${initialResolution}.png`;
         img.className = `underground-layer-${layerName.toLowerCase()}`;
         
         const overlay = L.imageOverlay(img.src, bounds, {
@@ -52,8 +52,9 @@ export function initialize(container, params = {}) {
         });
 
         overlay.updateResolution = function(resolution) {
-            const newSrc = `/images/underground_map/${layerName}_${resolution}.png`;
+            const newSrc = `/images/${layerName}_${resolution}.png`;
             if (img.src !== newSrc) {
+                console.log(`Updating ${layerName} to ${resolution} resolution`);
                 img.src = newSrc;
                 this.setUrl(newSrc);
             }
@@ -115,6 +116,8 @@ export function initialize(container, params = {}) {
         const size = map.getSize();
         const maxSize = Math.max(size.x, size.y);
         
+        console.log(`Current zoom: ${zoom}, Map size: ${size.x}x${size.y}, Max size: ${maxSize}`);
+
         let resolution;
         if (maxSize <= 1625 || zoom <= 0) {
             resolution = 'quarter';
@@ -123,6 +126,8 @@ export function initialize(container, params = {}) {
         } else {
             resolution = 'full';
         }
+
+        console.log(`Selected resolution: ${resolution}`);
 
         TILE_LAYERS.forEach(layerName => {
             if (layers[layerName].updateResolution) {
