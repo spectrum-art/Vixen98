@@ -184,7 +184,7 @@ export function initialize(container, params = {}) {
     `;
     document.head.appendChild(style);
 
-    `psetTimeout(() => {
+    setTimeout(() => {
         if (container.contains(loadingIndicator)) {
             container.removeChild(loadingIndicator);
         }
