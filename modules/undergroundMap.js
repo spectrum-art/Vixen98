@@ -30,7 +30,8 @@ export function initialize(container, params = {}) {
         zoomAnimation: true,
         markerZoomAnimation: true,
         preferCanvas: true,
-        attributionControl: false
+        attributionControl: false,
+        backgroundColor: '#000000'
     });
 
     const layers = {};
@@ -40,9 +41,9 @@ export function initialize(container, params = {}) {
     const northEast = map.unproject([ORIGINAL_IMAGE_SIZE, 0], MAX_ZOOM);
     const bounds = new L.LatLngBounds(southWest, northEast);
 
-    function createCustomOverlay(layerName, initialResolution = 'quarter') {
+    function createCustomOverlay(layerName, initialResolution = 'quarter', defaultVisible = true) {
         const img = new Image();
-        img.src = `/images/${layerName}_${initialResolution}.png`;
+        img.src = `/images/underground_map/${layerName}_${initialResolution}.png`;
         img.className = `underground-layer-${layerName.toLowerCase()}`;
         
         const overlay = L.imageOverlay(img.src, bounds, {
@@ -58,18 +59,23 @@ export function initialize(container, params = {}) {
             }
         };
 
+        if (defaultVisible) {
+            overlay.addTo(map);
+        }
+
         return overlay;
     }
 
     TILE_LAYERS.forEach((layerName) => {
-        const layer = createCustomOverlay(layerName);
-        layer.addTo(map);
+        const defaultVisible = layerName === 'Base';
+        const layer = createCustomOverlay(layerName, 'quarter', defaultVisible);
         layers[layerName] = layer;
         controls.addOverlay(layer, layerName);
     });
 
     PIN_LAYERS.forEach(layerName => {
         const markerGroup = L.layerGroup();
+        const defaultVisible = layerName === 'Vendors' || layerName === 'Entrances';
 
         fetch(`/data/${layerName.toLowerCase().replace(' ', '_')}.json`)
             .then(response => response.json())
@@ -83,11 +89,19 @@ export function initialize(container, params = {}) {
                             iconSize: [20, 20]
                         })
                     });
-                    marker.bindTooltip(pin.label);
+                    
+                    if (layerName === 'Vendors' || layerName === 'Entrances') {
+                        marker.bindTooltip(pin.label, {permanent: true, direction: 'top', offset: [0, -10]});
+                    }
+                    
                     markerGroup.addLayer(marker);
                 });
             })
             .catch(error => console.error(`Error loading ${layerName} data:`, error));
+
+        if (defaultVisible) {
+            markerGroup.addTo(map);
+        }
 
         layers[layerName] = markerGroup;
         controls.addOverlay(markerGroup, layerName);
@@ -111,7 +125,9 @@ export function initialize(container, params = {}) {
         }
 
         TILE_LAYERS.forEach(layerName => {
-            layers[layerName].updateResolution(resolution);
+            if (layers[layerName].updateResolution) {
+                layers[layerName].updateResolution(resolution);
+            }
         });
     }
 
@@ -126,7 +142,6 @@ export function initialize(container, params = {}) {
             container.style.height = `${newSize}px`;
         }
         map.invalidateSize({ animate: false, pan: false });
-        
         map.fitBounds(bounds);
         updateImageResolution();
     }, 250);
@@ -160,6 +175,9 @@ export function initialize(container, params = {}) {
 
     const style = document.createElement('style');
     style.textContent = `
+        .leaflet-container {
+            background: #000000;
+        }
         .leaflet-control-layers {
             background: rgba(255, 255, 255, 0.8);
             border-radius: 5px;
@@ -188,5 +206,5 @@ export function initialize(container, params = {}) {
         if (container.contains(loadingIndicator)) {
             container.removeChild(loadingIndicator);
         }
-    }, 2500);
+    }, 5000);
 }
