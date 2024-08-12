@@ -17,9 +17,10 @@ export function initialize(container, params = {}) {
 
     const loadingIndicator = createLoadingIndicator(container);
     let map, layers, controls;
+    const loadedLayers = new Set();
 
     initializeMap()
-        .then(() => Promise.all([loadTileLayers(), loadPinLayers()]))
+        .then(() => Promise.all([...TILE_LAYERS, ...PIN_LAYERS].map(layerName => loadLayer(layerName))))
         .then(finishMapInitialization)
         .catch(handleGlobalError);
 
@@ -53,49 +54,49 @@ export function initialize(container, params = {}) {
         });
     }
 
-    function loadTileLayers() {
-        return Promise.all(TILE_LAYERS.map(layerName => loadLayer(layerName, createTileLayer)));
-    }
-
-    function loadPinLayers() {
-        return Promise.all(PIN_LAYERS.map(layerName => loadLayer(layerName, createPinLayer)));
-    }
-
-    function loadLayer(layerName, createLayerFunc, retryCount = 0) {
+    function loadLayer(layerName, retryCount = 0) {
         return new Promise((resolve, reject) => {
-            const layer = createLayerFunc(layerName);
+            const isTileLayer = TILE_LAYERS.includes(layerName);
+            const layer = isTileLayer ? createTileLayer(layerName) : createPinLayer(layerName);
             
             const onLoad = () => {
+                console.log(`${layerName} layer loaded successfully`);
                 layers[layerName] = layer;
-                controls.addOverlay(layer, layerName);
+                if (!loadedLayers.has(layerName)) {
+                    controls.addOverlay(layer, layerName);
+                    loadedLayers.add(layerName);
+                }
                 updateLoadingProgress();
-                resolve();
+                resolve(layer);
             };
 
             const onError = (error) => {
                 console.error(`Error loading ${layerName} layer:`, error);
                 if (retryCount < MAX_RETRIES) {
                     setTimeout(() => {
-                        loadLayer(layerName, createLayerFunc, retryCount + 1).then(resolve).catch(reject);
+                        loadLayer(layerName, retryCount + 1).then(resolve).catch(reject);
                     }, RETRY_DELAY);
                 } else {
                     reject(`Failed to load ${layerName} layer after ${MAX_RETRIES} attempts`);
                 }
             };
 
-            if (layer instanceof L.LayerGroup) {
-                layer.on('add', onLoad);
+            if (isTileLayer) {
+                layer.on('load', onLoad);
+                layer.on('error', onError);
+                if (layerName === 'Base') {
+                    layer.addTo(map);
+                }
+            } else {
                 fetchPinData(layerName)
                     .then(data => {
                         data.forEach(pin => addPinToLayer(pin, layer, layerName));
                         if (layerName === 'Vendors' || layerName === 'Entrances') {
                             layer.addTo(map);
                         }
+                        onLoad();
                     })
                     .catch(onError);
-            } else {
-                layer.on('load', onLoad);
-                layer.on('error', onError);
             }
         });
     }
@@ -231,8 +232,8 @@ export function initialize(container, params = {}) {
 
     function updateLoadingProgress() {
         const totalLayers = TILE_LAYERS.length + PIN_LAYERS.length;
-        const loadedLayers = Object.keys(layers).length;
-        const progress = (loadedLayers / totalLayers) * 100;
+        const loadedLayersCount = loadedLayers.size;
+        const progress = (loadedLayersCount / totalLayers) * 100;
         const loadingText = loadingIndicator.querySelector('.loading-text');
         if (loadingText) {
             loadingText.textContent = `Loading map... ${Math.round(progress)}%`;
