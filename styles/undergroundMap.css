@@ -2,4 +2,78 @@
     font-family: "Pixelated MS Sans Serif", Arial;
     color: white;
     font-weight: bold;
-  }
+}
+.leaflet-container {
+  background: #000000;
+}
+.leaflet-control-layers {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 5px;
+  padding: 5px;
+}
+.leaflet-control-layers label {
+  margin-bottom: 5px;
+}
+.leaflet-control-layers-selector:checked + span {
+  font-weight: bold;
+  color: #000080;
+}
+.leaflet-control-layers-selector:not(:checked) + span {
+  color: #808080;
+}
+.map-pin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+.underground-map-label {
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  font-family: "Pixelated MS Sans Serif", Arial;
+  color: white;
+  font-weight: bold;
+  font-size: inherit;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8), -1px -1px 2px rgba(0, 0, 0, 0.8), 1px -1px 2px rgba(0, 0, 0, 0.8), -1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+.map-loading-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  color: white;
+  font-family: "Pixelated MS Sans Serif", Arial;
+}
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.map-error-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(255, 0, 0, 0.8);
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+  font-family: "Pixelated MS Sans Serif", Arial;
+}

@@ -5,6 +5,9 @@ const PIN_LAYERS = ['Vendors', 'Entrances', 'Surface Labels'];
 const MAX_ZOOM = 2;
 const MIN_ZOOM = -1;
 const ORIGINAL_IMAGE_SIZE = 6500;
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 2000;
+const LOAD_TIMEOUT = 20000;
 
 export function initialize(container, params = {}) {
     if (!container || !(container instanceof HTMLElement)) {
@@ -12,120 +15,187 @@ export function initialize(container, params = {}) {
         return;
     }
 
-    const loadingIndicator = document.createElement('div');
-    loadingIndicator.className = 'map-loading-indicator';
-    loadingIndicator.textContent = 'Loading map...';
-    container.appendChild(loadingIndicator);
+    const loadingIndicator = createLoadingIndicator(container);
+    let map, layers, controls;
 
-    container.style.width = '100%';
-    container.style.height = '100%';
+    initializeMap()
+        .then(() => Promise.all([loadTileLayers(), loadPinLayers()]))
+        .then(finishMapInitialization)
+        .catch(handleGlobalError);
 
-    const map = L.map(container, {
-        crs: L.CRS.Simple,
-        minZoom: MIN_ZOOM,
-        maxZoom: MAX_ZOOM,
-        zoomSnap: 0.25,
-        zoomDelta: 0.25,
-        wheelPxPerZoomLevel: 120,
-        zoomAnimation: true,
-        markerZoomAnimation: true,
-        preferCanvas: true,
-        attributionControl: false,
-        backgroundColor: '#000000'
-    });
+    function initializeMap() {
+        return new Promise((resolve) => {
+            map = L.map(container, {
+                crs: L.CRS.Simple,
+                minZoom: MIN_ZOOM,
+                maxZoom: MAX_ZOOM,
+                zoomSnap: 0.25,
+                zoomDelta: 0.25,
+                wheelPxPerZoomLevel: 120,
+                zoomAnimation: true,
+                markerZoomAnimation: true,
+                preferCanvas: true,
+                attributionControl: false,
+                backgroundColor: '#000000'
+            });
 
-    const layers = {};
-    const controls = L.control.layers(null, null, { position: 'topright' }).addTo(map);
+            layers = {};
+            controls = L.control.layers(null, null, { position: 'topright' }).addTo(map);
 
-    const southWest = map.unproject([0, ORIGINAL_IMAGE_SIZE], MAX_ZOOM);
-    const northEast = map.unproject([ORIGINAL_IMAGE_SIZE, 0], MAX_ZOOM);
-    const bounds = new L.LatLngBounds(southWest, northEast);
+            const southWest = map.unproject([0, ORIGINAL_IMAGE_SIZE], MAX_ZOOM);
+            const northEast = map.unproject([ORIGINAL_IMAGE_SIZE, 0], MAX_ZOOM);
+            const bounds = new L.LatLngBounds(southWest, northEast);
 
-    function createCustomOverlay(layerName, initialResolution = 'quarter', defaultVisible = true) {
-        const img = new Image();
-        img.src = `/images/underground_map/${layerName}_${initialResolution}.png`;
-        img.className = `underground-layer-${layerName.toLowerCase()}`;
-        
-        const overlay = L.imageOverlay(img.src, bounds, {
+            map.fitBounds(bounds);
+            map.setMaxBounds(bounds.pad(0.5));
+
+            resolve();
+        });
+    }
+
+    function loadTileLayers() {
+        return Promise.all(TILE_LAYERS.map(layerName => loadLayer(layerName, createTileLayer)));
+    }
+
+    function loadPinLayers() {
+        return Promise.all(PIN_LAYERS.map(layerName => loadLayer(layerName, createPinLayer)));
+    }
+
+    function loadLayer(layerName, createLayerFunc, retryCount = 0) {
+        return new Promise((resolve, reject) => {
+            const layer = createLayerFunc(layerName);
+            
+            const onLoad = () => {
+                layers[layerName] = layer;
+                controls.addOverlay(layer, layerName);
+                updateLoadingProgress();
+                resolve();
+            };
+
+            const onError = (error) => {
+                console.error(`Error loading ${layerName} layer:`, error);
+                if (retryCount < MAX_RETRIES) {
+                    setTimeout(() => {
+                        loadLayer(layerName, createLayerFunc, retryCount + 1).then(resolve).catch(reject);
+                    }, RETRY_DELAY);
+                } else {
+                    reject(`Failed to load ${layerName} layer after ${MAX_RETRIES} attempts`);
+                }
+            };
+
+            if (layer instanceof L.LayerGroup) {
+                layer.on('add', onLoad);
+                fetchPinData(layerName)
+                    .then(data => {
+                        data.forEach(pin => addPinToLayer(pin, layer, layerName));
+                        if (layerName === 'Vendors' || layerName === 'Entrances') {
+                            layer.addTo(map);
+                        }
+                    })
+                    .catch(onError);
+            } else {
+                layer.on('load', onLoad);
+                layer.on('error', onError);
+            }
+        });
+    }
+
+    function createTileLayer(layerName) {
+        const bounds = map.options.maxBounds;
+        const layer = L.imageOverlay(`/images/underground_map/${layerName}_quarter.png`, bounds, {
             opacity: layerName === 'Surface' ? 0.5 : 1,
             className: `underground-layer-${layerName.toLowerCase()}`
         });
 
-        overlay.updateResolution = function(resolution) {
+        layer.updateResolution = function(resolution) {
             const newSrc = `/images/underground_map/${layerName}_${resolution}.png`;
-            if (img.src !== newSrc) {
-                console.log(`Updating ${layerName} to ${resolution} resolution`);
-                img.src = newSrc;
-                this.setUrl(newSrc);
-            }
+            this.setUrl(newSrc);
         };
 
-        if (defaultVisible) {
-            overlay.addTo(map);
-        }
-
-        return overlay;
+        return layer;
     }
 
-    TILE_LAYERS.forEach((layerName) => {
-        const defaultVisible = layerName === 'Base';
-        const layer = createCustomOverlay(layerName, 'quarter', defaultVisible);
-        layers[layerName] = layer;
-        controls.addOverlay(layer, layerName);
-    });
+    function createPinLayer(layerName) {
+        return L.layerGroup();
+    }
 
-    PIN_LAYERS.forEach(layerName => {
-        const markerGroup = L.layerGroup();
-        const defaultVisible = layerName === 'Vendors' || layerName === 'Entrances';
+    function fetchPinData(layerName) {
+        return fetch(`/data/${layerName.toLowerCase().replace(' ', '_')}.json`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            });
+    }
 
-        fetch(`/data/${layerName.toLowerCase().replace(' ', '_')}.json`)
-            .then(response => response.json())
-            .then(data => {
-                data.forEach(pin => {
-                    const latlng = map.unproject([pin.x, pin.y], MAX_ZOOM);
-                    const marker = L.marker(latlng, {
-                        icon: L.divIcon({
-                            html: pin.icon,
-                            className: 'map-pin',
-                            iconSize: [20, 20]
-                        })
-                    });
-                    
-                    if (layerName === 'Vendors' || layerName === 'Entrances') {
-                        const labelDirection = pin.x > ORIGINAL_IMAGE_SIZE / 2 ? 'right' : 'left';
-                        const labelOffset = labelDirection === 'right' ? [10, 0] : [-10, 0];
-                        
-                        marker.bindTooltip(pin.label, {
-                            permanent: true,
-                            direction: labelDirection,
-                            offset: labelOffset,
-                            className: 'underground-map-label'
-                        });
-                    }
-                    
-                    markerGroup.addLayer(marker);
-                });
+    function addPinToLayer(pin, layer, layerName) {
+        const latlng = map.unproject([pin.x, pin.y], MAX_ZOOM);
+        const marker = L.marker(latlng, {
+            icon: L.divIcon({
+                html: pin.icon,
+                className: 'map-pin',
+                iconSize: [20, 20]
             })
-            .catch(error => console.error(`Error loading ${layerName} data:`, error));
-
-        if (defaultVisible) {
-            markerGroup.addTo(map);
+        });
+        
+        if (layerName === 'Vendors' || layerName === 'Entrances') {
+            const labelDirection = pin.x > ORIGINAL_IMAGE_SIZE / 2 ? 'right' : 'left';
+            const labelOffset = labelDirection === 'right' ? [10, 0] : [-10, 0];
+            
+            marker.bindTooltip(pin.label, {
+                permanent: true,
+                direction: labelDirection,
+                offset: labelOffset,
+                className: 'underground-map-label'
+            });
         }
+        
+        layer.addLayer(marker);
+    }
 
-        layers[layerName] = markerGroup;
-        controls.addOverlay(markerGroup, layerName);
-    });
+    function finishMapInitialization() {
+        setupMapEventListeners();
+        setupResizeHandling();
+        addMapControls();
+        removeLoadingIndicator();
+    }
 
-    map.fitBounds(bounds);
-    map.setMaxBounds(bounds.pad(0.5));
+    function setupMapEventListeners() {
+        map.on('zoomend', updateImageResolution);
+        map.on('resize', updateImageResolution);
+        updateImageResolution();
+    }
+
+    function setupResizeHandling() {
+        const resizeMap = debounce(() => {
+            const windowElement = container.closest('.window');
+            if (windowElement) {
+                const newSize = Math.min(windowElement.clientWidth, windowElement.clientHeight);
+                container.style.width = `${newSize}px`;
+                container.style.height = `${newSize}px`;
+            }
+            map.invalidateSize({ animate: false, pan: false });
+            map.fitBounds(map.options.maxBounds);
+            updateImageResolution();
+        }, 250);
+
+        resizeMap();
+        window.addEventListener('resize', resizeMap);
+
+        const windowElement = container.closest('.window');
+        if (windowElement) {
+            const observer = new ResizeObserver(resizeMap);
+            observer.observe(windowElement);
+        }
+    }
+
+    function addMapControls() {
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+    }
 
     function updateImageResolution() {
         const zoom = map.getZoom();
-        const size = map.getSize();
-        const maxSize = Math.max(size.x, size.y);
-        
-        console.log(`Current zoom: ${zoom}, Map size: ${size.x}x${size.y}, Max size: ${maxSize}`);
-
         let resolution;
         if (zoom <= 0) {
             resolution = 'quarter';
@@ -135,104 +205,56 @@ export function initialize(container, params = {}) {
             resolution = 'full';
         }
 
-        console.log(`Selected resolution: ${resolution}`);
-
-        TILE_LAYERS.forEach(layerName => {
-            if (layers[layerName].updateResolution) {
-                layers[layerName].updateResolution(resolution);
+        Object.values(layers).forEach(layer => {
+            if (layer.updateResolution) {
+                layer.updateResolution(resolution);
             }
         });
     }
 
-    map.on('zoomend', function() {
-        console.log('Zoom ended, current zoom:', map.getZoom());
-        updateImageResolution();
-    });
-
-    map.on('resize', updateImageResolution);
-    updateImageResolution();
-
-    const resizeMap = debounce(() => {
-        const windowElement = container.closest('.window');
-        if (windowElement) {
-            const newSize = Math.min(windowElement.clientWidth, windowElement.clientHeight);
-            container.style.width = `${newSize}px`;
-            container.style.height = `${newSize}px`;
-        }
-        map.invalidateSize({ animate: false, pan: false });
-        map.fitBounds(bounds);
-        updateImageResolution();
-    }, 250);
-
-    resizeMap();
-    setTimeout(resizeMap, 100);
-
-    window.addEventListener('resize', resizeMap);
-
-    const windowElement = container.closest('.window');
-    if (windowElement) {
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                    if (windowElement.classList.contains('active')) {
-                        setTimeout(resizeMap, 0);
-                    }
-                }
-            });
-        });
-        observer.observe(windowElement, { attributes: true });
+    function handleGlobalError(error) {
+        console.error('Fatal error in underground map initialization:', error);
+        removeLoadingIndicator();
+        showErrorMessage(container, 'Failed to load the underground map. Please try again later.');
     }
 
-    map.on('load', () => {
+    function createLoadingIndicator(container) {
+        const loadingIndicator = document.createElement('div');
+        loadingIndicator.className = 'map-loading-indicator';
+        loadingIndicator.innerHTML = `
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Loading map... 0%</div>
+        `;
+        container.appendChild(loadingIndicator);
+        return loadingIndicator;
+    }
+
+    function updateLoadingProgress() {
+        const totalLayers = TILE_LAYERS.length + PIN_LAYERS.length;
+        const loadedLayers = Object.keys(layers).length;
+        const progress = (loadedLayers / totalLayers) * 100;
+        const loadingText = loadingIndicator.querySelector('.loading-text');
+        if (loadingText) {
+            loadingText.textContent = `Loading map... ${Math.round(progress)}%`;
+        }
+    }
+
+    function removeLoadingIndicator() {
         if (container.contains(loadingIndicator)) {
             container.removeChild(loadingIndicator);
         }
-    });
+    }
 
-    L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-    const style = document.createElement('style');
-    style.textContent = `
-        .leaflet-container {
-            background: #000000;
-        }
-        .leaflet-control-layers {
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 5px;
-            padding: 5px;
-        }
-        .leaflet-control-layers label {
-            margin-bottom: 5px;
-        }
-        .leaflet-control-layers-selector:checked + span {
-            font-weight: bold;
-            color: #000080;
-        }
-        .leaflet-control-layers-selector:not(:checked) + span {
-            color: #808080;
-        }
-        .map-pin {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-        .underground-map-label {
-            background-color: transparent;
-            border: none;
-            box-shadow: none;
-            font-family: "Pixelated MS Sans Serif", Arial;
-            color: white;
-            font-weight: bold;
-            font-size: inherit;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8), -1px -1px 2px rgba(0, 0, 0, 0.8), 1px -1px 2px rgba(0, 0, 0, 0.8), -1px 1px 2px rgba(0, 0, 0, 0.8);
-        }
-    `;
-    document.head.appendChild(style);
+    function showErrorMessage(container, message) {
+        const errorElement = document.createElement('div');
+        errorElement.className = 'map-error-message';
+        errorElement.textContent = message;
+        container.appendChild(errorElement);
+    }
 
     setTimeout(() => {
         if (container.contains(loadingIndicator)) {
-            container.removeChild(loadingIndicator);
+            handleGlobalError('Map loading timed out');
         }
-    }, 2500);
+    }, LOAD_TIMEOUT);
 }
