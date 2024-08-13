@@ -3,7 +3,7 @@ import { debounce } from './utils.js';
 const TILE_LAYERS = ['Base', 'Surface'];
 const PIN_LAYERS = ['Vendors', 'Entrances', 'Surface Labels'];
 const MAX_ZOOM = 2;
-const MIN_ZOOM = -1;
+const MIN_ZOOM = -2;
 const ORIGINAL_IMAGE_SIZE = 6500;
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 2000;
