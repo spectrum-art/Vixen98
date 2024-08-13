@@ -5,7 +5,7 @@ const PIN_LAYERS = ['Vendors', 'Entrances', 'Surface Labels'];
 const MAX_ZOOM = 2;
 const MIN_ZOOM = -2;
 const ORIGINAL_IMAGE_SIZE = 6500;
-const RENDERED_IMAGE_SIZE = ORIGINAL_IMAGE_SIZE * 2; // Double the size to make tiles appear at 50%
+const RENDERED_IMAGE_SIZE = ORIGINAL_IMAGE_SIZE;
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 2000;
 const LOAD_TIMEOUT = 30000;
@@ -103,16 +103,17 @@ export function initialize(container, params = {}) {
 
     function createTileLayer(layerName) {
         const imageUrl = `/images/underground_map/${layerName}_quarter.png`;
-        const layer = L.imageOverlay(imageUrl, [[0, 0], [RENDERED_IMAGE_SIZE, RENDERED_IMAGE_SIZE]], {
+        const layer = L.imageOverlay(imageUrl, [[0, 0], [ORIGINAL_IMAGE_SIZE, ORIGINAL_IMAGE_SIZE]], {
             opacity: layerName === 'Surface' ? 0.5 : 1,
-            className: `underground-layer-${layerName.toLowerCase()}`
+            className: `underground-layer-${layerName.toLowerCase()}`,
+            interactive: false
         });
-
+    
         layer.updateResolution = function(resolution) {
             const newSrc = `/images/underground_map/${layerName}_${resolution}.png`;
             this.setUrl(newSrc);
         };
-
+    
         return layer;
     }
 
@@ -131,11 +132,7 @@ export function initialize(container, params = {}) {
     }
 
     function addPinToLayer(pin, layer, layerName) {
-        const scaleFactor = RENDERED_IMAGE_SIZE / ORIGINAL_IMAGE_SIZE;
-        const newX = pin.x * scaleFactor;
-        const newY = pin.y * scaleFactor;
-        
-        const latlng = map.unproject([newX, newY], MAX_ZOOM);
+        const latlng = map.unproject([pin.x, pin.y], MAX_ZOOM);
         const marker = L.marker(latlng, {
             icon: L.divIcon({
                 html: pin.icon,
@@ -145,7 +142,7 @@ export function initialize(container, params = {}) {
         });
         
         if (layerName === 'Vendors' || layerName === 'Entrances') {
-            const labelDirection = newX > RENDERED_IMAGE_SIZE / 2 ? 'right' : 'left';
+            const labelDirection = pin.x > ORIGINAL_IMAGE_SIZE / 2 ? 'right' : 'left';
             const labelOffset = labelDirection === 'right' ? [10, 0] : [-10, 0];
             
             marker.bindTooltip(pin.label, {
