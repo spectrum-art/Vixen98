@@ -61,40 +61,47 @@ export function initialize(container, params = {}) {
     function loadLayer(layerName) {
         return new Promise((resolve, reject) => {
             const isTileLayer = TILE_LAYERS.includes(layerName);
-            const layer = isTileLayer ? createTileLayer(layerName) : createPinLayer(layerName);
             
             if (isTileLayer) {
-                layer.on('load', () => {
-                    console.log(`${layerName} layer loaded successfully`);
-                    resolve(layer);
-                });
-                layer.on('error', (error) => {
-                    console.error(`Error loading ${layerName} layer:`, error);
-                    reject(error);
-                });
+                const imageUrl = `/images/underground_map/${layerName}_quarter.png`;
+                preloadImage(imageUrl)
+                    .then(() => {
+                        const layer = createTileLayer(layerName);
+                        layers[layerName] = layer;
+                        controls.addOverlay(layer, layerName);
+                        if (layerName === 'Base') {
+                            layer.addTo(map);
+                        }
+                        console.log(`${layerName} layer loaded successfully`);
+                        resolve(layer);
+                    })
+                    .catch(error => {
+                        console.error(`Error preloading ${layerName} layer:`, error);
+                        reject(error);
+                    });
             } else {
+                const layer = createPinLayer(layerName);
                 fetchPinData(layerName)
                     .then(data => {
                         data.forEach(pin => addPinToLayer(pin, layer, layerName));
+                        layers[layerName] = layer;
+                        controls.addOverlay(layer, layerName);
+                        if (layerName === 'Vendors' || layerName === 'Entrances') {
+                            layer.addTo(map);
+                        }
                         resolve(layer);
                     })
                     .catch(reject);
             }
-            
-            layers[layerName] = layer;
-            controls.addOverlay(layer, layerName);
-            
-            if (layerName === 'Base' || layerName === 'Vendors' || layerName === 'Entrances') {
-                layer.addTo(map);
-            }
         });
     }
 
-    function createTileLayer(layerName) {
-        const imageUrl = `/images/underground_map/${layerName}_quarter.png`;
-        return L.imageOverlay(imageUrl, [[0, 0], [ORIGINAL_IMAGE_SIZE, ORIGINAL_IMAGE_SIZE]], {
-            opacity: layerName === 'Surface' ? 0.5 : 1,
-            className: `underground-layer-${layerName.toLowerCase()}`
+    function preloadImage(url) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => resolve(url);
+            img.onerror = () => reject(new Error(`Failed to load image: ${url}`));
+            img.src = url;
         });
     }
 
@@ -181,8 +188,9 @@ export function initialize(container, params = {}) {
 
     function handleGlobalError(error) {
         console.error('Fatal error in underground map initialization:', error);
+        console.error('Stack trace:', error.stack);
         removeLoadingIndicator();
-        showErrorMessage(container, 'Failed to load the underground map. Please try again later.');
+        showErrorMessage(container, `Failed to load the underground map: ${error.message}. Please try again later.`);
     }
 
     function createLoadingIndicator(container) {
