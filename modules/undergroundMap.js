@@ -7,7 +7,7 @@ const MIN_ZOOM = -1;
 const ORIGINAL_IMAGE_SIZE = 6500;
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 2000;
-const LOAD_TIMEOUT = 20000;
+const LOAD_TIMEOUT = 30000;
 
 export function initialize(container, params = {}) {
     if (!container || !(container instanceof HTMLElement)) {
@@ -84,9 +84,7 @@ export function initialize(container, params = {}) {
             if (isTileLayer) {
                 layer.on('load', onLoad);
                 layer.on('error', onError);
-                if (layerName === 'Base') {
-                    layer.addTo(map);
-                }
+                layer.addTo(map);
             } else {
                 fetchPinData(layerName)
                     .then(data => {
