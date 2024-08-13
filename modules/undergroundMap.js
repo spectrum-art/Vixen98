@@ -21,8 +21,14 @@ export function initialize(container, params = {}) {
 
     initializeMap()
         .then(() => Promise.all([...TILE_LAYERS, ...PIN_LAYERS].map(layerName => loadLayer(layerName))))
-        .then(finishMapInitialization)
-        .catch(handleGlobalError);
+        .then(() => {
+            console.log('All layers loaded, finishing initialization');
+            return finishMapInitialization();
+        })
+        .catch(error => {
+            console.error('Error during map initialization:', error);
+            handleGlobalError(error);
+        });
 
     function initializeMap() {
         return new Promise((resolve) => {
@@ -62,6 +68,8 @@ export function initialize(container, params = {}) {
             const isTileLayer = TILE_LAYERS.includes(layerName);
             const layer = isTileLayer ? createTileLayer(layerName) : createPinLayer(layerName);
             
+            console.log(`Attempting to load ${layerName} layer`);
+    
             const onLoad = () => {
                 console.log(`${layerName} layer loaded successfully`);
                 layers[layerName] = layer;
@@ -75,10 +83,11 @@ export function initialize(container, params = {}) {
                 updateLoadingProgress();
                 resolve(layer);
             };
-
+    
             const onError = (error) => {
                 console.error(`Error loading ${layerName} layer:`, error);
                 if (retryCount < MAX_RETRIES) {
+                    console.log(`Retrying ${layerName} layer load, attempt ${retryCount + 1}`);
                     setTimeout(() => {
                         loadLayer(layerName, retryCount + 1).then(resolve).catch(reject);
                     }, RETRY_DELAY);
@@ -86,10 +95,11 @@ export function initialize(container, params = {}) {
                     reject(`Failed to load ${layerName} layer after ${MAX_RETRIES} attempts`);
                 }
             };
-
+    
             if (isTileLayer) {
                 layer.on('load', onLoad);
                 layer.on('error', onError);
+                layer.addTo(map);
             } else {
                 fetchPinData(layerName)
                     .then(data => {
@@ -102,16 +112,21 @@ export function initialize(container, params = {}) {
     }
 
     function createTileLayer(layerName) {
-        const layer = L.imageOverlay(`/images/underground_map/${layerName}_quarter.png`, map.options.maxBounds, {
+        console.log(`Creating tile layer: ${layerName}`);
+        const imageUrl = `/images/underground_map/${layerName}_quarter.png`;
+        console.log(`Image URL: ${imageUrl}`);
+        
+        const layer = L.imageOverlay(imageUrl, map.options.maxBounds, {
             opacity: layerName === 'Surface' ? 0.5 : 1,
             className: `underground-layer-${layerName.toLowerCase()}`
         });
-
+    
         layer.updateResolution = function(resolution) {
             const newSrc = `/images/underground_map/${layerName}_${resolution}.png`;
+            console.log(`Updating ${layerName} resolution to ${resolution}`);
             this.setUrl(newSrc);
         };
-
+    
         return layer;
     }
 
