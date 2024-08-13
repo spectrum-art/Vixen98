@@ -43,11 +43,14 @@ export function initialize(container, params = {}) {
             layers = {};
             controls = L.control.layers(null, null, { position: 'topright' }).addTo(map);
 
+            const mapSize = Math.min(container.clientWidth, container.clientHeight);
+            const zoom = Math.log2(mapSize / 1625);
+            map.setView([ORIGINAL_IMAGE_SIZE/2, ORIGINAL_IMAGE_SIZE/2], zoom);
+
             const southWest = map.unproject([0, ORIGINAL_IMAGE_SIZE], MAX_ZOOM);
             const northEast = map.unproject([ORIGINAL_IMAGE_SIZE, 0], MAX_ZOOM);
             const bounds = new L.LatLngBounds(southWest, northEast);
 
-            map.fitBounds(bounds);
             map.setMaxBounds(bounds.pad(0.5));
 
             resolve();
@@ -65,6 +68,9 @@ export function initialize(container, params = {}) {
                 if (!loadedLayers.has(layerName)) {
                     controls.addOverlay(layer, layerName);
                     loadedLayers.add(layerName);
+                }
+                if (layerName === 'Base' || layerName === 'Vendors' || layerName === 'Entrances') {
+                    layer.addTo(map);
                 }
                 updateLoadingProgress();
                 resolve(layer);
@@ -84,14 +90,10 @@ export function initialize(container, params = {}) {
             if (isTileLayer) {
                 layer.on('load', onLoad);
                 layer.on('error', onError);
-                layer.addTo(map);
             } else {
                 fetchPinData(layerName)
                     .then(data => {
                         data.forEach(pin => addPinToLayer(pin, layer, layerName));
-                        if (layerName === 'Vendors' || layerName === 'Entrances') {
-                            layer.addTo(map);
-                        }
                         onLoad();
                     })
                     .catch(onError);
@@ -100,8 +102,7 @@ export function initialize(container, params = {}) {
     }
 
     function createTileLayer(layerName) {
-        const bounds = map.options.maxBounds;
-        const layer = L.imageOverlay(`/images/underground_map/${layerName}_quarter.png`, bounds, {
+        const layer = L.imageOverlay(`/images/underground_map/${layerName}_quarter.png`, map.options.maxBounds, {
             opacity: layerName === 'Surface' ? 0.5 : 1,
             className: `underground-layer-${layerName.toLowerCase()}`
         });
@@ -175,7 +176,11 @@ export function initialize(container, params = {}) {
                 container.style.height = `${newSize}px`;
             }
             map.invalidateSize({ animate: false, pan: false });
-            map.fitBounds(map.options.maxBounds);
+            
+            const mapSize = Math.min(container.clientWidth, container.clientHeight);
+            const zoom = Math.log2(mapSize / 1625);
+            map.setView(map.getCenter(), zoom);
+            
             updateImageResolution();
         }, 250);
 
@@ -198,7 +203,7 @@ export function initialize(container, params = {}) {
         let resolution;
         if (zoom <= 0) {
             resolution = 'quarter';
-        } else if (zoom === 1) {
+        } else if (zoom <= 1) {
             resolution = 'half';
         } else {
             resolution = 'full';
