@@ -21,14 +21,8 @@ export function initialize(container, params = {}) {
 
     initializeMap()
         .then(() => Promise.all([...TILE_LAYERS, ...PIN_LAYERS].map(layerName => loadLayer(layerName))))
-        .then(() => {
-            console.log('All layers loaded, finishing initialization');
-            return finishMapInitialization();
-        })
-        .catch(error => {
-            console.error('Error during map initialization:', error);
-            handleGlobalError(error);
-        });
+        .then(finishMapInitialization)
+        .catch(handleGlobalError);
 
     function initializeMap() {
         return new Promise((resolve) => {
@@ -49,14 +43,11 @@ export function initialize(container, params = {}) {
             layers = {};
             controls = L.control.layers(null, null, { position: 'topright' }).addTo(map);
 
-            const mapSize = Math.min(container.clientWidth, container.clientHeight);
-            const zoom = Math.log2(mapSize / 1625);
-            map.setView([ORIGINAL_IMAGE_SIZE/2, ORIGINAL_IMAGE_SIZE/2], zoom);
-
             const southWest = map.unproject([0, ORIGINAL_IMAGE_SIZE], MAX_ZOOM);
             const northEast = map.unproject([ORIGINAL_IMAGE_SIZE, 0], MAX_ZOOM);
             const bounds = new L.LatLngBounds(southWest, northEast);
 
+            map.fitBounds(bounds);
             map.setMaxBounds(bounds.pad(0.5));
 
             resolve();
@@ -68,10 +59,7 @@ export function initialize(container, params = {}) {
             const isTileLayer = TILE_LAYERS.includes(layerName);
             const layer = isTileLayer ? createTileLayer(layerName) : createPinLayer(layerName);
             
-            console.log(`Attempting to load ${layerName} layer`);
-    
             const onLoad = () => {
-                console.log(`${layerName} layer loaded successfully`);
                 layers[layerName] = layer;
                 if (!loadedLayers.has(layerName)) {
                     controls.addOverlay(layer, layerName);
@@ -83,11 +71,9 @@ export function initialize(container, params = {}) {
                 updateLoadingProgress();
                 resolve(layer);
             };
-    
+
             const onError = (error) => {
-                console.error(`Error loading ${layerName} layer:`, error);
                 if (retryCount < MAX_RETRIES) {
-                    console.log(`Retrying ${layerName} layer load, attempt ${retryCount + 1}`);
                     setTimeout(() => {
                         loadLayer(layerName, retryCount + 1).then(resolve).catch(reject);
                     }, RETRY_DELAY);
@@ -95,7 +81,7 @@ export function initialize(container, params = {}) {
                     reject(`Failed to load ${layerName} layer after ${MAX_RETRIES} attempts`);
                 }
             };
-    
+
             if (isTileLayer) {
                 layer.on('load', onLoad);
                 layer.on('error', onError);
@@ -112,21 +98,17 @@ export function initialize(container, params = {}) {
     }
 
     function createTileLayer(layerName) {
-        console.log(`Creating tile layer: ${layerName}`);
         const imageUrl = `/images/underground_map/${layerName}_quarter.png`;
-        console.log(`Image URL: ${imageUrl}`);
-        
         const layer = L.imageOverlay(imageUrl, map.options.maxBounds, {
             opacity: layerName === 'Surface' ? 0.5 : 1,
             className: `underground-layer-${layerName.toLowerCase()}`
         });
-    
+
         layer.updateResolution = function(resolution) {
             const newSrc = `/images/underground_map/${layerName}_${resolution}.png`;
-            console.log(`Updating ${layerName} resolution to ${resolution}`);
             this.setUrl(newSrc);
         };
-    
+
         return layer;
     }
 
@@ -191,11 +173,7 @@ export function initialize(container, params = {}) {
                 container.style.height = `${newSize}px`;
             }
             map.invalidateSize({ animate: false, pan: false });
-            
-            const mapSize = Math.min(container.clientWidth, container.clientHeight);
-            const zoom = Math.log2(mapSize / 1625);
-            map.setView(map.getCenter(), zoom);
-            
+            map.fitBounds(map.options.maxBounds);
             updateImageResolution();
         }, 250);
 
@@ -218,7 +196,7 @@ export function initialize(container, params = {}) {
         let resolution;
         if (zoom <= 0) {
             resolution = 'quarter';
-        } else if (zoom <= 1) {
+        } else if (zoom < 1.5) {
             resolution = 'half';
         } else {
             resolution = 'full';
