@@ -14,16 +14,12 @@ export function initialize(container, params = {}) {
     }
 
     const loadingIndicator = createLoadingIndicator(container);
-    let map, layers, controls;
 
     initializeMap()
+        .then(() => loadAllLayers())
         .then(() => {
-            const layerPromises = [...TILE_LAYERS, ...PIN_LAYERS].map(layerName => loadLayer(layerName));
-            return Promise.all(layerPromises);
-        })
-        .then(() => {
-            console.log('All layers loaded successfully');
             finishMapInitialization();
+            removeLoadingIndicator(container, loadingIndicator);
         })
         .catch(handleGlobalError);
 
@@ -54,47 +50,49 @@ export function initialize(container, params = {}) {
             map.fitBounds(bounds);
             map.setMaxBounds(bounds.pad(0.5));
 
+            map.invalidateSize();
+
             resolve();
         });
     }
 
-    function loadLayer(layerName) {
-        return new Promise((resolve, reject) => {
-            const isTileLayer = TILE_LAYERS.includes(layerName);
-            
-            if (isTileLayer) {
-                const imageUrl = `/images/underground_map/${layerName}_quarter.png`;
-                preloadImage(imageUrl)
-                    .then(() => {
-                        const layer = createTileLayer(layerName);
-                        layers[layerName] = layer;
-                        controls.addOverlay(layer, layerName);
-                        if (layerName === 'Base') {
-                            layer.addTo(map);
-                        }
-                        console.log(`${layerName} layer loaded successfully`);
-                        resolve(layer);
-                    })
-                    .catch(error => {
-                        console.error(`Error preloading ${layerName} layer:`, error);
-                        reject(error);
-                    });
-            } else {
-                const layer = createPinLayer(layerName);
-                fetchPinData(layerName)
-                    .then(data => {
-                        data.forEach(pin => addPinToLayer(pin, layer, layerName));
-                        layers[layerName] = layer;
-                        controls.addOverlay(layer, layerName);
-                        if (layerName === 'Vendors' || layerName === 'Entrances') {
-                            layer.addTo(map);
-                        }
-                        resolve(layer);
-                    })
-                    .catch(reject);
-            }
-        });
-    }
+function loadAllLayers() {
+    return Promise.all([...TILE_LAYERS, ...PIN_LAYERS].map(layerName => loadLayer(layerName)));
+}
+
+function loadLayer(layerName) {
+    return new Promise((resolve, reject) => {
+        const isTileLayer = TILE_LAYERS.includes(layerName);
+        const layer = isTileLayer ? createTileLayer(layerName) : createPinLayer(layerName);
+
+        layers[layerName] = layer;
+        controls.addOverlay(layer, layerName);
+
+        if (isTileLayer) {
+            layer.on('load', () => {
+                console.log(`${layerName} layer loaded successfully`);
+                if (layerName === 'Base') {
+                    layer.addTo(map);
+                }
+                resolve(layer);
+            });
+            layer.on('error', (error) => {
+                console.error(`Error loading ${layerName} layer:`, error);
+                reject(error);
+            });
+        } else {
+            fetchPinData(layerName)
+                .then(data => {
+                    data.forEach(pin => addPinToLayer(pin, layer, layerName));
+                    if (layerName === 'Vendors' || layerName === 'Entrances') {
+                        layer.addTo(map);
+                    }
+                    resolve(layer);
+                })
+                .catch(reject);
+        }
+    });
+}
 
     function preloadImage(url) {
         return new Promise((resolve, reject) => {
@@ -189,7 +187,7 @@ export function initialize(container, params = {}) {
     function handleGlobalError(error) {
         console.error('Fatal error in underground map initialization:', error);
         console.error('Stack trace:', error.stack);
-        removeLoadingIndicator();
+        removeLoadingIndicator(container, loadingIndicator);
         showErrorMessage(container, `Failed to load the underground map: ${error.message}. Please try again later.`);
     }
 
