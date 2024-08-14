@@ -203,7 +203,7 @@ export function initialize(container, params = {}) {
 
     function createCustomOverlay(layerName, initialResolution = 'quarter', defaultVisible = true) {
         const img = new Image();
-        img.src = `/images/underground_map/${layerName}_${initialResolution}.png`;
+        img.src = `../images/underground_map/${layerName}_${initialResolution}.png`;
         img.className = `underground-layer-${layerName.toLowerCase()}`;
         
         const overlay = L.imageOverlay(img.src, map.options.maxBounds, {
@@ -212,7 +212,7 @@ export function initialize(container, params = {}) {
         });
 
         overlay.updateResolution = function(resolution) {
-            const newSrc = `/images/underground_map/${layerName}_${resolution}.png`;
+            const newSrc = `../images/underground_map/${layerName}_${resolution}.png`;
             if (img.src !== newSrc) {
                 console.log(`Updating ${layerName} to ${resolution} resolution`);
                 img.src = newSrc;
