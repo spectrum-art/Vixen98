@@ -36,8 +36,7 @@ export function initialize(container, params = {}) {
                 zoomAnimation: true,
                 markerZoomAnimation: true,
                 preferCanvas: true,
-                attributionControl: false,
-                backgroundColor: '#000000'
+                attributionControl: false
             });
 
             layers = {};
@@ -50,22 +49,29 @@ export function initialize(container, params = {}) {
             map.fitBounds(bounds);
             map.setMaxBounds(bounds.pad(0.5));
 
+            console.log('Map initialized with bounds:', bounds.toString());
             resolve();
         });
     }
 
     function loadTileLayers() {
+        console.log('Loading tile layers');
         return Promise.all(TILE_LAYERS.map(loadTileLayer));
     }
 
     function loadTileLayer(layerName, retryCount = 0) {
         return new Promise((resolve, reject) => {
+            console.log(`Loading tile layer: ${layerName}`);
             const defaultVisible = layerName === 'Base';
             const layer = createCustomOverlay(layerName, 'quarter', defaultVisible);
             
             layer.on('load', () => {
+                console.log(`${layerName} layer loaded successfully`);
                 layers[layerName] = layer;
                 controls.addOverlay(layer, layerName);
+                if (defaultVisible) {
+                    layer.addTo(map);
+                }
                 updateLoadingProgress();
                 resolve();
             });
@@ -84,11 +90,13 @@ export function initialize(container, params = {}) {
     }
 
     function loadPinLayers() {
+        console.log('Loading pin layers');
         return Promise.all(PIN_LAYERS.map(loadPinLayer));
     }
 
     function loadPinLayer(layerName, retryCount = 0) {
         return new Promise((resolve, reject) => {
+            console.log(`Loading pin layer: ${layerName}`);
             const markerGroup = L.layerGroup();
             const defaultVisible = layerName === 'Vendors' || layerName === 'Entrances';
 
@@ -101,11 +109,12 @@ export function initialize(container, params = {}) {
                 })
                 .then(data => {
                     data.forEach(pin => addPinToLayer(pin, markerGroup, layerName));
+                    layers[layerName] = markerGroup;
+                    controls.addOverlay(markerGroup, layerName);
                     if (defaultVisible) {
                         markerGroup.addTo(map);
                     }
-                    layers[layerName] = markerGroup;
-                    controls.addOverlay(markerGroup, layerName);
+                    console.log(`${layerName} pin layer loaded successfully`);
                     updateLoadingProgress();
                     resolve();
                 })
@@ -148,10 +157,12 @@ export function initialize(container, params = {}) {
     }
 
     function finishMapInitialization() {
+        console.log('Finishing map initialization');
         setupMapEventListeners();
         setupResizeHandling();
         addMapControls();
         removeLoadingIndicator();
+        console.log('Map initialization complete');
     }
 
     function setupMapEventListeners() {
@@ -203,16 +214,20 @@ export function initialize(container, params = {}) {
 
     function createCustomOverlay(layerName, initialResolution = 'quarter', defaultVisible = true) {
         const img = new Image();
-        img.src = `../images/underground_map/${layerName}_${initialResolution}.png`;
+        img.src = `/images/underground_map/${layerName}_${initialResolution}.png`;
         img.className = `underground-layer-${layerName.toLowerCase()}`;
         
-        const overlay = L.imageOverlay(img.src, map.options.maxBounds, {
+        const southWest = map.unproject([0, ORIGINAL_IMAGE_SIZE], MAX_ZOOM);
+        const northEast = map.unproject([ORIGINAL_IMAGE_SIZE, 0], MAX_ZOOM);
+        const bounds = new L.LatLngBounds(southWest, northEast);
+
+        const overlay = L.imageOverlay(img.src, bounds, {
             opacity: layerName === 'Surface' ? 0.5 : 1,
             className: `underground-layer-${layerName.toLowerCase()}`
         });
 
         overlay.updateResolution = function(resolution) {
-            const newSrc = `../images/underground_map/${layerName}_${resolution}.png`;
+            const newSrc = `/images/underground_map/${layerName}_${resolution}.png`;
             if (img.src !== newSrc) {
                 console.log(`Updating ${layerName} to ${resolution} resolution`);
                 img.src = newSrc;
@@ -220,10 +235,7 @@ export function initialize(container, params = {}) {
             }
         };
 
-        if (defaultVisible) {
-            overlay.addTo(map);
-        }
-
+        console.log(`Created custom overlay for ${layerName}`);
         return overlay;
     }
 
@@ -271,6 +283,7 @@ export function initialize(container, params = {}) {
         if (loadingText) {
             loadingText.textContent = `Loading map... ${Math.round(progress)}%`;
         }
+        console.log(`Loading progress: ${Math.round(progress)}%`);
     }
 
     function removeLoadingIndicator() {
