@@ -279,7 +279,7 @@ export function initialize(container, params = {}) {
         const maxSize = Math.max(size.x, size.y);
         
         console.log(`Current zoom: ${zoom}, Map size: ${size.x}x${size.y}, Max size: ${maxSize}`);
-
+    
         let resolution;
         if (zoom <= 0) {
             resolution = 'quarter';
@@ -288,12 +288,16 @@ export function initialize(container, params = {}) {
         } else {
             resolution = 'full';
         }
-
+    
         console.log(`Selected resolution: ${resolution}`);
-
+    
         TILE_LAYERS.forEach(layerName => {
             if (layers[layerName] && layers[layerName].updateResolution) {
-                layers[layerName].updateResolution(resolution);
+                if (layers[layerName].currentResolution !== resolution) {
+                    layers[layerName].updateResolution(resolution);
+                    layers[layerName].currentResolution = resolution;
+                    console.log(`Updated ${layerName} to ${resolution} resolution`);
+                }
             }
         });
     }
