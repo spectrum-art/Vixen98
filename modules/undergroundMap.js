@@ -36,6 +36,36 @@ export function initialize(container, params = {}) {
             console.error('Error in main initialization chain:', error);
             handleGlobalError(error);
         });
+    
+    function initializeMap() {
+        return new Promise((resolve) => {
+            map = L.map(container, {
+                crs: L.CRS.Simple,
+                minZoom: MIN_ZOOM,
+                maxZoom: MAX_ZOOM,
+                zoomSnap: 0.25,
+                zoomDelta: 0.25,
+                wheelPxPerZoomLevel: 120,
+                zoomAnimation: true,
+                markerZoomAnimation: true,
+                preferCanvas: true,
+                attributionControl: false
+            });
+
+            layers = {};
+            controls = L.control.layers(null, null, { position: 'topright' }).addTo(map);
+
+            const southWest = map.unproject([0, ORIGINAL_IMAGE_SIZE], MAX_ZOOM);
+            const northEast = map.unproject([ORIGINAL_IMAGE_SIZE, 0], MAX_ZOOM);
+            const bounds = new L.LatLngBounds(southWest, northEast);
+
+            map.fitBounds(bounds);
+            map.setMaxBounds(bounds.pad(0.5));
+
+            console.log('Map initialized with bounds:', bounds.toString());
+            resolve();
+        });
+    }
 
     function loadTileLayers() {
         console.log('Starting to load tile layers');
