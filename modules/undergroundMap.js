@@ -19,60 +19,37 @@ export function initialize(container, params = {}) {
     const loadingIndicator = createLoadingIndicator(container);
     let map, layers, controls;
 
-    try {
-        initializeMap()
-            .then(() => {
-                console.log('Map initialized, loading tile layers');
-                return loadTileLayers();
-            })
-            .then(() => {
-                console.log('Tile layers loaded, loading pin layers');
-                return loadPinLayers();
-            })
-            .then(() => {
-                console.log('All layers loaded, finishing map initialization');
-                finishMapInitialization();
-            })
-            .catch(handleGlobalError);
-    } catch (error) {
-        console.error('Uncaught error in main initialization chain:', error);
-        handleGlobalError(error);
-    }
-
-    function initializeMap() {
-        return new Promise((resolve) => {
-            console.log('Creating Leaflet map');
-            map = L.map(container, {
-                crs: L.CRS.Simple,
-                minZoom: MIN_ZOOM,
-                maxZoom: MAX_ZOOM,
-                zoomSnap: 0.25,
-                zoomDelta: 0.25,
-                wheelPxPerZoomLevel: 120,
-                zoomAnimation: true,
-                markerZoomAnimation: true,
-                preferCanvas: true,
-                attributionControl: false
-            });
-
-            layers = {};
-            controls = L.control.layers(null, null, { position: 'topright' }).addTo(map);
-
-            const southWest = map.unproject([0, ORIGINAL_IMAGE_SIZE], MAX_ZOOM);
-            const northEast = map.unproject([ORIGINAL_IMAGE_SIZE, 0], MAX_ZOOM);
-            const bounds = new L.LatLngBounds(southWest, northEast);
-
-            map.fitBounds(bounds);
-            map.setMaxBounds(bounds.pad(0.5));
-
-            console.log('Map initialized with bounds:', bounds.toString());
-            resolve();
+    initializeMap()
+        .then(() => {
+            console.log('Map initialized, loading tile layers');
+            return loadTileLayers();
+        })
+        .then(() => {
+            console.log('Tile layers loaded, loading pin layers');
+            return loadPinLayers();
+        })
+        .then(() => {
+            console.log('All layers loaded, finishing map initialization');
+            finishMapInitialization();
+        })
+        .catch(error => {
+            console.error('Error in main initialization chain:', error);
+            handleGlobalError(error);
         });
-    }
 
     function loadTileLayers() {
         console.log('Starting to load tile layers');
-        return Promise.all(TILE_LAYERS.map(loadTileLayer));
+        return new Promise((resolve, reject) => {
+            Promise.all(TILE_LAYERS.map(loadTileLayer))
+                .then(() => {
+                    console.log('All tile layers loaded successfully');
+                    resolve();
+                })
+                .catch(error => {
+                    console.error('Error loading tile layers:', error);
+                    reject(error);
+                });
+        });
     }
 
     function loadTileLayer(layerName, retryCount = 0) {
@@ -82,14 +59,17 @@ export function initialize(container, params = {}) {
             const layer = createCustomOverlay(layerName, 'quarter', defaultVisible);
             
             layer.on('load', () => {
-                console.log(`${layerName} layer loaded successfully`);
-                layers[layerName] = layer;
-                controls.addOverlay(layer, layerName);
-                if (defaultVisible) {
-                    layer.addTo(map);
-                }
-                updateLoadingProgress();
-                resolve();
+                console.log(`${layerName} layer 'load' event fired`);
+                setTimeout(() => {
+                    console.log(`${layerName} layer loaded successfully`);
+                    layers[layerName] = layer;
+                    controls.addOverlay(layer, layerName);
+                    if (defaultVisible) {
+                        layer.addTo(map);
+                    }
+                    updateLoadingProgress();
+                    resolve();
+                }, 100); // Small delay to ensure layer is fully initialized
             });
 
             layer.on('error', (error) => {
