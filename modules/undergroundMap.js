@@ -89,23 +89,20 @@ export function initialize(container, params = {}) {
             const defaultVisible = layerName === 'Base';
             const layer = createCustomOverlay(layerName, 'quarter', defaultVisible);
             
-            const img = new Image();
-            img.onload = () => {
-                console.log(`Image for ${layerName} loaded successfully`);
+            layer.on('load', () => {
+                console.log(`${layerName} layer loaded successfully`);
                 layers[layerName] = layer;
                 controls.addOverlay(layer, layerName);
-                if (defaultVisible) {
-                    layer.addTo(map);
-                }
                 updateLoadingProgress();
+                map.fitBounds(layer.getBounds());
                 resolve();
-            };
-            img.onerror = (error) => {
-                console.error(`Error loading image for ${layerName}:`, error);
-                reject(new Error(`Failed to load image for ${layerName}`));
-            };
-            img.src = `/images/underground_map/${layerName}_quarter.png`;
-
+            });
+    
+            layer.on('error', (error) => {
+                console.error(`Error loading ${layerName} layer:`, error);
+                reject(new Error(`Failed to load ${layerName} layer`));
+            });
+    
             setTimeout(() => {
                 if (!layers[layerName]) {
                     console.error(`Timeout while loading ${layerName} layer`);
@@ -204,7 +201,21 @@ export function initialize(container, params = {}) {
             console.log('Zoom ended, current zoom:', map.getZoom());
             updateImageResolution();
         });
-
+    
+        map.on('moveend', function() {
+            const center = map.getCenter();
+            const bounds = map.getBounds();
+            console.log(`Map moved. Center: (${center.lat}, ${center.lng}), Bounds: SW(${bounds.getSouthWest().lat}, ${bounds.getSouthWest().lng}), NE(${bounds.getNorthEast().lat}, ${bounds.getNorthEast().lng})`);
+        });
+    
+        map.on('layeradd', function(e) {
+            console.log(`Layer added: ${e.layer.options.className}`);
+        });
+    
+        map.on('layerremove', function(e) {
+            console.log(`Layer removed: ${e.layer.options.className}`);
+        });
+    
         map.on('resize', updateImageResolution);
         updateImageResolution();
     }
@@ -253,22 +264,37 @@ export function initialize(container, params = {}) {
         console.log(`Creating custom overlay for ${layerName}`);
         const imageSrc = `/images/underground_map/${layerName}_${initialResolution}.png`;
         console.log(`Loading image from: ${imageSrc}`);
-
+    
         const southWest = map.unproject([0, ORIGINAL_IMAGE_SIZE], MAX_ZOOM);
         const northEast = map.unproject([ORIGINAL_IMAGE_SIZE, 0], MAX_ZOOM);
         const bounds = new L.LatLngBounds(southWest, northEast);
-
+    
+        console.log(`Bounds for ${layerName}: SW(${southWest.lat}, ${southWest.lng}), NE(${northEast.lat}, ${northEast.lng})`);
+    
         const overlay = L.imageOverlay(imageSrc, bounds, {
             opacity: layerName === 'Surface' ? 0.5 : 1,
-            className: `underground-layer-${layerName.toLowerCase()}`
+            className: `underground-layer-${layerName.toLowerCase()}`,
+            zIndex: layerName === 'Base' ? 10 : 20,
         });
-
+    
+        overlay.on('load', function() {
+            console.log(`${layerName} overlay loaded`);
+        });
+    
+        overlay.on('error', function(error) {
+            console.error(`Error loading ${layerName} overlay:`, error);
+        });
+    
         overlay.updateResolution = function(resolution) {
             const newSrc = `/images/underground_map/${layerName}_${resolution}.png`;
-            console.log(`Updating ${layerName} to ${resolution} resolution`);
+            console.log(`Updating ${layerName} to ${resolution} resolution: ${newSrc}`);
             this.setUrl(newSrc);
         };
-
+    
+        if (defaultVisible) {
+            overlay.addTo(map);
+        }
+    
         console.log(`Custom overlay created for ${layerName}`);
         return overlay;
     }
