@@ -84,47 +84,54 @@ let particles;
 let config;
 let colorConfig;
 let buffer32;
+let imageRect;
 
 function setup(container) {
-  size = 3;
+  size = 1;  // Reduced size for higher resolution
   noiseZ = 0;
   canvas = document.createElement('canvas');
   container.appendChild(canvas);
   ctx = canvas.getContext("2d");
   config = {
-    zoom: 100,
-    noiseSpeed: 0.0071,
-    particleSpeed: 1.5,
-    fieldForce: 40,
-    randomForce: 10,
+    zoom: 200,  // Increased zoom for finer detail
+    noiseSpeed: 0.0035,  // Reduced speed to match higher resolution
+    particleSpeed: 0.75,  // Reduced speed to match higher resolution
+    fieldForce: 20,  // Adjusted force
+    randomForce: 5,  // Adjusted force
   };
 
   colorConfig = {
-    particleOpacity: 0.091,
+    particleOpacity: 0.05,  // Reduced opacity for more subtle effect
   };
+  
+  // Scale up canvas size
+  canvas.style.width = '100%';
+  canvas.style.height = '100%';
+  
   reset();
 }
 
 function reset() {
-  w = canvas.width = canvas.offsetWidth;
-  h = canvas.height = canvas.offsetHeight;
+  w = canvas.width = canvas.offsetWidth * 2;  // Double the canvas resolution
+  h = canvas.height = canvas.offsetHeight * 2;
   columns = Math.floor(w / size) + 1;
   rows = Math.floor(h / size) + 1;
-  initParticles();
   initField();
   drawText(() => {
     drawBackground();
+    initParticles();
     draw();
   });
 }
 
 function initParticles() {
   particles = [];
-  let numberOfParticles = w * h / 800;
+  let numberOfParticles = imageRect.width * imageRect.height / 100;  // Adjust particle density
   for(let i = 0; i < numberOfParticles; i++) {
     let particle = new Particle(
-      w/2 + Math.random()*400-200, 
-      h/2 + Math.random()*400-200);
+      imageRect.x + Math.random() * imageRect.width, 
+      imageRect.y + Math.random() * imageRect.height
+    );
     particles.push(particle);
   }
 }
@@ -176,10 +183,18 @@ function drawText(callback) {
   logo.src = "../images/vixenLogoBlack.png";
   logo.onload = () => {
     let scale = Math.min(w / logo.width, h / logo.height) * 0.8;
-    let scaledWidth = logo.width * scale;
-    let scaledHeight = logo.height * scale;
-    let leftMargin = (w - scaledWidth) / 2;
-    let topMargin = (h - scaledHeight) / 2;
+    let scaledWidth = Math.floor(logo.width * scale);
+    let scaledHeight = Math.floor(logo.height * scale);
+    let leftMargin = Math.floor((w - scaledWidth) / 2);
+    let topMargin = Math.floor((h - scaledHeight) / 2);
+    
+    imageRect = {
+      x: leftMargin,
+      y: topMargin,
+      width: scaledWidth,
+      height: scaledHeight
+    };
+    
     ctx.drawImage(logo, leftMargin, topMargin, scaledWidth, scaledHeight);
     let image = ctx.getImageData(0, 0, w, h);
     buffer32 = new Uint32Array(image.data.buffer);
@@ -189,6 +204,7 @@ function drawText(callback) {
 
 function drawParticles() {
   ctx.strokeStyle = `rgba(255, 0, 74, ${colorConfig.particleOpacity})`;
+  ctx.lineWidth = 0.5;  // Thinner lines for more detail
   let x;
   let y;
   particles.forEach(p => {
