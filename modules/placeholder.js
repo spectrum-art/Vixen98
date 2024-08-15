@@ -1,1 +1,5 @@
-import { apps } from './apps.js';
+import { setup } from './particleBezier.js';
+
+export function initialize(container) {
+  setup(container);
+}

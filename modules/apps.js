@@ -137,7 +137,7 @@ export const apps = {
     icon: '📄',
     accessLevel: 1,
     showOnDesktop: false,
-    jsFiles: ['placeholder.js'],
+    jsFiles: ['placeholder.js', 'particleBezier.js'],
     cssFiles: ['placeholder.css'],
     window: {
       width: '90%',
