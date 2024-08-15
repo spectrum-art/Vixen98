@@ -175,9 +175,12 @@ function drawText(callback) {
   logo.crossOrigin = "anonymous";
   logo.src = "../images/vixenLogoBlack.png";
   logo.onload = () => {
-    let leftMargin = (w - logo.width) / 2;
-    let topMargin = (h - logo.height) / 2;
-    ctx.drawImage(logo, leftMargin, topMargin); 
+    let scale = Math.min(w / logo.width, h / logo.height) * 0.8;
+    let scaledWidth = logo.width * scale;
+    let scaledHeight = logo.height * scale;
+    let leftMargin = (w - scaledWidth) / 2;
+    let topMargin = (h - scaledHeight) / 2;
+    ctx.drawImage(logo, leftMargin, topMargin, scaledWidth, scaledHeight);
     let image = ctx.getImageData(0, 0, w, h);
     buffer32 = new Uint32Array(image.data.buffer);
     if(callback) callback();
