@@ -37,53 +37,53 @@ export function initialize(container, params = {}) {
             handleGlobalError(error);
         });
 
-        function loadTileLayers() {
-            console.log('Starting to load tile layers');
-            return new Promise((resolve, reject) => {
-                const layerPromises = TILE_LAYERS.map(loadTileLayer);
-                Promise.all(layerPromises)
-                    .then(() => {
-                        console.log('All tile layers loaded successfully');
-                        resolve();
-                    })
-                    .catch(error => {
-                        console.error('Error loading tile layers:', error);
-                        reject(error);
-                    });
-            });
-        }
-    
-        function loadTileLayer(layerName) {
-            return new Promise((resolve, reject) => {
-                console.log(`Loading tile layer: ${layerName}`);
-                const defaultVisible = layerName === 'Base';
-                const layer = createCustomOverlay(layerName, 'quarter', defaultVisible);
-                
-                const img = new Image();
-                img.onload = () => {
-                    console.log(`Image for ${layerName} loaded successfully`);
-                    layers[layerName] = layer;
-                    controls.addOverlay(layer, layerName);
-                    if (defaultVisible) {
-                        layer.addTo(map);
-                    }
-                    updateLoadingProgress();
+    function loadTileLayers() {
+        console.log('Starting to load tile layers');
+        return new Promise((resolve, reject) => {
+            const layerPromises = TILE_LAYERS.map(loadTileLayer);
+            Promise.all(layerPromises)
+                .then(() => {
+                    console.log('All tile layers loaded successfully');
                     resolve();
-                };
-                img.onerror = (error) => {
-                    console.error(`Error loading image for ${layerName}:`, error);
-                    reject(new Error(`Failed to load image for ${layerName}`));
-                };
-                img.src = `/images/underground_map/${layerName}_quarter.png`;
-    
-                setTimeout(() => {
-                    if (!layers[layerName]) {
-                        console.error(`Timeout while loading ${layerName} layer`);
-                        reject(new Error(`Timeout while loading ${layerName} layer`));
-                    }
-                }, LOAD_TIMEOUT);
-            });
-        }
+                })
+                .catch(error => {
+                    console.error('Error loading tile layers:', error);
+                    reject(error);
+                });
+        });
+    }
+
+    function loadTileLayer(layerName) {
+        return new Promise((resolve, reject) => {
+            console.log(`Loading tile layer: ${layerName}`);
+            const defaultVisible = layerName === 'Base';
+            const layer = createCustomOverlay(layerName, 'quarter', defaultVisible);
+            
+            const img = new Image();
+            img.onload = () => {
+                console.log(`Image for ${layerName} loaded successfully`);
+                layers[layerName] = layer;
+                controls.addOverlay(layer, layerName);
+                if (defaultVisible) {
+                    layer.addTo(map);
+                }
+                updateLoadingProgress();
+                resolve();
+            };
+            img.onerror = (error) => {
+                console.error(`Error loading image for ${layerName}:`, error);
+                reject(new Error(`Failed to load image for ${layerName}`));
+            };
+            img.src = `/images/underground_map/${layerName}_quarter.png`;
+
+            setTimeout(() => {
+                if (!layers[layerName]) {
+                    console.error(`Timeout while loading ${layerName} layer`);
+                    reject(new Error(`Timeout while loading ${layerName} layer`));
+                }
+            }, LOAD_TIMEOUT);
+        });
+    }
 
     function loadPinLayers() {
         console.log('Loading pin layers');
