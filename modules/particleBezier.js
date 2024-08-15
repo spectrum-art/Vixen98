@@ -86,7 +86,7 @@ let colorConfig;
 let buffer32;
 
 function setup(container) {
-  size = 3;
+  size = 1;
   noiseZ = 0;
   canvas = document.createElement('canvas');
   container.appendChild(canvas);
