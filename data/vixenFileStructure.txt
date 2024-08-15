@@ -1,0 +1,76 @@
+Vixen98
+│   index.html
+│   main.js
+│   server.js
+│   vixenFileStructure.txt
+│   
+├───.github
+│   ├───scripts
+│   │       update_announcements.py
+│   │       
+│   └───workflows
+│           update-announcements.yml
+│           
+├───data
+│       alibiDistricts.csv
+│       alibiLocations.csv
+│       announcements.json
+│       entrances.json
+│       surface_labels.json
+│       vendors.json
+│       vixenlemonlist.csv
+│       
+├───images
+│   │   BIOS-screen.gif
+│   │   black_pixel.png
+│   │   lemonlistbg.png
+│   │   SewerMapBase.png
+│   │   SewerMapBase.png.ovr
+│   │   SewerMapEntrances.png
+│   │   SewerMapEntrances.png.ovr
+│   │   SewerMapSurfaceLabels.png
+│   │   SewerMapVendors.png
+│   │   startbutton.png
+│   │   vixen98logo.png
+│   │   vixenfavicon.png
+│   │   vixenstartbutton.png
+│   │   vixensystem.png
+│   │   
+│   └───underground_map
+│           base_full.png
+│           base_half.png
+│           base_quarter.png
+│           surface_full.png
+│           surface_half.png
+│           surface_quarter.png
+│           
+├───modules
+│       alibi.js
+│       apps.js
+│       auth.js
+│       cookieBatchLog.js
+│       cookieDeliveryMap.js
+│       desktop.js
+│       documents.js
+│       encryption.js
+│       lemonList.js
+│       maps.js
+│       placeholder.js
+│       propaganda.js
+│       routing.js
+│       system.js
+│       undergroundMap.js
+│       utils.js
+│       windowManagement.js
+│       
+└───styles
+        alibi.css
+        common.css
+        documents.css
+        encryption.css
+        lemonList.css
+        main.css
+        maps.css
+        propaganda.css
+        system.css
+        undergroundMap.css

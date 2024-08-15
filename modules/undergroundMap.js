@@ -15,17 +15,28 @@ export function initialize(container, params = {}) {
         return;
     }
 
+    console.log('Initializing Underground Map');
     const loadingIndicator = createLoadingIndicator(container);
     let map, layers, controls;
 
     initializeMap()
-        .then(() => loadTileLayers())
-        .then(() => loadPinLayers())
-        .then(finishMapInitialization)
+        .then(() => {
+            console.log('Map initialized, loading tile layers');
+            return loadTileLayers();
+        })
+        .then(() => {
+            console.log('Tile layers loaded, loading pin layers');
+            return loadPinLayers();
+        })
+        .then(() => {
+            console.log('All layers loaded, finishing map initialization');
+            finishMapInitialization();
+        })
         .catch(handleGlobalError);
 
     function initializeMap() {
         return new Promise((resolve) => {
+            console.log('Creating Leaflet map');
             map = L.map(container, {
                 crs: L.CRS.Simple,
                 minZoom: MIN_ZOOM,
@@ -79,6 +90,7 @@ export function initialize(container, params = {}) {
             layer.on('error', (error) => {
                 console.error(`Error loading ${layerName} layer:`, error);
                 if (retryCount < MAX_RETRIES) {
+                    console.log(`Retrying ${layerName} layer load, attempt ${retryCount + 1}`);
                     setTimeout(() => {
                         loadTileLayer(layerName, retryCount + 1).then(resolve).catch(reject);
                     }, RETRY_DELAY);
@@ -105,10 +117,15 @@ export function initialize(container, params = {}) {
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
+                    console.log(`${layerName} JSON fetched successfully`);
                     return response.json();
                 })
                 .then(data => {
-                    data.forEach(pin => addPinToLayer(pin, markerGroup, layerName));
+                    console.log(`${layerName} JSON parsed successfully:`, data);
+                    data.forEach(pin => {
+                        console.log(`Adding pin to ${layerName}:`, pin);
+                        addPinToLayer(pin, markerGroup, layerName);
+                    });
                     layers[layerName] = markerGroup;
                     controls.addOverlay(markerGroup, layerName);
                     if (defaultVisible) {
@@ -121,6 +138,7 @@ export function initialize(container, params = {}) {
                 .catch(error => {
                     console.error(`Error loading ${layerName} data:`, error);
                     if (retryCount < MAX_RETRIES) {
+                        console.log(`Retrying ${layerName} data load, attempt ${retryCount + 1}`);
                         setTimeout(() => {
                             loadPinLayer(layerName, retryCount + 1).then(resolve).catch(reject);
                         }, RETRY_DELAY);
@@ -132,6 +150,7 @@ export function initialize(container, params = {}) {
     }
 
     function addPinToLayer(pin, markerGroup, layerName) {
+        console.log(`Adding pin to layer ${layerName}:`, pin);
         const latlng = map.unproject([pin.x, pin.y], MAX_ZOOM);
         const marker = L.marker(latlng, {
             icon: L.divIcon({
@@ -154,6 +173,7 @@ export function initialize(container, params = {}) {
         }
         
         markerGroup.addLayer(marker);
+        console.log(`Pin added to layer ${layerName}:`, marker);
     }
 
     function finishMapInitialization() {
@@ -177,6 +197,7 @@ export function initialize(container, params = {}) {
 
     function setupResizeHandling() {
         const resizeMap = debounce(() => {
+            console.log('Resizing map');
             const windowElement = container.closest('.window');
             if (windowElement) {
                 const newSize = Math.min(windowElement.clientWidth, windowElement.clientHeight);
@@ -186,6 +207,7 @@ export function initialize(container, params = {}) {
             map.invalidateSize({ animate: false, pan: false });
             map.fitBounds(map.options.maxBounds);
             updateImageResolution();
+            console.log('Map resized');
         }, 250);
 
         resizeMap();
@@ -196,6 +218,7 @@ export function initialize(container, params = {}) {
         const windowElement = container.closest('.window');
         if (windowElement) {
             const observer = new ResizeObserver(debounce(() => {
+                console.log('Window resized, updating map');
                 resizeMap();
             }, 100));
             observer.observe(windowElement);
@@ -213,6 +236,7 @@ export function initialize(container, params = {}) {
     }
 
     function createCustomOverlay(layerName, initialResolution = 'quarter', defaultVisible = true) {
+        console.log(`Creating custom overlay for ${layerName}`);
         const img = new Image();
         img.src = `/images/underground_map/${layerName}_${initialResolution}.png`;
         img.className = `underground-layer-${layerName.toLowerCase()}`;
@@ -235,7 +259,7 @@ export function initialize(container, params = {}) {
             }
         };
 
-        console.log(`Created custom overlay for ${layerName}`);
+        console.log(`Custom overlay created for ${layerName}`);
         return overlay;
     }
 
@@ -293,6 +317,7 @@ export function initialize(container, params = {}) {
     }
 
     function showErrorMessage(container, message) {
+        console.error('Showing error message:', message);
         const errorElement = document.createElement('div');
         errorElement.className = 'map-error-message';
         errorElement.textContent = message;
@@ -301,6 +326,7 @@ export function initialize(container, params = {}) {
 
     const loadTimeout = setTimeout(() => {
         if (container.contains(loadingIndicator)) {
+            console.error('Map loading timed out');
             handleGlobalError(new Error('Map loading timed out'));
         }
     }, LOAD_TIMEOUT);
