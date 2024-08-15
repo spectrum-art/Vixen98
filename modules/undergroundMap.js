@@ -7,7 +7,7 @@ const MIN_ZOOM = -1;
 const ORIGINAL_IMAGE_SIZE = 6500;
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 2000;
-const LOAD_TIMEOUT = 20000;
+const LOAD_TIMEOUT = 30000;
 
 export function initialize(container, params = {}) {
     if (!container || !(container instanceof HTMLElement)) {
@@ -37,31 +37,31 @@ export function initialize(container, params = {}) {
             handleGlobalError(error);
         });
 
-    function loadTileLayers() {
-        console.log('Starting to load tile layers');
-        return new Promise((resolve, reject) => {
-            Promise.all(TILE_LAYERS.map(loadTileLayer))
-                .then(() => {
-                    console.log('All tile layers loaded successfully');
-                    resolve();
-                })
-                .catch(error => {
-                    console.error('Error loading tile layers:', error);
-                    reject(error);
-                });
-        });
-    }
-
-    function loadTileLayer(layerName, retryCount = 0) {
-        return new Promise((resolve, reject) => {
-            console.log(`Loading tile layer: ${layerName}`);
-            const defaultVisible = layerName === 'Base';
-            const layer = createCustomOverlay(layerName, 'quarter', defaultVisible);
-            
-            layer.on('load', () => {
-                console.log(`${layerName} layer 'load' event fired`);
-                setTimeout(() => {
-                    console.log(`${layerName} layer loaded successfully`);
+        function loadTileLayers() {
+            console.log('Starting to load tile layers');
+            return new Promise((resolve, reject) => {
+                const layerPromises = TILE_LAYERS.map(loadTileLayer);
+                Promise.all(layerPromises)
+                    .then(() => {
+                        console.log('All tile layers loaded successfully');
+                        resolve();
+                    })
+                    .catch(error => {
+                        console.error('Error loading tile layers:', error);
+                        reject(error);
+                    });
+            });
+        }
+    
+        function loadTileLayer(layerName) {
+            return new Promise((resolve, reject) => {
+                console.log(`Loading tile layer: ${layerName}`);
+                const defaultVisible = layerName === 'Base';
+                const layer = createCustomOverlay(layerName, 'quarter', defaultVisible);
+                
+                const img = new Image();
+                img.onload = () => {
+                    console.log(`Image for ${layerName} loaded successfully`);
                     layers[layerName] = layer;
                     controls.addOverlay(layer, layerName);
                     if (defaultVisible) {
@@ -69,29 +69,21 @@ export function initialize(container, params = {}) {
                     }
                     updateLoadingProgress();
                     resolve();
-                }, 100); // Small delay to ensure layer is fully initialized
+                };
+                img.onerror = (error) => {
+                    console.error(`Error loading image for ${layerName}:`, error);
+                    reject(new Error(`Failed to load image for ${layerName}`));
+                };
+                img.src = `/images/underground_map/${layerName}_quarter.png`;
+    
+                setTimeout(() => {
+                    if (!layers[layerName]) {
+                        console.error(`Timeout while loading ${layerName} layer`);
+                        reject(new Error(`Timeout while loading ${layerName} layer`));
+                    }
+                }, LOAD_TIMEOUT);
             });
-
-            layer.on('error', (error) => {
-                console.error(`Error loading ${layerName} layer:`, error);
-                if (retryCount < MAX_RETRIES) {
-                    console.log(`Retrying ${layerName} layer load, attempt ${retryCount + 1}`);
-                    setTimeout(() => {
-                        loadTileLayer(layerName, retryCount + 1).then(resolve).catch(reject);
-                    }, RETRY_DELAY);
-                } else {
-                    reject(new Error(`Failed to load ${layerName} layer after ${MAX_RETRIES} attempts`));
-                }
-            });
-
-            setTimeout(() => {
-                if (!layers[layerName]) {
-                    console.error(`Timeout while loading ${layerName} layer`);
-                    reject(new Error(`Timeout while loading ${layerName} layer`));
-                }
-            }, LOAD_TIMEOUT);
-        });
-    }
+        }
 
     function loadPinLayers() {
         console.log('Loading pin layers');
@@ -229,31 +221,22 @@ export function initialize(container, params = {}) {
 
     function createCustomOverlay(layerName, initialResolution = 'quarter', defaultVisible = true) {
         console.log(`Creating custom overlay for ${layerName}`);
-        const img = new Image();
         const imageSrc = `/images/underground_map/${layerName}_${initialResolution}.png`;
         console.log(`Loading image from: ${imageSrc}`);
-        img.src = imageSrc;
-        img.className = `underground-layer-${layerName.toLowerCase()}`;
-        
-        img.onload = () => console.log(`Image for ${layerName} loaded successfully`);
-        img.onerror = (error) => console.error(`Error loading image for ${layerName}:`, error);
 
         const southWest = map.unproject([0, ORIGINAL_IMAGE_SIZE], MAX_ZOOM);
         const northEast = map.unproject([ORIGINAL_IMAGE_SIZE, 0], MAX_ZOOM);
         const bounds = new L.LatLngBounds(southWest, northEast);
 
-        const overlay = L.imageOverlay(img.src, bounds, {
+        const overlay = L.imageOverlay(imageSrc, bounds, {
             opacity: layerName === 'Surface' ? 0.5 : 1,
             className: `underground-layer-${layerName.toLowerCase()}`
         });
 
         overlay.updateResolution = function(resolution) {
             const newSrc = `/images/underground_map/${layerName}_${resolution}.png`;
-            if (img.src !== newSrc) {
-                console.log(`Updating ${layerName} to ${resolution} resolution`);
-                img.src = newSrc;
-                this.setUrl(newSrc);
-            }
+            console.log(`Updating ${layerName} to ${resolution} resolution`);
+            this.setUrl(newSrc);
         };
 
         console.log(`Custom overlay created for ${layerName}`);
