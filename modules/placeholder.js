@@ -1,4 +1,4 @@
-import { setup } from './particleBezier.js';
+import { initialize as initializeParticleBezier } from './particleBezier.js';
 
 export function initialize(container, params = {}) {
     if (!container || !(container instanceof HTMLElement)) {
@@ -13,5 +13,5 @@ export function initialize(container, params = {}) {
 function setupPlaceholderApp(container) {
     container.innerHTML = '<div id="placeholder-canvas-container" style="width:100%;height:100%;"></div>';
     const canvasContainer = container.querySelector('#placeholder-canvas-container');
-    setup(canvasContainer);
+    initializeParticleBezier(canvasContainer);
 }
