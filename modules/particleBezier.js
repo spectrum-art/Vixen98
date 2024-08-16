@@ -14,17 +14,15 @@ class Vector {
   }
 
   setLength(length) {
-    let angle = this.getAngle();
-    this.x = Math.cos(angle) * length;
-    this.y = Math.sin(angle) * length;
+    const currentLength = this.getLength();
+    if (currentLength !== 0) {
+      this.x = (this.x / currentLength) * length;
+      this.y = (this.y / currentLength) * length;
+    }
   }
 
   getLength() {
     return Math.sqrt(this.x * this.x + this.y * this.y);
-  }
-
-  getAngle() {
-    return Math.atan2(this.y, this.x);
   }
 }
 
@@ -34,25 +32,28 @@ class Particle {
     this.vel = new Vector(0, 0);
     this.acc = new Vector(0, 0);
     this.color = "rgba(255, 255, 255, 0.5)";
+    this.lifespan = 0;
   }
   
   update() {
     this.vel.addTo(this.acc);
+    this.vel.setLength(Math.min(this.vel.getLength(), 2));
     this.pos.addTo(this.vel);
     this.acc.x = 0;
     this.acc.y = 0;
-    this.vel.setLength(Math.min(this.vel.getLength(), 2));
+    this.lifespan++;
   }
   
   draw() {
     ctx.fillStyle = this.color;
-    ctx.fillRect(this.pos.x, this.pos.y, 2, 2);
+    ctx.fillRect(this.pos.x, this.pos.y, 1, 1);
   }
 }
 
 let canvas, ctx, w, h;
 let particles = [];
 let logoData;
+let noiseScale = 0.005;
 
 function setup(container) {
   canvas = document.createElement('canvas');
@@ -91,39 +92,3 @@ function loadLogo(callback) {
     
     tempCtx.drawImage(logo, x, y, scaledWidth, scaledHeight);
     logoData = tempCtx.getImageData(0, 0, w, h).data;
-    callback();
-  };
-  logo.src = "../images/vixenLogoBlack.png";
-}
-
-function initParticles() {
-  particles = [];
-  for (let i = 0; i < 5000; i++) {
-    particles.push(new Particle(Math.random() * w, Math.random() * h));
-  }
-}
-
-function draw() {
-  ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-  ctx.fillRect(0, 0, w, h);
-  
-  particles.forEach(p => {
-    const index = (Math.floor(p.pos.y) * w + Math.floor(p.pos.x)) * 4;
-    if (logoData[index] > 0) {
-      p.acc = new Vector((Math.random() - 0.5) * 0.5, (Math.random() - 0.5) * 0.5);
-      p.color = "rgba(255, 0, 74, 0.8)";
-    } else {
-      const noise = noise3D(p.pos.x * 0.01, p.pos.y * 0.01, performance.now() * 0.0001);
-      p.acc = new Vector(Math.cos(noise * Math.PI * 2) * 0.1, Math.sin(noise * Math.PI * 2) * 0.1);
-      p.color = "rgba(255, 255, 255, 0.5)";
-    }
-    p.update();
-    p.draw();
-  });
-  
-  requestAnimationFrame(draw);
-}
-
-export function initialize(container) {
-  setup(container);
-}
