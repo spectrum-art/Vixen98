@@ -92,3 +92,46 @@ function loadLogo(callback) {
     
     tempCtx.drawImage(logo, x, y, scaledWidth, scaledHeight);
     logoData = tempCtx.getImageData(0, 0, w, h).data;
+    callback();
+  };
+  logo.src = "../images/vixenLogoBlack.png";
+}
+
+function initParticles() {
+  particles = [];
+  for (let i = 0; i < 10000; i++) {
+    particles.push(new Particle(Math.random() * w, Math.random() * h));
+  }
+}
+
+function draw() {
+  ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+  ctx.fillRect(0, 0, w, h);
+  
+  particles.forEach(p => {
+    const index = (Math.floor(p.pos.y) * w + Math.floor(p.pos.x)) * 4;
+    if (logoData[index] > 0) {
+      p.acc = new Vector((Math.random() - 0.5) * 0.1, (Math.random() - 0.5) * 0.1);
+      p.color = "rgba(255, 0, 74, 0.8)";
+    } else {
+      const noise = noise3D(p.pos.x * noiseScale, p.pos.y * noiseScale, performance.now() * 0.0001);
+      p.acc = new Vector(Math.cos(noise * Math.PI * 2) * 0.02, Math.sin(noise * Math.PI * 2) * 0.02);
+      p.color = "rgba(255, 255, 255, 0.3)";
+    }
+    p.update();
+    p.draw();
+
+    if (p.lifespan > 200 || p.pos.x < 0 || p.pos.x > w || p.pos.y < 0 || p.pos.y > h) {
+      p.pos.x = Math.random() * w;
+      p.pos.y = Math.random() * h;
+      p.vel = new Vector(0, 0);
+      p.lifespan = 0;
+    }
+  });
+  
+  requestAnimationFrame(draw);
+}
+
+export function initialize(container) {
+  setup(container);
+}
