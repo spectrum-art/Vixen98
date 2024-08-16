@@ -65,10 +65,12 @@ function setup(container) {
     particleOpacity: 0.091,
   };
   
-  canvas.style.width = '100%';
-  canvas.style.height = '100%';
-  
   resetCanvas(container);
+  
+  const resizeObserver = new ResizeObserver(() => {
+    resetCanvas(container);
+  });
+  resizeObserver.observe(container);
 }
 
 function resetCanvas(container) {
@@ -79,8 +81,14 @@ function resetCanvas(container) {
   
   noise.seed(Math.random());
   
-  w = canvas.width = container.clientWidth;
-  h = canvas.height = container.clientHeight;
+  const dpr = window.devicePixelRatio || 1;
+  w = canvas.width = container.clientWidth * dpr;
+  h = canvas.height = container.clientHeight * dpr;
+  
+  canvas.style.width = `${container.clientWidth}px`;
+  canvas.style.height = `${container.clientHeight}px`;
+  
+  ctx.scale(dpr, dpr);
   
   columns = Math.floor(w / size) + 1;
   rows = Math.floor(h / size) + 1;
@@ -148,14 +156,15 @@ function drawText(callback) {
   logo.crossOrigin = "anonymous";
   logo.src = "../images/vixenLogoBlack.png";
   logo.onload = () => {
-    const scale = Math.min(w / logo.width, h / logo.height);
+    const dpr = window.devicePixelRatio || 1;
+    const scale = Math.min(w / (logo.width * dpr), h / (logo.height * dpr));
     const logoWidth = logo.width * scale;
     const logoHeight = logo.height * scale;
-    const leftMargin = (w - logoWidth) / 2;
-    const topMargin = (h - logoHeight) / 2;
+    const leftMargin = (w / dpr - logoWidth) / 2;
+    const topMargin = (h / dpr - logoHeight) / 2;
     
     ctx.drawImage(logo, leftMargin, topMargin, logoWidth, logoHeight); 
-    let image = ctx.getImageData(0, 0, w, h);
+    let image = ctx.getImageData(0, 0, w / dpr, h / dpr);
     buffer32 = new Uint32Array(image.data.buffer);
     if(callback) callback();
   };
