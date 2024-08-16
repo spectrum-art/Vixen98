@@ -47,26 +47,50 @@ class Particle {
 }
 
 function setup(container) {
-  size = 3;
-  noiseZ = 0;
-  canvas = document.createElement('canvas');
-  ctx = canvas.getContext('2d');
-  container.appendChild(canvas);
+    size = 3;
+    noiseZ = 0;
+    canvas = document.createElement('canvas');
+    ctx = canvas.getContext('2d');
+    container.appendChild(canvas);
+    
+    config = {
+      zoom: 100,
+      noiseSpeed: 0.0071,
+      particleSpeed: 1.5,
+      fieldForce: 40,
+      randomForce: 10,
+    };
   
-  config = {
-    zoom: 100,
-    noiseSpeed: 0.0071,
-    particleSpeed: 1.5,
-    fieldForce: 40,
-    randomForce: 10,
-  };
-
-  colorConfig = {
-    particleOpacity: 0.091,
-  };
+    colorConfig = {
+      particleOpacity: 0.091,
+    };
+    
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    
+    reset(container);
+  }
   
-  reset(container);
-}
+  function reset(container) {
+    if (typeof noise === 'undefined' || typeof noise.seed !== 'function') {
+      console.error('Perlin noise library not loaded or incorrect');
+      return;
+    }
+    
+    noise.seed(Math.random());
+    
+    w = canvas.width = container.clientWidth;
+    h = canvas.height = container.clientHeight;
+    
+    columns = Math.floor(w / size) + 1;
+    rows = Math.floor(h / size) + 1;
+    initParticles();
+    initField();
+    drawText(() => {
+      drawBackground();
+      requestAnimationFrame(draw);
+    });
+  }
 
 function reset(container) {
   if (typeof noise === 'undefined' || typeof noise.seed !== 'function') {
@@ -174,21 +198,15 @@ function drawParticles() {
 }
 
 export function initialize(container) {
-  if (!container || !(container instanceof HTMLElement)) {
-    console.error('Invalid container provided to Placeholder initialize function');
-    return;
+    if (!container || !(container instanceof HTMLElement)) {
+      console.error('Invalid container provided to Placeholder initialize function');
+      return;
+    }
+    
+    if (typeof noise === 'undefined' || typeof noise.seed !== 'function') {
+      console.error('Perlin noise library not loaded or incorrect');
+      return;
+    }
+
+    setup(container);
   }
-  
-  if (typeof noise === 'undefined' || typeof noise.seed !== 'function') {
-    console.error('Perlin noise library not loaded or incorrect');
-    return;
-  }
-  
-  const placeholderContainer = container.querySelector('.window-content');
-  if (!placeholderContainer) {
-    console.error('Could not find .window-content within the provided container');
-    return;
-  }
-  
-  setup(placeholderContainer);
-}
