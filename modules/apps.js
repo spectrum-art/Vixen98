@@ -140,7 +140,7 @@ export const apps = {
     jsFiles: ['placeholder.js', 'particleBezier.js'],
     cssFiles: ['placeholder.css'],
     window: {
-      width: '67.5%',
+      width: '66.67%',
       height: '90%',
       minWidth: '600px',
       minHeight: '400px'
