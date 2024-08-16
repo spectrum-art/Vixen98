@@ -1,4 +1,4 @@
-import { noise } from 'https://cdn.skypack.dev/simplex-noise@4.0.1';
+import { createNoise3D } from 'https://cdn.skypack.dev/simplex-noise@4.0.1';
 
 export function initialize(container, params = {}) {
     if (!container || !(container instanceof HTMLElement)) {
@@ -10,6 +10,7 @@ export function initialize(container, params = {}) {
     container.appendChild(canvas);
     const ctx = canvas.getContext('2d');
 
+    const noise3D = createNoise3D();
     let w, h, size, columns, rows, noiseZ, particles, field, buffer32;
     const config = {
         zoom: 100,
@@ -91,7 +92,6 @@ export function initialize(container, params = {}) {
     function setup() {
         size = 3;
         noiseZ = 0;
-        noise.seed(Math.random());
         resize();
         window.addEventListener('resize', resize);
         initParticles();
@@ -138,8 +138,8 @@ export function initialize(container, params = {}) {
                     x1 = (Math.random() - 0.5) * config.randomForce;
                     y1 = (Math.random() - 0.5) * config.randomForce;
                 } else {
-                    x1 = noise(x / config.zoom, y / config.zoom, noiseZ) * config.fieldForce;
-                    y1 = noise(x / config.zoom + 40000, y / config.zoom + 40000, noiseZ) * config.fieldForce;
+                    x1 = noise3D(x / config.zoom, y / config.zoom, noiseZ) * config.fieldForce;
+                    y1 = noise3D(x / config.zoom + 40000, y / config.zoom + 40000, noiseZ) * config.fieldForce;
                 }
                 field[x][y].x = x1;
                 field[x][y].y = y1;
