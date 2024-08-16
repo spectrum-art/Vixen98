@@ -10,7 +10,7 @@ class Particle {
     this.vel = new Vector(Math.random() - 0.5, Math.random() - 0.5);
     this.acc = new Vector(0, 0);
     this.lifespan = 0;
-    this.maxLifespan = 1000 + Math.random() * 2000;
+    this.maxLifespan = 10000 + Math.random() * 2000;
   }
   
   move(acc) {
