@@ -119,7 +119,7 @@ function scaleCanvas(container) {
 
 function initParticles() {
   particles = [];
-  let numberOfParticles = Math.floor((w * h / 400) * 1.5);
+  let numberOfParticles = Math.floor((w * h / 400) * 4);
   for(let i = 0; i < numberOfParticles; i++) {
     let particle = new Particle(Math.random() * w, Math.random() * h);
     particles.push(particle);
