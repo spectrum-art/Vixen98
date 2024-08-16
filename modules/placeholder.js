@@ -46,12 +46,12 @@ class Particle {
   }
 }
 
-function setup() {
+function setup(container) {
   size = 3;
   noiseZ = 0;
   canvas = document.createElement('canvas');
   ctx = canvas.getContext('2d');
-  document.querySelector('.window-content').appendChild(canvas);
+  container.appendChild(canvas);
   
   config = {
     zoom: 100,
@@ -65,10 +65,10 @@ function setup() {
     particleOpacity: 0.091,
   };
   
-  reset();
+  reset(container);
 }
 
-function reset() {
+function reset(container) {
   if (typeof noise === 'undefined' || typeof noise.seed !== 'function') {
     console.error('Perlin noise library not loaded or incorrect');
     return;
@@ -76,7 +76,6 @@ function reset() {
   
   noise.seed(Math.random());
   
-  const container = document.querySelector('.window-content');
   w = canvas.width = container.clientWidth;
   h = canvas.height = container.clientHeight;
   
@@ -185,5 +184,11 @@ export function initialize(container) {
     return;
   }
   
-  setup();
+  const placeholderContainer = container.querySelector('.window-content');
+  if (!placeholderContainer) {
+    console.error('Could not find .window-content within the provided container');
+    return;
+  }
+  
+  setup(placeholderContainer);
 }
