@@ -81,7 +81,7 @@ let config;
 let colorConfig;
 let buffer32;
 
-function setup(container, callback) {
+export function setup(container, callback) {
   size = 3;
   noiseZ = 0;
   canvas = document.createElement('canvas');
