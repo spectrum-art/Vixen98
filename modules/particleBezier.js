@@ -2,7 +2,75 @@ import { createNoise3D } from 'https://cdn.skypack.dev/simplex-noise@4.0.1';
 
 const noise3D = createNoise3D();
 
-// ... (Vector and Particle classes remain the same)
+class Vector {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  addTo(v) {
+    this.x += v.x;
+    this.y += v.y;
+  }
+
+  setLength(length) {
+    let angle = this.getAngle();
+    this.x = Math.cos(angle) * length;
+    this.y = Math.sin(angle) * length;
+  }
+
+  getLength() {
+    return Math.sqrt(this.x * this.x + this.y * this.y);
+  }
+
+  getAngle() {
+    return Math.atan2(this.y, this.x);
+  }
+}
+
+class Particle {
+  constructor(x, y) {
+    this.pos = new Vector(x, y);
+    this.prevPos = new Vector(x, y);
+    this.vel = new Vector(Math.random() - 0.5, Math.random() - 0.5);
+    this.acc = new Vector(0, 0);
+  }
+  
+  move(acc) {
+    this.prevPos.x = this.pos.x;
+    this.prevPos.y = this.pos.y;
+    if(acc) {
+      this.acc.addTo(acc);
+    }
+    this.vel.addTo(this.acc);
+    this.pos.addTo(this.vel);
+    if(this.vel.getLength() > config.particleSpeed) {
+      this.vel.setLength(config.particleSpeed);
+    }
+    this.acc.x = 0;
+    this.acc.y = 0;
+  }
+    
+  drawLine() {
+    ctx.beginPath();
+    ctx.moveTo(this.prevPos.x, this.prevPos.y);
+    ctx.lineTo(this.pos.x, this.pos.y);
+    ctx.stroke();  
+  }
+  
+  wrap() {
+    if(this.pos.x > w) {
+      this.prevPos.x = this.pos.x = 0;
+    } else if(this.pos.x < 0) {
+      this.prevPos.x = this.pos.x = w - 1;
+    }
+    if(this.pos.y > h) {
+      this.prevPos.y = this.pos.y = 0;
+    } else if(this.pos.y < 0) {
+      this.prevPos.y = this.pos.y = h - 1;
+    }
+  }
+}
 
 let canvas;
 let ctx;
@@ -57,7 +125,7 @@ function reset(callback) {
 
 function initParticles() {
   console.log('Initializing particles');
-  let particles = [];
+  particles = [];
   let numberOfParticles = w * h / 800;
   for(let i = 0; i < numberOfParticles; i++) {
     let particle = new Particle(
@@ -143,7 +211,7 @@ function draw() {
   requestAnimationFrame(draw);
   calculateField();
   noiseZ += config.noiseSpeed;
-  drawBackground();  // Add this line to refresh the background
+  drawBackground();
   drawParticles();
 }
 
