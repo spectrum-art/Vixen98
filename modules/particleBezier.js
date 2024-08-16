@@ -55,7 +55,47 @@ function reset(callback) {
   });
 }
 
-// ... (other functions remain the same)
+function initParticles() {
+  console.log('Initializing particles');
+  particles = [];
+  let numberOfParticles = w * h / 800;
+  for(let i = 0; i < numberOfParticles; i++) {
+    let particle = new Particle(
+      w/2 + Math.random()*400-200, 
+      h/2 + Math.random()*400-200);
+    particles.push(particle);
+  }
+}
+
+function initField() {
+  console.log('Initializing field');
+  field = new Array(columns);
+  for(let x = 0; x < columns; x++) {
+    field[x] = new Array(columns);
+    for(let y = 0; y < rows; y++) {
+      field[x][y] = new Vector(0, 0);
+    }
+  }  
+}
+
+function calculateField() {
+  let x1;
+  let y1;
+  for(let x = 0; x < columns; x++) {
+    for(let y = 0; y < rows; y++) {
+      let color = buffer32[y*size * w + x*size];
+      if (color) {
+        x1 = (Math.random()-0.5) * config.randomForce;
+        y1 = (Math.random()-0.5) * config.randomForce;
+      } else {
+        x1 = noise3D(x/config.zoom, y/config.zoom, noiseZ) * config.fieldForce / 20;
+        y1 = noise3D(x/config.zoom + 40000, y/config.zoom + 40000, noiseZ) * config.fieldForce / 20;
+      }
+      field[x][y].x = x1;
+      field[x][y].y = y1;
+    }
+  }
+}
 
 function drawBackground() {
   ctx.fillStyle = "black";
