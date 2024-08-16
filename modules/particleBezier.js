@@ -1,5 +1,3 @@
-import noise from 'https://cdn.jsdelivr.net/npm/noisejs@2.1.0/index.js';
-
 class Vector {
   constructor(x, y) {
     this.x = x;
