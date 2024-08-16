@@ -1,3 +1,7 @@
+import { createNoise3D } from 'https://cdn.skypack.dev/simplex-noise@4.0.1';
+
+const noise3D = createNoise3D();
+
 class Vector {
   constructor(x, y) {
     this.x = x;
@@ -105,7 +109,6 @@ export function setup(container, callback) {
 }
 
 function reset(callback) {
-  noise.seed(Math.random());  
   w = canvas.width = canvas.offsetWidth;
   h = canvas.height = canvas.offsetHeight;
   columns = Math.floor(w / size) + 1;
@@ -156,8 +159,8 @@ function calculateField() {
         x1 = (Math.random()-0.5) * config.randomForce;
         y1 = (Math.random()-0.5) * config.randomForce;
       } else {
-        x1 = noise.simplex3(x/config.zoom, y/config.zoom, noiseZ) * config.fieldForce / 20;
-        y1 = noise.simplex3(x/config.zoom + 40000, y/config.zoom + 40000, noiseZ) * config.fieldForce / 20;
+        x1 = noise3D(x/config.zoom, y/config.zoom, noiseZ) * config.fieldForce / 20;
+        y1 = noise3D(x/config.zoom + 40000, y/config.zoom + 40000, noiseZ) * config.fieldForce / 20;
       }
       field[x][y].x = x1;
       field[x][y].y = y1;
