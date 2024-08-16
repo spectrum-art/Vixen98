@@ -1,7 +1,6 @@
 import { Vector } from './vector.js';
 
 const CANVAS_SIZE = 1000;
-
 let canvas, ctx, field, w, h, size, columns, rows, noiseZ, particles, config, colorConfig, buffer32;
 
 class Particle {
@@ -49,22 +48,22 @@ class Particle {
 }
 
 function setup(container) {
-  size = 3;
+  size = 2;
   noiseZ = 0;
   canvas = document.createElement('canvas');
   ctx = canvas.getContext('2d');
   container.appendChild(canvas);
   
   config = {
-    zoom: 50,
-    noiseSpeed: 0.005,
-    particleSpeed: 2,
-    fieldForce: 60,
-    randomForce: 20,
+    zoom: 75,
+    noiseSpeed: 0.0071,
+    particleSpeed: 1.5,
+    fieldForce: 40,
+    randomForce: 10,
   };
 
   colorConfig = {
-    particleOpacity: 0.2,
+    particleOpacity: 0.091,
   };
   
   canvas.width = CANVAS_SIZE;
@@ -102,9 +101,11 @@ function resetCanvas(container) {
 
 function scaleCanvas(container) {
   const headerHeight = 20;
-  const availableWidth = container.clientWidth;
   const availableHeight = container.clientHeight - headerHeight;
-  const scale = Math.min(availableWidth / CANVAS_SIZE, availableHeight / CANVAS_SIZE);
+  const scale = Math.min(
+    container.clientWidth / CANVAS_SIZE,
+    availableHeight / CANVAS_SIZE
+  );
   const scaledWidth = Math.floor(CANVAS_SIZE * scale);
   const scaledHeight = Math.floor(CANVAS_SIZE * scale);
 
@@ -112,13 +113,13 @@ function scaleCanvas(container) {
   canvas.style.height = `${scaledHeight}px`;
 
   canvas.style.position = 'absolute';
-  canvas.style.left = `${(availableWidth - scaledWidth) / 2}px`;
+  canvas.style.left = `${(container.clientWidth - scaledWidth) / 2}px`;
   canvas.style.top = `${headerHeight + (availableHeight - scaledHeight) / 2}px`;
 }
 
 function initParticles() {
   particles = [];
-  let numberOfParticles = w * h / 400;
+  let numberOfParticles = Math.floor((w * h / 400) * 1.5);
   for(let i = 0; i < numberOfParticles; i++) {
     let particle = new Particle(Math.random() * w, Math.random() * h);
     particles.push(particle);
@@ -152,14 +153,13 @@ function calculateField() {
 
   for(let x = 0; x < columns; x++) {
     for(let y = 0; y < rows; y++) {
-      let index = (y * size * w + x * size) * 4;
-      let color = buffer32[index/4];
+      let color = buffer32 ? buffer32[y*size * w + x*size] : 0;
       if (color) {
-        field[x][y].x = (Math.random() - 0.5) * config.randomForce * 2;
-        field[x][y].y = (Math.random() - 0.5) * config.randomForce * 2;
+        field[x][y].x = (Math.random()-0.5) * config.randomForce;
+        field[x][y].y = (Math.random()-0.5) * config.randomForce;
       } else {
-        field[x][y].x = noise.simplex3(x/config.zoom, y/config.zoom, noiseZ) * config.fieldForce;
-        field[x][y].y = noise.simplex3(x/config.zoom + 40000, y/config.zoom + 40000, noiseZ) * config.fieldForce;
+        field[x][y].x = noise.simplex3(x/config.zoom, y/config.zoom, noiseZ) * config.fieldForce / 20;
+        field[x][y].y = noise.simplex3(x/config.zoom + 40000, y/config.zoom + 40000, noiseZ) * config.fieldForce / 20;
       }
     }
   }
@@ -175,7 +175,7 @@ function drawText(callback) {
   logo.crossOrigin = "anonymous";
   logo.src = "../images/vixenLogoBlack.png";
   logo.onload = () => {
-    const scale = Math.min(w / logo.width, h / logo.height);
+    const scale = Math.min(w / logo.width, h / logo.height) * 0.8;
     const logoWidth = logo.width * scale;
     const logoHeight = logo.height * scale;
     const leftMargin = (w - logoWidth) / 2;
@@ -189,8 +189,7 @@ function drawText(callback) {
 }
 
 function drawParticles() {
-  ctx.strokeStyle = `rgba(255, 60, 0, ${colorConfig.particleOpacity})`;
-  ctx.lineWidth = 2;
+  ctx.strokeStyle = `rgba(255, 0, 74, ${colorConfig.particleOpacity})`;
   particles.forEach(p => {
     let x = p.pos.x / size;
     let y = p.pos.y / size;
