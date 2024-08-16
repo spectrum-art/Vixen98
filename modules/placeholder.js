@@ -1,7 +1,7 @@
 import { Vector } from './vector.js';
 
 const CANVAS_SIZE = 1000;
-let canvas, ctx, field, w, h, size, columns, rows, noiseZ, particles, config, colorConfig, buffer32;
+let canvas, ctx, field, w, h, size, columns, rows, noiseZ, particles, config, colorConfig, buffer32, logoArea;
 
 class Particle {
   constructor(x, y) {
@@ -89,9 +89,9 @@ function resetCanvas(container) {
   
   columns = Math.floor(w / size) + 1;
   rows = Math.floor(h / size) + 1;
-  initParticles();
-  initField();
   drawText(() => {
+    initParticles();
+    initField();
     drawBackground();
     requestAnimationFrame(draw);
   });
@@ -119,9 +119,11 @@ function scaleCanvas(container) {
 
 function initParticles() {
   particles = [];
-  let numberOfParticles = Math.floor((w * h / 400) * 4);
-  for(let i = 0; i < numberOfParticles; i++) {
-    let particle = new Particle(Math.random() * w, Math.random() * h);
+  const particleCount = Math.floor(logoArea.width * logoArea.height / 20);
+  for(let i = 0; i < particleCount; i++) {
+    let x = logoArea.x + Math.random() * logoArea.width;
+    let y = logoArea.y + Math.random() * logoArea.height;
+    let particle = new Particle(x, y);
     particles.push(particle);
   }
 }
@@ -175,11 +177,19 @@ function drawText(callback) {
   logo.crossOrigin = "anonymous";
   logo.src = "../images/vixenLogoBlack.png";
   logo.onload = () => {
-    const scale = Math.min(w / logo.width, h / logo.height) * 0.8;
+    const maxLogoWidth = w * 0.5;
+    const scale = Math.min(maxLogoWidth / logo.width, h / logo.height);
     const logoWidth = logo.width * scale;
     const logoHeight = logo.height * scale;
     const leftMargin = (w - logoWidth) / 2;
     const topMargin = (h - logoHeight) / 2;
+    
+    logoArea = {
+      x: leftMargin,
+      y: topMargin,
+      width: logoWidth,
+      height: logoHeight
+    };
     
     ctx.drawImage(logo, leftMargin, topMargin, logoWidth, logoHeight); 
     let image = ctx.getImageData(0, 0, w, h);
