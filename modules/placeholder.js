@@ -67,15 +67,15 @@ function setup(container) {
   container.appendChild(canvas);
   
   config = {
-    zoom: 50,
-    noiseSpeed: 0.0005,
-    particleSpeed: 2,
-    fieldForce: 80,
-    randomForce: 5,
+    zoom: 75,
+    noiseSpeed: 0.0071,
+    particleSpeed: 1.5,
+    fieldForce: 40,
+    randomForce: 10,
   };
 
   colorConfig = {
-    particleOpacity: 0.3,
+    particleOpacity: 0.091,
   };
   
   canvas.width = CANVAS_SIZE;
@@ -131,7 +131,7 @@ function scaleCanvas(container) {
 
 function initParticles() {
   particles = [];
-  const particleCount = Math.floor(logoArea.width * logoArea.height / 10);
+  const particleCount = Math.floor(logoArea.width * logoArea.height / 20);
   for(let i = 0; i < particleCount; i++) {
     let x = logoArea.x + Math.random() * logoArea.width;
     let y = logoArea.y + Math.random() * logoArea.height;
@@ -141,8 +141,8 @@ function initParticles() {
 }
 
 function draw() {
-  ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-  ctx.fillRect(0, 0, w, h);
+  ctx.clearRect(0, 0, w, h);
+  drawBackground();
   calculateField();
   noiseZ += config.noiseSpeed;
   drawParticles();
@@ -172,8 +172,8 @@ function calculateField() {
         field[x][y].x = (Math.random()-0.5) * config.randomForce;
         field[x][y].y = (Math.random()-0.5) * config.randomForce;
       } else {
-        field[x][y].x = noise.simplex3(x/config.zoom, y/config.zoom, noiseZ) * config.fieldForce;
-        field[x][y].y = noise.simplex3(x/config.zoom + 40000, y/config.zoom + 40000, noiseZ) * config.fieldForce;
+        field[x][y].x = noise.simplex3(x/config.zoom, y/config.zoom, noiseZ) * config.fieldForce / 20;
+        field[x][y].y = noise.simplex3(x/config.zoom + 40000, y/config.zoom + 40000, noiseZ) * config.fieldForce / 20;
       }
     }
   }
