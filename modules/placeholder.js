@@ -9,6 +9,8 @@ class Particle {
     this.prevPos = new Vector(x, y);
     this.vel = new Vector(Math.random() - 0.5, Math.random() - 0.5);
     this.acc = new Vector(0, 0);
+    this.lifespan = 0;
+    this.maxLifespan = 1000 + Math.random() * 2000;
   }
   
   move(acc) {
@@ -24,26 +26,36 @@ class Particle {
     }
     this.acc.x = 0;
     this.acc.y = 0;
+    this.lifespan++;
+    if (this.lifespan > this.maxLifespan) {
+      this.reset();
+    }
   }
     
   drawLine() {
+    const alpha = 1 - (this.lifespan / this.maxLifespan);
+    ctx.strokeStyle = `rgba(255, 0, 74, ${alpha * colorConfig.particleOpacity})`;
     ctx.beginPath();
     ctx.moveTo(this.prevPos.x, this.prevPos.y);
     ctx.lineTo(this.pos.x, this.pos.y);
     ctx.stroke();  
   }
   
+  reset() {
+    this.pos.x = logoArea.x + Math.random() * logoArea.width;
+    this.pos.y = logoArea.y + Math.random() * logoArea.height;
+    this.prevPos.x = this.pos.x;
+    this.prevPos.y = this.pos.y;
+    this.vel.x = Math.random() - 0.5;
+    this.vel.y = Math.random() - 0.5;
+    this.lifespan = 0;
+  }
+  
   wrap() {
-    if(this.pos.x > w) {
-      this.prevPos.x = this.pos.x = 0;
-    } else if(this.pos.x < 0) {
-      this.prevPos.x = this.pos.x = w - 1;
-    }
-    if(this.pos.y > h) {
-      this.prevPos.y = this.pos.y = 0;
-    } else if(this.pos.y < 0) {
-      this.prevPos.y = this.pos.y = h - 1;
-    }
+    if(this.pos.x > w) this.pos.x = 0;
+    if(this.pos.x < 0) this.pos.x = w;
+    if(this.pos.y > h) this.pos.y = 0;
+    if(this.pos.y < 0) this.pos.y = h;
   }
 }
 
@@ -55,15 +67,15 @@ function setup(container) {
   container.appendChild(canvas);
   
   config = {
-    zoom: 75,
-    noiseSpeed: 0.0071,
-    particleSpeed: 1.5,
-    fieldForce: 40,
-    randomForce: 10,
+    zoom: 50,
+    noiseSpeed: 0.0005,
+    particleSpeed: 2,
+    fieldForce: 80,
+    randomForce: 5,
   };
 
   colorConfig = {
-    particleOpacity: 0.091,
+    particleOpacity: 0.3,
   };
   
   canvas.width = CANVAS_SIZE;
@@ -119,7 +131,7 @@ function scaleCanvas(container) {
 
 function initParticles() {
   particles = [];
-  const particleCount = Math.floor(logoArea.width * logoArea.height / 20);
+  const particleCount = Math.floor(logoArea.width * logoArea.height / 10);
   for(let i = 0; i < particleCount; i++) {
     let x = logoArea.x + Math.random() * logoArea.width;
     let y = logoArea.y + Math.random() * logoArea.height;
@@ -129,8 +141,8 @@ function initParticles() {
 }
 
 function draw() {
-  ctx.clearRect(0, 0, w, h);
-  drawBackground();
+  ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+  ctx.fillRect(0, 0, w, h);
   calculateField();
   noiseZ += config.noiseSpeed;
   drawParticles();
@@ -160,8 +172,8 @@ function calculateField() {
         field[x][y].x = (Math.random()-0.5) * config.randomForce;
         field[x][y].y = (Math.random()-0.5) * config.randomForce;
       } else {
-        field[x][y].x = noise.simplex3(x/config.zoom, y/config.zoom, noiseZ) * config.fieldForce / 20;
-        field[x][y].y = noise.simplex3(x/config.zoom + 40000, y/config.zoom + 40000, noiseZ) * config.fieldForce / 20;
+        field[x][y].x = noise.simplex3(x/config.zoom, y/config.zoom, noiseZ) * config.fieldForce;
+        field[x][y].y = noise.simplex3(x/config.zoom + 40000, y/config.zoom + 40000, noiseZ) * config.fieldForce;
       }
     }
   }
@@ -199,7 +211,6 @@ function drawText(callback) {
 }
 
 function drawParticles() {
-  ctx.strokeStyle = `rgba(255, 0, 74, ${colorConfig.particleOpacity})`;
   particles.forEach(p => {
     let x = p.pos.x / size;
     let y = p.pos.y / size;
