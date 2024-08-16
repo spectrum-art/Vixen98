@@ -57,7 +57,7 @@ function reset(callback) {
 
 function initParticles() {
   console.log('Initializing particles');
-  particles = [];
+  let particles = [];
   let numberOfParticles = w * h / 800;
   for(let i = 0; i < numberOfParticles; i++) {
     let particle = new Particle(
