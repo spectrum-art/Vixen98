@@ -1,6 +1,3 @@
-import { Vector } from './vector.js';
-import { noise } from './perlinNoise.js';
-
 let canvas, ctx, field, w, h, size, columns, rows, noiseZ, particles, config, colorConfig, buffer32;
 
 class Particle {
@@ -70,9 +67,13 @@ function setup() {
   }
   
   function reset() {
+    if (typeof noise === 'undefined') {
+      console.error('Perlin noise library not loaded');
+      return;
+    }
+    
     noise.seed(Math.random());
     
-    // Set canvas size to match the window content size
     const container = document.querySelector('.window-content');
     w = canvas.width = container.clientWidth;
     h = canvas.height = container.clientHeight;
@@ -172,6 +173,16 @@ function setup() {
   export function initialize(container) {
     if (!container || !(container instanceof HTMLElement)) {
       console.error('Invalid container provided to Placeholder initialize function');
+      return;
+    }
+    
+    if (typeof Vector === 'undefined') {
+      console.error('Vector class not loaded');
+      return;
+    }
+    
+    if (typeof noise === 'undefined') {
+      console.error('Perlin noise library not loaded');
       return;
     }
     
