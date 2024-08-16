@@ -46,6 +46,8 @@ class Particle {
   }
 }
 
+const CANVAS_SIZE = 1000;
+
 function setup(container) {
   size = 3;
   noiseZ = 0;
@@ -65,10 +67,13 @@ function setup(container) {
     particleOpacity: 0.091,
   };
   
+  canvas.width = CANVAS_SIZE;
+  canvas.height = CANVAS_SIZE;
+  
   resetCanvas(container);
   
   const resizeObserver = new ResizeObserver(() => {
-    resetCanvas(container);
+    scaleCanvas(container);
   });
   resizeObserver.observe(container);
 }
@@ -81,14 +86,7 @@ function resetCanvas(container) {
   
   noise.seed(Math.random());
   
-  const dpr = window.devicePixelRatio || 1;
-  w = canvas.width = container.clientWidth * dpr;
-  h = canvas.height = container.clientHeight * dpr;
-  
-  canvas.style.width = `${container.clientWidth}px`;
-  canvas.style.height = `${container.clientHeight}px`;
-  
-  ctx.scale(dpr, dpr);
+  w = h = CANVAS_SIZE;
   
   columns = Math.floor(w / size) + 1;
   rows = Math.floor(h / size) + 1;
@@ -98,6 +96,20 @@ function resetCanvas(container) {
     drawBackground();
     requestAnimationFrame(draw);
   });
+
+  scaleCanvas(container);
+}
+
+function scaleCanvas(container) {
+  const scale = Math.min(container.clientWidth / CANVAS_SIZE, container.clientHeight / CANVAS_SIZE);
+  const scaledWidth = Math.floor(CANVAS_SIZE * scale);
+  const scaledHeight = Math.floor(CANVAS_SIZE * scale);
+
+  canvas.style.width = `${scaledWidth}px`;
+  canvas.style.height = `${scaledHeight}px`;
+  canvas.style.position = 'absolute';
+  canvas.style.left = `${(container.clientWidth - scaledWidth) / 2}px`;
+  canvas.style.top = `${(container.clientHeight - scaledHeight) / 2}px`;
 }
 
 function initParticles() {
@@ -109,11 +121,31 @@ function initParticles() {
   }
 }
 
+function drawText(callback) {
+  let logo = new Image();
+  logo.crossOrigin = "anonymous";
+  logo.src = "../images/vixenLogoBlack.png";
+  logo.onload = () => {
+    const scale = Math.min(w / logo.width, h / logo.height);
+    const logoWidth = logo.width * scale;
+    const logoHeight = logo.height * scale;
+    const leftMargin = (w - logoWidth) / 2;
+    const topMargin = (h - logoHeight) / 2;
+    
+    ctx.drawImage(logo, leftMargin, topMargin, logoWidth, logoHeight); 
+    let image = ctx.getImageData(0, 0, w, h);
+    buffer32 = new Uint32Array(image.data.buffer);
+    if(callback) callback();
+  };
+}
+
 function draw() {
-  requestAnimationFrame(draw);
+  ctx.clearRect(0, 0, w, h);
+  drawBackground();
   calculateField();
   noiseZ += config.noiseSpeed;
   drawParticles();
+  requestAnimationFrame(draw);
 }
 
 function initField() {
@@ -149,25 +181,6 @@ function calculateField() {
 function drawBackground() {
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, w, h);
-}
-
-function drawText(callback) {
-  let logo = new Image();
-  logo.crossOrigin = "anonymous";
-  logo.src = "../images/vixenLogoBlack.png";
-  logo.onload = () => {
-    const dpr = window.devicePixelRatio || 1;
-    const scale = Math.min(w / (logo.width * dpr), h / (logo.height * dpr));
-    const logoWidth = logo.width * scale;
-    const logoHeight = logo.height * scale;
-    const leftMargin = (w / dpr - logoWidth) / 2;
-    const topMargin = (h / dpr - logoHeight) / 2;
-    
-    ctx.drawImage(logo, leftMargin, topMargin, logoWidth, logoHeight); 
-    let image = ctx.getImageData(0, 0, w / dpr, h / dpr);
-    buffer32 = new Uint32Array(image.data.buffer);
-    if(callback) callback();
-  };
 }
 
 function drawParticles() {
