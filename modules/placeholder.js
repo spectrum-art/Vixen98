@@ -189,7 +189,7 @@ function drawText(callback) {
 }
 
 function drawParticles() {
-  ctx.strokeStyle = `rgba(250, 70, 2, ${colorConfig.particleOpacity})`;
+  ctx.strokeStyle = `rgba(255, 60, 0, ${colorConfig.particleOpacity})`;
   ctx.lineWidth = 2;
   particles.forEach(p => {
     let x = p.pos.x / size;
