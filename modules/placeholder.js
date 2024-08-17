@@ -225,7 +225,7 @@ function drawParticles() {
 function drawOverlayText() {
   ctx.save();
   ctx.fillStyle = 'black';
-  ctx.font = '700 20px monospace';
+  ctx.font = '700 25px monospace';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText('SFSF%RZXY%UF^', w / 2, (h / 2 - 15));
