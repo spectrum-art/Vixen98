@@ -221,6 +221,15 @@ function finishMapInitialization(container) {
     map.fitBounds(map.getBounds());
 
     setTimeout(() => {
+        map.invalidateSize();
+        TILE_LAYERS.forEach(layerName => {
+            if (layers[layerName]) {
+                layers[layerName].redraw();
+            }
+        });
+    }, 100);
+
+    setTimeout(() => {
         checkLayerVisibility();
         debugLayerBounds();
         addDebugRectangle();
