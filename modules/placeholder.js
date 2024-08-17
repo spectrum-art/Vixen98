@@ -64,9 +64,9 @@ function setup(container) {
   config = {
     zoom: 75,
     noiseSpeed: 0.0071,
-    particleSpeed: 1.0,
-    fieldForce: 60,
-    randomForce: 10,
+    particleSpeed: 0.9,
+    fieldForce: 80,
+    randomForce: 20,
   };
 
   colorConfig = {
@@ -126,7 +126,7 @@ function scaleCanvas(container) {
 
 function initParticles() {
   particles = [];
-  const particleCount = Math.floor(logoArea.width * logoArea.height / 30);
+  const particleCount = Math.floor(logoArea.width * logoArea.height / 40);
   for(let i = 0; i < particleCount; i++) {
     let x = logoArea.x + Math.random() * logoArea.width;
     let y = logoArea.y + Math.random() * logoArea.height;
