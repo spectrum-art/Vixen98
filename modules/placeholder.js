@@ -179,7 +179,7 @@ function drawBackground() {
 }
 
 function drawCenterText() {
-  ctx.fillStyle = "black";
+  ctx.fillStyle = "white";
   ctx.font = "700 11px monospace";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
