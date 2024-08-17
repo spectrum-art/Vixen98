@@ -19,7 +19,7 @@ export function initialize(container, params = {}) {
     const loadingIndicator = createLoadingIndicator(container);
     let map, layers, controls;
 
-    return initializeMap()
+    return initializeMap(container)
         .then(() => {
             console.log('Map initialized, loading tile layers');
             return loadTileLayers();
@@ -30,7 +30,7 @@ export function initialize(container, params = {}) {
         })
         .then(() => {
             console.log('All layers loaded, finishing map initialization');
-            finishMapInitialization();
+            finishMapInitialization(container);
             return { map, layers, controls };
         })
         .catch(error => {
@@ -40,7 +40,7 @@ export function initialize(container, params = {}) {
         });
 }
 
-function initializeMap() {
+function initializeMap(container) {
     return new Promise((resolve) => {
         console.log('Creating Leaflet map');
         map = L.map(container, {
@@ -209,10 +209,10 @@ function addPinToLayer(pin, markerGroup, layerName) {
     console.log(`Pin added to layer ${layerName}:`, marker);
 }
 
-function finishMapInitialization() {
+function finishMapInitialization(container) {
     console.log('Finishing map initialization');
     setupMapEventListeners();
-    setupResizeHandling();
+    setupResizeHandling(container);
     addMapControls();
     removeLoadingIndicator();
     map.invalidateSize();
@@ -225,8 +225,8 @@ function finishMapInitialization() {
     }, 2000);
 
     setTimeout(() => {
-        console.log('Underground layer CSS (Base):', getComputedStyle(document.querySelector('.underground-layer-base')));
-        console.log('Underground layer CSS (Surface):', getComputedStyle(document.querySelector('.underground-layer-surface')));
+        console.log('Underground layer CSS (Base):', getComputedStyle(container.querySelector('.underground-layer-base')));
+        console.log('Underground layer CSS (Surface):', getComputedStyle(container.querySelector('.underground-layer-surface')));
     }, 1000);
 
     console.log('Map initialization complete');
@@ -256,7 +256,7 @@ function setupMapEventListeners() {
     updateImageResolution();
 }
 
-function setupResizeHandling() {
+function setupResizeHandling(container) {
     const resizeMap = debounce(() => {
         console.log('Resizing map');
         const windowElement = container.closest('.window');
@@ -324,7 +324,7 @@ function createCustomOverlay(layerName, initialResolution = 'quarter', defaultVi
     console.log(`Custom overlay created for ${layerName}`);
     
     setTimeout(() => {
-        console.log(`Underground layer CSS (${layerName}):`, getComputedStyle(document.querySelector(`.underground-layer-${layerName.toLowerCase()}`)));
+        console.log(`Underground layer CSS (${layerName}):`, getComputedStyle(container.querySelector(`.underground-layer-${layerName.toLowerCase()}`)));
     }, 1000);
 
     return overlay;
