@@ -64,13 +64,13 @@ function setup(container) {
   config = {
     zoom: 75,
     noiseSpeed: 0.0071,
-    particleSpeed: 0.9,
+    particleSpeed: 1.1,
     fieldForce: 80,
     randomForce: 20,
   };
 
   colorConfig = {
-    particleOpacity: 0.1,
+    particleOpacity: 0.085,
   };
   
   canvas.width = CANVAS_SIZE;
