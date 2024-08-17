@@ -9,6 +9,9 @@ const MAX_RETRIES = 3;
 const RETRY_DELAY = 2000;
 const LOAD_TIMEOUT = 90000;
 
+let map, layers, controls;
+let loadingIndicator;
+
 export function initialize(container, params = {}) {
     if (!container || !(container instanceof HTMLElement)) {
         console.error('Invalid container provided to Underground Map initialize function');
@@ -16,13 +19,12 @@ export function initialize(container, params = {}) {
     }
 
     console.log('Initializing Underground Map');
-    const loadingIndicator = createLoadingIndicator(container);
-    let map, layers, controls;
+    loadingIndicator = createLoadingIndicator(container);
 
     return initializeMap(container)
         .then(() => {
             console.log('Map initialized, loading tile layers');
-            return loadTileLayers();
+            return loadTileLayers(container);
         })
         .then(() => {
             console.log('Tile layers loaded, loading pin layers');
@@ -71,13 +73,13 @@ function initializeMap(container) {
     });
 }
 
-function loadTileLayers() {
+function loadTileLayers(container) {
     console.log('Starting to load tile layers');
-    return loadTileLayer('Base')
+    return loadTileLayer(container, 'Base')
         .then((baseLayer) => {
             console.log('Base layer loaded successfully');
             addLayerToMap(baseLayer, 'Base');
-            return loadTileLayer('Surface').then(surfaceLayer => {
+            return loadTileLayer(container, 'Surface').then(surfaceLayer => {
                 addLayerToMap(surfaceLayer, 'Surface');
                 console.log('Surface layer loaded successfully');
                 return [baseLayer, surfaceLayer];
@@ -92,11 +94,11 @@ function loadTileLayers() {
         });
 }
 
-function loadTileLayer(layerName, retryCount = 0) {
+function loadTileLayer(container, layerName, retryCount = 0) {
     return new Promise((resolve, reject) => {
         console.log(`Loading tile layer: ${layerName} (Attempt ${retryCount + 1})`);
         const defaultVisible = layerName === 'Base';
-        const layer = createCustomOverlay(layerName, 'quarter', defaultVisible);
+        const layer = createCustomOverlay(container, layerName, 'quarter', defaultVisible);
         
         const img = new Image();
         img.onload = () => {
@@ -290,7 +292,7 @@ function addMapControls() {
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 }
 
-function createCustomOverlay(layerName, initialResolution = 'quarter', defaultVisible = true) {
+function createCustomOverlay(container, layerName, initialResolution = 'quarter', defaultVisible = true) {
     console.log(`Creating custom overlay for ${layerName}`);
     const imageSrc = `/images/underground_map/${layerName}_${initialResolution}.png`;
     console.log(`Loading image from: ${imageSrc}`);
@@ -389,8 +391,8 @@ function updateLoadingProgress() {
 }
 
 function removeLoadingIndicator() {
-    if (container.contains(loadingIndicator)) {
-        container.removeChild(loadingIndicator);
+    if (loadingIndicator && loadingIndicator.parentNode) {
+        loadingIndicator.parentNode.removeChild(loadingIndicator);
     }
 }
 
