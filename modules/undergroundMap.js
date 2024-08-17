@@ -73,17 +73,19 @@ export function initialize(container, params = {}) {
         return loadTileLayer('Base')
             .then((baseLayer) => {
                 console.log('Base layer loaded successfully');
-                return loadTileLayer('Surface').catch(error => {
-                    console.warn('Failed to load Surface layer:', error);
-                    return baseLayer; // Continue with just the Base layer
+                addLayerToMap(baseLayer, 'Base');
+                return loadTileLayer('Surface').then(surfaceLayer => {
+                    addLayerToMap(surfaceLayer, 'Surface');
+                    console.log('Surface layer loaded successfully');
+                    return [baseLayer, surfaceLayer];
                 });
             })
             .then(() => {
                 console.log('Tile layers loaded');
             })
             .catch(error => {
-                console.error('Failed to load Base layer:', error);
-                throw error; // Rethrow to be caught by the main initialization
+                console.error('Failed to load tile layers:', error);
+                throw error;
             });
     }
 
@@ -100,10 +102,6 @@ export function initialize(container, params = {}) {
                 layers[layerName] = layer;
                 controls.addOverlay(layer, layerName);
                 updateLoadingProgress();
-                if (defaultVisible) {
-                    layer.addTo(map);
-                    map.fitBounds(layer.getBounds());
-                }
                 resolve(layer);
             };
             img.onerror = (error) => {
@@ -214,6 +212,8 @@ export function initialize(container, params = {}) {
         setupResizeHandling();
         addMapControls();
         removeLoadingIndicator();
+        map.invalidateSize();
+        map.fitBounds(map.getBounds());
         console.log('Map initialization complete');
     }
 
@@ -284,7 +284,7 @@ export function initialize(container, params = {}) {
         const northEast = map.unproject([ORIGINAL_IMAGE_SIZE, 0], MAX_ZOOM);
         const bounds = new L.LatLngBounds(southWest, northEast);
 
-        console.log(`Bounds for ${layerName}: SW(${southWest.lat}, ${southWest.lng}), NE(${northEast.lat}, ${northEast.lng})`);
+        console.log(`Bounds for ${layerName}: SW(${bounds.getSouthWest().toString()}), NE(${bounds.getNorthEast().toString()})`);
 
         const overlay = L.imageOverlay(imageSrc, bounds, {
             opacity: layerName === 'Surface' ? 0.5 : 1,
@@ -306,12 +306,15 @@ export function initialize(container, params = {}) {
             this.setUrl(newSrc);
         };
 
-        if (defaultVisible) {
-            overlay.addTo(map);
-        }
-
         console.log(`Custom overlay created for ${layerName}`);
         return overlay;
+    }
+
+    function addLayerToMap(layer, layerName) {
+        layer.addTo(map);
+        console.log(`${layerName} layer added to map`);
+        console.log(`${layerName} layer visibility:`, map.hasLayer(layer));
+        console.log(`${layerName} layer bounds:`, layer.getBounds().toString());
     }
 
     function updateImageResolution() {
@@ -378,4 +381,52 @@ export function initialize(container, params = {}) {
         errorElement.textContent = message;
         container.appendChild(errorElement);
     }
+    setTimeout(() => {
+        console.log('Underground layer CSS (Base):', getComputedStyle(document.querySelector('.underground-layer-base')));
+        console.log('Underground layer CSS (Surface):', getComputedStyle(document.querySelector('.underground-layer-surface')));
+    }, 1000);
 }
+
+function checkLayerVisibility() {
+    TILE_LAYERS.forEach(layerName => {
+        if (layers[layerName]) {
+            console.log(`${layerName} layer visibility:`, map.hasLayer(layers[layerName]));
+            console.log(`${layerName} layer opacity:`, layers[layerName].options.opacity);
+            console.log(`${layerName} layer z-index:`, layers[layerName].options.zIndex);
+        } else {
+            console.log(`${layerName} layer not found in layers object`);
+        }
+    });
+}
+
+function debugLayerBounds() {
+    TILE_LAYERS.forEach(layerName => {
+        if (layers[layerName]) {
+            const bounds = layers[layerName].getBounds();
+            console.log(`${layerName} layer bounds:`, bounds.toString());
+            console.log(`${layerName} layer bounds in pixels:`, {
+                SW: map.project(bounds.getSouthWest(), map.getZoom()),
+                NE: map.project(bounds.getNorthEast(), map.getZoom())
+            });
+        }
+    });
+}
+
+function addDebugRectangle() {
+    const bounds = map.getBounds();
+    const rectangle = L.rectangle(bounds, {color: "#ff7800", weight: 1}).addTo(map);
+    console.log('Debug rectangle added with bounds:', bounds.toString());
+}
+
+// Call these debug functions at the end of initialize
+setTimeout(() => {
+    checkLayerVisibility();
+    debugLayerBounds();
+    addDebugRectangle();
+}, 2000);
+
+return {
+    map: map,
+    layers: layers,
+    controls: controls
+};
