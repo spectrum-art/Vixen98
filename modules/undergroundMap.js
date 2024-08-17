@@ -21,7 +21,8 @@ export function initialize(container, params = {}) {
     console.log('Initializing Underground Map');
     loadingIndicator = createLoadingIndicator(container);
 
-    return initializeMap(container)
+    return preloadImages()
+        .then(() => initializeMap(container))
         .then(() => {
             console.log('Map initialized, loading tile layers');
             return loadTileLayers(container);
@@ -42,6 +43,17 @@ export function initialize(container, params = {}) {
         });
 }
 
+function preloadImages() {
+    return Promise.all(TILE_LAYERS.map(layerName => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = resolve;
+            img.onerror = reject;
+            img.src = `/images/underground_map/${layerName}_quarter.png`;
+        });
+    }));
+}
+
 function initializeMap(container) {
     return new Promise((resolve) => {
         console.log('Creating Leaflet map');
@@ -55,6 +67,7 @@ function initializeMap(container) {
             zoomAnimation: true,
             markerZoomAnimation: true,
             preferCanvas: true,
+            backgroundColor: '#FF0000',
             attributionControl: false
         });
 
@@ -304,7 +317,7 @@ function addMapControls() {
 function createCustomOverlay(container, layerName, initialResolution = 'quarter', defaultVisible = true) {
     console.log(`Creating custom overlay for ${layerName}`);
     const imageSrc = `/images/underground_map/${layerName}_${initialResolution}.png`;
-    console.log(`Loading image from: ${imageSrc}`);
+    console.log(`Full image URL: ${window.location.origin}${imageSrc}`);
 
     const southWest = map.unproject([0, ORIGINAL_IMAGE_SIZE], MAX_ZOOM);
     const northEast = map.unproject([ORIGINAL_IMAGE_SIZE, 0], MAX_ZOOM);
@@ -314,7 +327,7 @@ function createCustomOverlay(container, layerName, initialResolution = 'quarter'
 
     const overlay = L.imageOverlay(imageSrc, bounds, {
         opacity: layerName === 'Surface' ? 0.5 : 1,
-        className: `underground-layer-${layerName.toLowerCase()}`,
+        className: `underground-layer-${layerName.toLowerCase()} visible-image`,
         zIndex: layerName === 'Base' ? 10 : 20,
     });
 
@@ -334,10 +347,6 @@ function createCustomOverlay(container, layerName, initialResolution = 'quarter'
 
     console.log(`Custom overlay created for ${layerName}`);
     
-    setTimeout(() => {
-        console.log(`Underground layer CSS (${layerName}):`, getComputedStyle(container.querySelector(`.underground-layer-${layerName.toLowerCase()}`)));
-    }, 1000);
-
     return overlay;
 }
 
