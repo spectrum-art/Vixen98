@@ -10,7 +10,7 @@ class Particle {
     this.vel = new Vector(Math.random() - 0.5, Math.random() - 0.5);
     this.acc = new Vector(0, 0);
     this.lifespan = 0;
-    this.maxLifespan = 10000 + Math.random() * 2000;
+    this.maxLifespan = 1000 + Math.random() * 2000;
   }
   
   move(acc) {
@@ -33,8 +33,6 @@ class Particle {
   }
     
   drawLine() {
-    const alpha = 1 - (this.lifespan / this.maxLifespan);
-    ctx.strokeStyle = `rgba(255, 0, 74, ${alpha * colorConfig.particleOpacity})`;
     ctx.beginPath();
     ctx.moveTo(this.prevPos.x, this.prevPos.y);
     ctx.lineTo(this.pos.x, this.pos.y);
@@ -51,11 +49,8 @@ class Particle {
     this.lifespan = 0;
   }
   
-  wrap() {
-    if(this.pos.x > w) this.pos.x = 0;
-    if(this.pos.x < 0) this.pos.x = w;
-    if(this.pos.y > h) this.pos.y = 0;
-    if(this.pos.y < 0) this.pos.y = h;
+  isOutOfBounds() {
+    return this.pos.x < 0 || this.pos.x > w || this.pos.y < 0 || this.pos.y > h;
   }
 }
 
@@ -141,8 +136,6 @@ function initParticles() {
 }
 
 function draw() {
-  ctx.clearRect(0, 0, w, h);
-  drawBackground();
   calculateField();
   noiseZ += config.noiseSpeed;
   drawParticles();
@@ -211,6 +204,7 @@ function drawText(callback) {
 }
 
 function drawParticles() {
+  ctx.strokeStyle = `rgba(255, 0, 74, ${colorConfig.particleOpacity})`;
   particles.forEach(p => {
     let x = p.pos.x / size;
     let y = p.pos.y / size;
@@ -219,8 +213,11 @@ function drawParticles() {
       v = field[Math.floor(x)][Math.floor(y)];
     }
     p.move(v);
-    p.wrap();
-    p.drawLine();
+    if (p.isOutOfBounds()) {
+      p.reset();
+    } else {
+      p.drawLine();
+    }
   });
 }
 
