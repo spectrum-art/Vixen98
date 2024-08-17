@@ -64,13 +64,13 @@ function setup(container) {
   config = {
     zoom: 75,
     noiseSpeed: 0.0071,
-    particleSpeed: 1.1,
-    fieldForce: 50,
+    particleSpeed: 1.0,
+    fieldForce: 60,
     randomForce: 10,
   };
 
   colorConfig = {
-    particleOpacity: 0.091,
+    particleOpacity: 0.1,
   };
   
   canvas.width = CANVAS_SIZE;
@@ -120,8 +120,8 @@ function scaleCanvas(container) {
   canvas.style.height = `${scaledHeight}px`;
 
   canvas.style.position = 'absolute';
-  canvas.style.left = `${(container.clientWidth - scaledWidth) / 2}px`;
-  canvas.style.top = `${headerHeight + (availableHeight - scaledHeight) / 2}px`;
+  canvas.style.left = `3px`;
+  canvas.style.top = `25px`;
 }
 
 function initParticles() {
