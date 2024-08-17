@@ -432,9 +432,3 @@ function addDebugRectangle() {
     const rectangle = L.rectangle(bounds, {color: "#ff7800", weight: 1}).addTo(map);
     console.log('Debug rectangle added with bounds:', bounds.toString());
 }
-
-return {
-    map: map,
-    layers: layers,
-    controls: controls
-};
