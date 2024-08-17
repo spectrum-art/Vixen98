@@ -97,9 +97,10 @@ function resetCanvas(container) {
   columns = Math.floor(w / size) + 1;
   rows = Math.floor(h / size) + 1;
   drawText(() => {
+    drawBackground();
+    drawCenterText();
     initParticles();
     initField();
-    drawBackground();
     requestAnimationFrame(draw);
   });
 
@@ -175,6 +176,14 @@ function calculateField() {
 function drawBackground() {
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, w, h);
+}
+
+function drawCenterText() {
+  ctx.fillStyle = "black";
+  ctx.font = "700 11px monospace";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("SFSF%RZXY%UF^", w / 2, h / 2);
 }
 
 function drawText(callback) {
