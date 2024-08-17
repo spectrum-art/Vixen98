@@ -182,7 +182,7 @@ function drawText(callback) {
   logo.crossOrigin = "anonymous";
   logo.src = "../images/vixenLogoBlack.png";
   logo.onload = () => {
-    const maxLogoWidth = w * 0.5;
+    const maxLogoWidth = w * 0.75;
     const scale = Math.min(maxLogoWidth / logo.width, h / logo.height);
     const logoWidth = logo.width * scale;
     const logoHeight = logo.height * scale;
