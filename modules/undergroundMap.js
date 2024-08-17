@@ -402,12 +402,6 @@ function showErrorMessage(container, message) {
     container.appendChild(errorElement);
 }
 
-    setTimeout(() => {
-        console.log('Underground layer CSS (Base):', getComputedStyle(document.querySelector('.underground-layer-base')));
-        console.log('Underground layer CSS (Surface):', getComputedStyle(document.querySelector('.underground-layer-surface')));
-    }, 1000);
-}
-
 function checkLayerVisibility() {
     TILE_LAYERS.forEach(layerName => {
         if (layers[layerName]) {
