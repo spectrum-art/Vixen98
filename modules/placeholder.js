@@ -64,8 +64,8 @@ function setup(container) {
   config = {
     zoom: 75,
     noiseSpeed: 0.0071,
-    particleSpeed: 1.5,
-    fieldForce: 40,
+    particleSpeed: 1.1,
+    fieldForce: 50,
     randomForce: 10,
   };
 
@@ -126,7 +126,7 @@ function scaleCanvas(container) {
 
 function initParticles() {
   particles = [];
-  const particleCount = Math.floor(logoArea.width * logoArea.height / 20);
+  const particleCount = Math.floor(logoArea.width * logoArea.height / 30);
   for(let i = 0; i < particleCount; i++) {
     let x = logoArea.x + Math.random() * logoArea.width;
     let y = logoArea.y + Math.random() * logoArea.height;
@@ -204,7 +204,7 @@ function drawText(callback) {
 }
 
 function drawParticles() {
-  ctx.strokeStyle = `rgba(255, 0, 74, ${colorConfig.particleOpacity})`;
+  ctx.strokeStyle = `rgba(255, 70, 0, ${colorConfig.particleOpacity})`;
   particles.forEach(p => {
     let x = p.pos.x / size;
     let y = p.pos.y / size;
