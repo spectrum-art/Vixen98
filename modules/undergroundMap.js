@@ -7,7 +7,7 @@ const MIN_ZOOM = -1;
 const ORIGINAL_IMAGE_SIZE = 6500;
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 2000;
-const LOAD_TIMEOUT = 30000;
+const LOAD_TIMEOUT = 90000;
 
 export function initialize(container, params = {}) {
     if (!container || !(container instanceof HTMLElement)) {
@@ -34,11 +34,12 @@ export function initialize(container, params = {}) {
         })
         .catch(error => {
             console.error('Error in main initialization chain:', error);
-            handleGlobalError(error);
+            showErrorMessage(container, 'Failed to load the underground map. Please check your internet connection and try again.');
         });
-    
+
     function initializeMap() {
         return new Promise((resolve) => {
+            console.log('Creating Leaflet map');
             map = L.map(container, {
                 crs: L.CRS.Simple,
                 minZoom: MIN_ZOOM,
@@ -69,44 +70,64 @@ export function initialize(container, params = {}) {
 
     function loadTileLayers() {
         console.log('Starting to load tile layers');
-        return new Promise((resolve, reject) => {
-            const layerPromises = TILE_LAYERS.map(loadTileLayer);
-            Promise.all(layerPromises)
-                .then(() => {
-                    console.log('All tile layers loaded successfully');
-                    resolve();
-                })
-                .catch(error => {
-                    console.error('Error loading tile layers:', error);
-                    reject(error);
+        return loadTileLayer('Base')
+            .then((baseLayer) => {
+                console.log('Base layer loaded successfully');
+                return loadTileLayer('Surface').catch(error => {
+                    console.warn('Failed to load Surface layer:', error);
+                    return baseLayer; // Continue with just the Base layer
                 });
-        });
+            })
+            .then(() => {
+                console.log('Tile layers loaded');
+            })
+            .catch(error => {
+                console.error('Failed to load Base layer:', error);
+                throw error; // Rethrow to be caught by the main initialization
+            });
     }
 
-    function loadTileLayer(layerName) {
+    function loadTileLayer(layerName, retryCount = 0) {
         return new Promise((resolve, reject) => {
-            console.log(`Loading tile layer: ${layerName}`);
+            console.log(`Loading tile layer: ${layerName} (Attempt ${retryCount + 1})`);
             const defaultVisible = layerName === 'Base';
             const layer = createCustomOverlay(layerName, 'quarter', defaultVisible);
             
-            layer.on('load', () => {
-                console.log(`${layerName} layer loaded successfully`);
+            const img = new Image();
+            img.onload = () => {
+                console.log(`${layerName} image loaded successfully`);
+                layer.setUrl(img.src);
                 layers[layerName] = layer;
                 controls.addOverlay(layer, layerName);
                 updateLoadingProgress();
-                map.fitBounds(layer.getBounds());
-                resolve();
-            });
-    
-            layer.on('error', (error) => {
-                console.error(`Error loading ${layerName} layer:`, error);
-                reject(new Error(`Failed to load ${layerName} layer`));
-            });
-    
+                if (defaultVisible) {
+                    layer.addTo(map);
+                    map.fitBounds(layer.getBounds());
+                }
+                resolve(layer);
+            };
+            img.onerror = (error) => {
+                console.error(`Error loading ${layerName} image:`, error);
+                if (retryCount < MAX_RETRIES) {
+                    console.log(`Retrying ${layerName} layer load (Attempt ${retryCount + 2})`);
+                    setTimeout(() => {
+                        loadTileLayer(layerName, retryCount + 1).then(resolve).catch(reject);
+                    }, RETRY_DELAY);
+                } else {
+                    reject(new Error(`Failed to load ${layerName} layer after ${MAX_RETRIES + 1} attempts`));
+                }
+            };
+            img.src = `/images/underground_map/${layerName}_quarter.png`;
+
             setTimeout(() => {
                 if (!layers[layerName]) {
                     console.error(`Timeout while loading ${layerName} layer`);
-                    reject(new Error(`Timeout while loading ${layerName} layer`));
+                    if (retryCount < MAX_RETRIES) {
+                        console.log(`Retrying ${layerName} layer load due to timeout (Attempt ${retryCount + 2})`);
+                        loadTileLayer(layerName, retryCount + 1).then(resolve).catch(reject);
+                    } else {
+                        reject(new Error(`Timeout while loading ${layerName} layer after ${MAX_RETRIES + 1} attempts`));
+                    }
                 }
             }, LOAD_TIMEOUT);
         });
@@ -201,21 +222,21 @@ export function initialize(container, params = {}) {
             console.log('Zoom ended, current zoom:', map.getZoom());
             updateImageResolution();
         });
-    
+
         map.on('moveend', function() {
             const center = map.getCenter();
             const bounds = map.getBounds();
             console.log(`Map moved. Center: (${center.lat}, ${center.lng}), Bounds: SW(${bounds.getSouthWest().lat}, ${bounds.getSouthWest().lng}), NE(${bounds.getNorthEast().lat}, ${bounds.getNorthEast().lng})`);
         });
-    
+
         map.on('layeradd', function(e) {
             console.log(`Layer added: ${e.layer.options.className}`);
         });
-    
+
         map.on('layerremove', function(e) {
             console.log(`Layer removed: ${e.layer.options.className}`);
         });
-    
+
         map.on('resize', updateImageResolution);
         updateImageResolution();
     }
@@ -254,47 +275,41 @@ export function initialize(container, params = {}) {
         L.control.zoom({ position: 'bottomright' }).addTo(map);
     }
 
-    function handleGlobalError(error) {
-        console.error('Fatal error in underground map initialization:', error);
-        removeLoadingIndicator();
-        showErrorMessage(container, 'Failed to load the underground map. Please try again later.');
-    }
-
     function createCustomOverlay(layerName, initialResolution = 'quarter', defaultVisible = true) {
         console.log(`Creating custom overlay for ${layerName}`);
         const imageSrc = `/images/underground_map/${layerName}_${initialResolution}.png`;
         console.log(`Loading image from: ${imageSrc}`);
-    
+
         const southWest = map.unproject([0, ORIGINAL_IMAGE_SIZE], MAX_ZOOM);
         const northEast = map.unproject([ORIGINAL_IMAGE_SIZE, 0], MAX_ZOOM);
         const bounds = new L.LatLngBounds(southWest, northEast);
-    
+
         console.log(`Bounds for ${layerName}: SW(${southWest.lat}, ${southWest.lng}), NE(${northEast.lat}, ${northEast.lng})`);
-    
+
         const overlay = L.imageOverlay(imageSrc, bounds, {
             opacity: layerName === 'Surface' ? 0.5 : 1,
             className: `underground-layer-${layerName.toLowerCase()}`,
             zIndex: layerName === 'Base' ? 10 : 20,
         });
-    
+
         overlay.on('load', function() {
             console.log(`${layerName} overlay loaded`);
         });
-    
+
         overlay.on('error', function(error) {
             console.error(`Error loading ${layerName} overlay:`, error);
         });
-    
+
         overlay.updateResolution = function(resolution) {
             const newSrc = `/images/underground_map/${layerName}_${resolution}.png`;
             console.log(`Updating ${layerName} to ${resolution} resolution: ${newSrc}`);
             this.setUrl(newSrc);
         };
-    
+
         if (defaultVisible) {
             overlay.addTo(map);
         }
-    
+
         console.log(`Custom overlay created for ${layerName}`);
         return overlay;
     }
@@ -305,7 +320,7 @@ export function initialize(container, params = {}) {
         const maxSize = Math.max(size.x, size.y);
         
         console.log(`Current zoom: ${zoom}, Map size: ${size.x}x${size.y}, Max size: ${maxSize}`);
-    
+
         let resolution;
         if (zoom <= 0) {
             resolution = 'quarter';
@@ -314,9 +329,9 @@ export function initialize(container, params = {}) {
         } else {
             resolution = 'full';
         }
-    
+
         console.log(`Selected resolution: ${resolution}`);
-    
+
         TILE_LAYERS.forEach(layerName => {
             if (layers[layerName] && layers[layerName].updateResolution) {
                 if (layers[layerName].currentResolution !== resolution) {
@@ -363,15 +378,4 @@ export function initialize(container, params = {}) {
         errorElement.textContent = message;
         container.appendChild(errorElement);
     }
-
-    const loadTimeout = setTimeout(() => {
-        if (container.contains(loadingIndicator)) {
-            console.error('Map loading timed out');
-            handleGlobalError(new Error('Map loading timed out'));
-        }
-    }, LOAD_TIMEOUT);
-
-    window.addEventListener('beforeunload', () => {
-        clearTimeout(loadTimeout);
-    });
 }
