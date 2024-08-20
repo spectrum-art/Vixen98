@@ -43,6 +43,7 @@
 
 .pin {
   position: absolute;
+  transform: translate(-50%, -50%);
   white-space: nowrap;
   font-size: 16px;
   display: flex;

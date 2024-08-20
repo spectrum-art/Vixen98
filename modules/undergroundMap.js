@@ -58,11 +58,12 @@ export function initialize(container) {
         }
 
         function resizePinContainerToLayer(layer, container) {
-            const rect = layer.getBoundingClientRect();
-            // container.style.left = `${rect.left}px`;
-            // container.style.top = `${rect.top}px`;
-            container.style.width = `${rect.width}px`;
-            container.style.height = `${rect.height}px`;
+            container.style.position = 'absolute';
+            container.style.left = '0';
+            container.style.top = '0';
+            container.style.width = '100%';
+            container.style.height = '100%';
+            container.style.pointerEvents = 'none';
         }
 
         function loadPins(container, pins, imageWidth, imageHeight, isBaseLayer = true) {
@@ -73,18 +74,18 @@ export function initialize(container) {
                 pinElement.style.position = 'absolute';
                 pinElement.style.left = `${(pin.x / imageWidth) * 100}%`;
                 pinElement.style.top = `${(pin.y / imageHeight) * 100}%`;
-
+        
                 const emojiElement = document.createElement('span');
                 emojiElement.className = 'emoji';
                 emojiElement.textContent = pin.icon;
                 emojiElement.style.position = 'absolute';
                 emojiElement.style.transform = 'translate(-50%, -50%)';
                 pinElement.appendChild(emojiElement);
-
+        
                 const labelElement = document.createElement('span');
                 labelElement.className = 'label';
                 labelElement.textContent = pin.label;
-
+        
                 if (isBaseLayer) {
                     labelElement.classList.add(pin.x >= imageWidth / 2 ? 'right' : 'left');
                     pinElement.appendChild(labelElement);
@@ -94,7 +95,7 @@ export function initialize(container) {
                     pinElement.addEventListener('mouseover', () => labelElement.style.display = 'inline-block');
                     pinElement.addEventListener('mouseout', () => labelElement.style.display = 'none');
                 }
-
+        
                 container.appendChild(pinElement);
             });
         }
@@ -131,7 +132,6 @@ export function initialize(container) {
             const transform = `scale(${scale}) translate(${panX}px, ${panY}px)`;
             baseLayer.style.transform = transform;
             surfaceLayer.style.transform = transform;
-            updatePinContainerSize();
             resizePinContainerToLayer(baseLayer, basePinsContainer);
             resizePinContainerToLayer(surfaceLayer, surfacePinsContainer);
         }
