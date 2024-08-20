@@ -10,7 +10,7 @@ export function initialize(container) {
                 <div id="surface-pins" class="pin-layer"></div>
             </div>
             <div id="layers-panel">
-                <label><input type="checkbox" id="toggle-base-layer" checked> Base Layer</label>
+                <label><input type="checkbox" id="toggle-base-layer" checked> Base Layer</label></br>
                 <label><input type="checkbox" id="toggle-surface-layer"> Surface Layer</label>
             </div>
             <div id="zoom-controls">
@@ -59,8 +59,8 @@ export function initialize(container) {
 
         function resizePinContainerToLayer(layer, container) {
             const rect = layer.getBoundingClientRect();
-            container.style.left = `${rect.left}px`;
-            container.style.top = `${rect.top}px`;
+            // container.style.left = `${rect.left}px`;
+            // container.style.top = `${rect.top}px`;
             container.style.width = `${rect.width}px`;
             container.style.height = `${rect.height}px`;
         }
