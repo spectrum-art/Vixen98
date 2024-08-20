@@ -1,4 +1,6 @@
-Vixen98
+Folder PATH listing
+Volume serial number is 6C90-4EEB
+C:.
 │   index.html
 │   main.js
 │   server.js
@@ -18,6 +20,7 @@ Vixen98
 │       entrances.json
 │       surface_labels.json
 │       vendors.json
+│       vixenFileStructure.txt
 │       vixenlemonlist.csv
 │       
 ├───images
@@ -33,6 +36,7 @@ Vixen98
 │   │   startbutton.png
 │   │   vixen98logo.png
 │   │   vixenfavicon.png
+│   │   vixenLogoBlack.png
 │   │   vixenstartbutton.png
 │   │   vixensystem.png
 │   │   
@@ -55,12 +59,15 @@ Vixen98
 │       encryption.js
 │       lemonList.js
 │       maps.js
+│       particleBezier.js
+│       perlinNoise.js
 │       placeholder.js
 │       propaganda.js
 │       routing.js
 │       system.js
 │       undergroundMap.js
 │       utils.js
+│       vector.js
 │       windowManagement.js
 │       
 └───styles
@@ -71,6 +78,7 @@ Vixen98
         lemonList.css
         main.css
         maps.css
+        placeholder.css
         propaganda.css
         system.css
         undergroundMap.css
