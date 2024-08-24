@@ -71,21 +71,18 @@ export function initialize(container) {
             pins.forEach(pin => {
                 const pinElement = document.createElement('div');
                 pinElement.className = 'pin';
-                pinElement.style.position = 'absolute';
                 pinElement.style.left = `${(pin.x / imageWidth) * 100}%`;
                 pinElement.style.top = `${(pin.y / imageHeight) * 100}%`;
-        
+
                 const emojiElement = document.createElement('span');
                 emojiElement.className = 'emoji';
                 emojiElement.textContent = pin.icon;
-                emojiElement.style.position = 'absolute';
-                emojiElement.style.transform = 'translate(-50%, -50%)';
                 pinElement.appendChild(emojiElement);
-        
+
                 const labelElement = document.createElement('span');
                 labelElement.className = 'label';
                 labelElement.textContent = pin.label;
-        
+
                 if (isBaseLayer) {
                     labelElement.classList.add(pin.x >= imageWidth / 2 ? 'right' : 'left');
                     pinElement.appendChild(labelElement);
@@ -95,7 +92,7 @@ export function initialize(container) {
                     pinElement.addEventListener('mouseover', () => labelElement.style.display = 'inline-block');
                     pinElement.addEventListener('mouseout', () => labelElement.style.display = 'none');
                 }
-        
+
                 container.appendChild(pinElement);
             });
         }
@@ -132,8 +129,10 @@ export function initialize(container) {
             const transform = `scale(${scale}) translate(${panX}px, ${panY}px)`;
             baseLayer.style.transform = transform;
             surfaceLayer.style.transform = transform;
-            resizePinContainerToLayer(baseLayer, basePinsContainer);
-            resizePinContainerToLayer(surfaceLayer, surfacePinsContainer);
+            basePinsContainer.style.transform = transform;
+            surfacePinsContainer.style.transform = transform;
+            
+            document.documentElement.style.setProperty('--pin-scale', 1 / scale);
         }
 
         mapContainer.addEventListener('wheel', (e) => {
@@ -218,5 +217,6 @@ export function initialize(container) {
         surfacePinsContainer.style.display = 'none';
 
         loadPinsWithRetry();
+        updateLayers();
     }, 100);
 }
