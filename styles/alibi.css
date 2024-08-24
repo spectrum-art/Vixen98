@@ -49,9 +49,9 @@
   }
   
   #alibi-result {
-    padding: 20px;
+    padding: 15px;
     border: 1px solid #ccc;
-    background-color: #f9f9f9;
+    background-color: #c3c3c3;
   }
 
   input[type="checkbox"] {
@@ -93,9 +93,9 @@
   }
 
   .witness-option {
-    margin-top: 15px;
-    padding-top: 10px;
-    border-top: 1px solid #ccc;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #ccc;
   }
   
   .witness-option label {

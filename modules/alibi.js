@@ -142,7 +142,7 @@ async function setupAlibiApp(container) {
     return `
       <div class="alibi-app">
         <h3>㊙️ Generate an Alibi ㊙️</h3>
-        <p>Select one or more areas, times of day, and types of activity. Or, generate a random alibi if you're feeling lucky.</p>
+        <p>Select one or more areas, times of day, and types of activity.</p>
         <div class="options-container">
           <div class="option-column">
             <h4>Area</h4>
@@ -165,7 +165,6 @@ async function setupAlibiApp(container) {
         </div>
         <div class="button-container">
           <button id="generate-button">Generate Alibi</button>
-          <button id="lucky-button">I'm Feeling Lucky!</button>
         </div>
         <div id="alibi-result"></div>
       </div>
@@ -219,7 +218,6 @@ function parseLocationsCSV(csv) {
     return {
       name: name.trim(),
       area: area.trim(),
-/*       activityTypes: assignActivityTypes(name.trim()) */
     };
   });
 }
@@ -242,30 +240,13 @@ function parseCSVLine(line) {
   return result;
 }
 
-/* function assignActivityTypes(locationName) {
-  const types = [];
-  if (locationName.includes('Bank')) types.push(activityTypes.LEGAL, activityTypes.WORK);
-  if (locationName.includes('Beach') || locationName.includes('Park')) types.push(activityTypes.LEISURE, activityTypes.SOCIAL);
-  if (locationName.includes('Hospital') || locationName.includes('Medical')) types.push(activityTypes.MEDICAL);
-  if (locationName.includes('Court') || locationName.includes('Hall')) types.push(activityTypes.LEGAL);
-  if (locationName.includes('School') || locationName.includes('University')) types.push(activityTypes.EDUCATION);
-  if (locationName.includes('Restaurant') || locationName.includes('Café')) types.push(activityTypes.FOOD);
-  if (locationName.includes('Shop') || locationName.includes('Store')) types.push(activityTypes.SHOPPING);
-  
-  if (types.length === 0) {
-    types.push(activityTypes.TRAVEL, activityTypes.SOCIAL, activityTypes.LEISURE);
-  }
-  
-  return types;
-} */
-
-  function setupDistrictCheckboxes(container) {
-    const checkboxContainer = container.querySelector('#district-checkboxes');
-    districts.forEach(district => {
-      const checkbox = createCheckbox(district, district);
-      checkboxContainer.appendChild(checkbox);
-    });
-  }
+function setupDistrictCheckboxes(container) {
+  const checkboxContainer = container.querySelector('#district-checkboxes');
+  districts.forEach(district => {
+    const checkbox = createCheckbox(district, district);
+    checkboxContainer.appendChild(checkbox);
+  });
+}
 
 function setupTimeCheckboxes(container) {
   const checkboxContainer = container.querySelector('#time-checkboxes');
@@ -304,10 +285,7 @@ function createCheckbox(value, label) {
 }
 
 function setupEventListeners(container) {
-  const luckyButton = container.querySelector('#lucky-button');
   const generateButton = container.querySelector('#generate-button');
-
-  luckyButton.addEventListener('click', () => generateAlibi(container, true));
   generateButton.addEventListener('click', () => generateAlibi(container, false));
 }
 
@@ -371,7 +349,7 @@ function generateAlibi(container, isRandom) {
       witnessInfo = `\nWitness: ${witnessName} - ${witnessPhone}`;
     }
   
-    const alibi = `At ${randomTime}, you were at ${location.name} (${location.area}), ${activity}.${witnessInfo}`;
+    const alibi = `"At ${randomTime}, I was at ${location.name} (${location.area}), ${activity}." ${witnessInfo}`;
     displayAlibi(container, alibi);
   }
 
@@ -383,7 +361,7 @@ function getRandomActivity(activityType) {
     const activitiesForType = activities[activityType];
     if (!activitiesForType || activitiesForType.length === 0) {
       console.error(`No activities found for type: ${activityType}`);
-      return "doing something";  // fallback activity
+      return "doing something";
     }
     return activitiesForType[Math.floor(Math.random() * activitiesForType.length)];
   }
