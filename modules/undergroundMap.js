@@ -49,6 +49,20 @@ export function initialize(container) {
             }
         }
 
+        function updateLayerVisibility() {
+            baseLayer.style.display = baseLayerCheckbox.checked ? 'block' : 'none';
+            basePinsContainer.style.display = baseLayerCheckbox.checked ? 'block' : 'none';
+            
+            surfaceLayer.style.display = surfaceLayerCheckbox.checked ? 'block' : 'none';
+            surfacePinsContainer.style.display = surfaceLayerCheckbox.checked ? 'block' : 'none';
+            surfaceLayer.style.opacity = surfaceLayerCheckbox.checked ? '0.5' : '0';
+        }
+        
+        baseLayerCheckbox.addEventListener('change', updateLayerVisibility);
+        surfaceLayerCheckbox.addEventListener('change', updateLayerVisibility);
+        
+        updateLayerVisibility();
+
         function updatePinContainerSize() {
             const layerRect = baseLayer.getBoundingClientRect();
             basePinsContainer.style.width = `${layerRect.width}px`;
@@ -133,8 +147,6 @@ export function initialize(container) {
             surfaceLayer.style.transform = transform;
             basePinsContainer.style.transform = transform;
             surfacePinsContainer.style.transform = transform;
-            
-            // Update pin sizes
             document.documentElement.style.setProperty('--pin-scale', 1 / scale);
         }
 
@@ -189,19 +201,6 @@ export function initialize(container) {
                 isPanning = false;
                 mapContainer.style.cursor = 'grab';
             }
-        });
-
-        baseLayerCheckbox.addEventListener('change', (e) => {
-            baseLayer.classList.toggle('active', e.target.checked);
-            basePinsContainer.style.display = e.target.checked ? 'block' : 'none';
-            updateLayers();
-        });
-
-        surfaceLayerCheckbox.addEventListener('change', (e) => {
-            surfaceLayer.classList.toggle('active', e.target.checked);
-            surfacePinsContainer.style.display = e.target.checked ? 'block' : 'none';
-            surfaceLayer.style.opacity = e.target.checked ? '0.5' : '0';
-            updateLayers();
         });
 
         baseLayer.onload = surfaceLayer.onload = () => {
