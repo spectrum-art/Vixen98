@@ -87,42 +87,21 @@ const activities = {
 let districts = [];
 let locations = [];
 
-function loadFaker() {
-    return new Promise((resolve, reject) => {
-      if (typeof faker !== 'undefined') {
-        resolve(faker);
-      } else {
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/@faker-js/faker/dist/faker.min.js';
-        script.onload = () => resolve(faker);
-        script.onerror = reject;
-        document.head.appendChild(script);
-      }
-    });
+export async function initialize(container, params = {}) {
+  if (!container || !(container instanceof HTMLElement)) {
+    console.error('Invalid container provided to Alibi initialize function');
+    return;
   }
 
-  let fakerLoaded = false;
-
-window.addEventListener('fakerloaded', function() {
-  fakerLoaded = true;
-});
-
-  export async function initialize(container, params = {}) {
-    if (!container || !(container instanceof HTMLElement)) {
-      console.error('Invalid container provided to Alibi initialize function');
-      return;
-    }
+  console.log('Initializing Alibi app with params:', params);
   
-    console.log('Initializing Alibi app with params:', params);
-    
-    try {
-      await loadFaker();
-      await setupAlibiApp(container);
-    } catch (error) {
-      console.error('Error initializing Alibi app:', error);
-      container.innerHTML = '<p>Error loading Alibi app. Please try again later.</p>';
-    }
+  try {
+    await setupAlibiApp(container);
+  } catch (error) {
+    console.error('Error initializing Alibi app:', error);
+    container.innerHTML = '<p>Error loading Alibi app. Please try again later.</p>';
   }
+}
 
 async function setupAlibiApp(container) {
     container.innerHTML = createAlibiAppHTML();
@@ -305,6 +284,46 @@ function generatePhoneNumber() {
     return `(${areaCode}) ${prefix}-${lineNumber.toString().padStart(4, '0')}`;
   }
 
+function generateName(){
+	var name1 = [
+    "James", "Mary", "John", "Patricia", "Robert", "Jennifer", "Michael", "Linda", 
+    "William", "Elizabeth", "David", "Barbara", "Richard", "Susan", "Joseph", 
+    "Jessica", "Thomas", "Sarah", "Charles", "Karen", "Christopher", "Nancy", 
+    "Daniel", "Lisa", "Matthew", "Betty", "Anthony", "Margaret", "Mark", "Sandra", 
+    "Donald", "Ashley", "Steven", "Dorothy", "Paul", "Kimberly", "Andrew", "Emily", 
+    "Joshua", "Donna", "Kenneth", "Michelle", "Kevin", "Carol", "Brian", "Amanda", 
+    "George", "Melissa", "Edward", "Deborah", "Ronald", "Stephanie", "Timothy", 
+    "Rebecca", "Jason", "Sharon", "Jeffrey", "Laura", "Ryan", "Cynthia", "Jacob", 
+    "Kathleen", "Gary", "Amy", "Nicholas", "Shirley", "Eric", "Angela", "Jonathan", 
+    "Helen", "Stephen", "Anna", "Larry", "Brenda", "Justin", "Pamela", "Scott", 
+    "Nicole", "Brandon", "Emma", "Benjamin", "Samantha", "Samuel", "Katherine", 
+    "Gregory", "Christine", "Frank", "Debra", "Alexander", "Rachel", "Raymond", 
+    "Catherine", "Patrick", "Carolyn", "Jack", "Janet", "Dennis", "Ruth", "Jerry", 
+    "Maria"
+  ];
+
+	var name2 = [
+    "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", 
+    "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", 
+    "Thomas", "Taylor", "Moore", "Jackson", "Martin", "Lee", "Perez", "Thompson", 
+    "White", "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson", 
+    "Walker", "Young", "Allen", "King", "Wright", "Scott", "Torres", "Nguyen", 
+    "Hill", "Flores", "Green", "Adams", "Nelson", "Baker", "Hall", "Rivera", 
+    "Campbell", "Mitchell", "Carter", "Roberts", "Gomez", "Phillips", "Evans", 
+    "Turner", "Diaz", "Parker", "Cruz", "Edwards", "Collins", "Reyes", "Stewart", 
+    "Morris", "Morales", "Murphy", "Cook", "Rogers", "Gutierrez", "Ortiz", "Morgan", 
+    "Cooper", "Peterson", "Bailey", "Reed", "Kelly", "Howard", "Ramos", "Kim", 
+    "Cox", "Ward", "Richardson", "Watson", "Brooks", "Chavez", "Wood", "James", 
+    "Bennett", "Gray", "Mendoza", "Ruiz", "Hughes", "Price", "Alvarez", "Castillo", 
+    "Sanders", "Patel", "Myers", "Long", "Ross", "Foster", "Jimenez", "Powell", 
+    "Jenkins", "Perry", "Russell", "Sullivan"
+  ];
+
+	var name = name1[Math.floor(Math.random() * (name1.length))] + ' ' + name2[Math.floor(Math.random() * (name2.length))];
+	return name;
+
+}
+
 function generateAlibi(container, isRandom) {
     const selectedDistricts = isRandom ? districts : getSelectedOptions(container, '#district-checkboxes');
     const selectedTimes = isRandom ? ['morning', 'day', 'afternoon', 'evening', 'night', 'late night'] : getSelectedOptions(container, '#time-checkboxes');
@@ -338,13 +357,7 @@ function generateAlibi(container, isRandom) {
     let witnessInfo = '';
   
     if (generateWitness) {
-      let witnessName;
-      if (typeof window.faker !== 'undefined' && window.faker.person && typeof window.faker.person.fullName === 'function') {
-        witnessName = window.faker.person.fullName();
-      } else {
-        console.warn('Faker not available or API has changed. Using fallback for name generation.');
-        witnessName = 'John Doe';
-      }
+      const witnessName = generateName();
       const witnessPhone = generatePhoneNumber();
       witnessInfo = `\nWitness: ${witnessName} - ${witnessPhone}`;
     }
