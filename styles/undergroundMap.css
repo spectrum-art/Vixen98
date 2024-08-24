@@ -14,6 +14,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
+  font-family: "MS Sans Serif", Arial, sans-serif;
 }
 
 #map {
@@ -81,19 +82,53 @@
   position: absolute;
   top: 10px;
   left: 10px;
-  background: rgba(255, 255, 255, 0.8);
-  padding: 10px;
-  border-radius: 5px;
+  background: #c0c0c0;
+  border: 2px solid;
+  border-top-color: #dfdfdf;
+  border-left-color: #dfdfdf;
+  border-right-color: #808080;
+  border-bottom-color: #808080;
+  padding: 5px;
+}
+
+#layers-panel label {
+  display: block;
+  margin-bottom: 5px;
 }
 
 #zoom-controls {
   position: absolute;
   bottom: 10px;
   right: 10px;
-  max-width: 5%;
-  background: rgba(255, 255, 255, 0.8);
-  padding: 10px;
-  border-radius: 5px;
+  background: #c0c0c0;
+  border: 2px solid;
+  border-top-color: #dfdfdf;
+  border-left-color: #dfdfdf;
+  border-right-color: #808080;
+  border-bottom-color: #808080;
+  padding: 2px;
+}
+
+.zoom-button {
+  width: 25px;
+  height: 25px;
+  margin: 2px;
+  font-size: 16px;
+  font-weight: bold;
+  background: #c0c0c0;
+  border: 2px solid;
+  border-top-color: #dfdfdf;
+  border-left-color: #dfdfdf;
+  border-right-color: #808080;
+  border-bottom-color: #808080;
+  cursor: pointer;
+}
+
+.zoom-button:active {
+  border-top-color: #808080;
+  border-left-color: #808080;
+  border-right-color: #dfdfdf;
+  border-bottom-color: #dfdfdf;
 }
 
 button {

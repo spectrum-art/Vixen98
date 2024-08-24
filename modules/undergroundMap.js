@@ -10,12 +10,12 @@ export function initialize(container) {
                 <div id="surface-pins" class="pin-layer"></div>
             </div>
             <div id="layers-panel">
-                <label><input type="checkbox" id="toggle-base-layer" checked> Base Layer</label></br>
+                <label><input type="checkbox" id="toggle-base-layer" checked> Base Layer</label>
                 <label><input type="checkbox" id="toggle-surface-layer"> Surface Layer</label>
             </div>
             <div id="zoom-controls">
-                <button id="zoom-in">+</button>
-                <button id="zoom-out">-</button>
+                <button id="zoom-in" class="zoom-button">+</button>
+                <button id="zoom-out" class="zoom-button">-</button>
             </div>
         `;
         container.appendChild(mapContainer);
@@ -125,6 +125,8 @@ export function initialize(container) {
                 .catch(error => console.error("Error loading pins:", error));
         }
 
+        let initialScale = 1;
+
         function updateLayers() {
             const transform = `scale(${scale}) translate(${panX}px, ${panY}px)`;
             baseLayer.style.transform = transform;
@@ -132,13 +134,17 @@ export function initialize(container) {
             basePinsContainer.style.transform = transform;
             surfacePinsContainer.style.transform = transform;
             
+            // Update pin sizes
             document.documentElement.style.setProperty('--pin-scale', 1 / scale);
         }
 
         mapContainer.addEventListener('wheel', (e) => {
             e.preventDefault();
-            scale = Math.min(Math.max(scale + (e.deltaY > 0 ? -0.2 : 0.2), 0.25), 4);
-            updateLayers();
+            const newScale = Math.min(Math.max(scale + (e.deltaY > 0 ? -0.2 : 0.2), initialScale), 4);
+            if (newScale !== scale) {
+                scale = newScale;
+                updateLayers();
+            }
         });
 
         zoomInBtn.addEventListener('click', () => {
@@ -147,8 +153,11 @@ export function initialize(container) {
         });
 
         zoomOutBtn.addEventListener('click', () => {
-            scale = Math.max(scale / 1.2, 0.25);
-            updateLayers();
+            const newScale = scale / 1.2;
+            if (newScale >= initialScale) {
+                scale = newScale;
+                updateLayers();
+            }
         });
 
         mapContainer.addEventListener('mousedown', (e) => {
@@ -196,8 +205,13 @@ export function initialize(container) {
         });
 
         baseLayer.onload = surfaceLayer.onload = () => {
-            updateLayerSize(baseLayer);
-            updateLayerSize(surfaceLayer);
+            const containerRect = mapContainer.getBoundingClientRect();
+            const imgAspect = baseLayer.naturalWidth / baseLayer.naturalHeight;
+            const containerAspect = containerRect.width / containerRect.height;
+            initialScale = imgAspect > containerAspect 
+                ? containerRect.width / baseLayer.naturalWidth 
+                : containerRect.height / baseLayer.naturalHeight;
+            scale = initialScale;
             updateLayers();
             loadPinsWithRetry();
         };
