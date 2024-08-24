@@ -13,74 +13,74 @@ const activityTypes = {
 
 const activities = {
   [activityTypes.WORK]: [
-    "Working a shift",
-    "Attending a business meeting",
-    "Doing overtime",
-    "Training a new employee",
-    "Fixing a work-related issue"
+    "working a shift",
+    "attending a business meeting",
+    "doing overtime",
+    "training a new employee",
+    "fixing a work-related issue"
   ],
   [activityTypes.SOCIAL]: [
-    "Hanging out with friends",
-    "Going on a date",
-    "Attending a party",
-    "Going dancing",
+    "hanging out with friends",
+    "going on a date",
+    "attending a party",
+    "going dancing",
     "ERPing"
   ],
   [activityTypes.FOOD]: [
-    "Getting food",
-    "Trying out a new restaurant",
-    "Picking up a takeout order",
-    "Having a quick snack",
-    "Meeting someone for lunch"
+    "getting food",
+    "trying out a new restaurant",
+    "picking up a takeout order",
+    "having a quick snack",
+    "meeting someone for lunch"
   ],
   [activityTypes.SHOPPING]: [
-    "Buying something off Lemon List",
-    "Window shopping",
-    "Returning a purchased item",
-    "Browsing for new clothes",
-    "Picking up groceries"
+    "buying something off Lemon List",
+    "window shopping",
+    "returning a purchased item",
+    "browsing for new clothes",
+    "picking up groceries"
   ],
   [activityTypes.LEISURE]: [
-    "Taking a leisurely walk",
-    "Watching a movie",
-    "Reading a book",
-    "Playing sports",
-    "Sightseeing"
+    "taking a leisurely walk",
+    "watching a movie",
+    "reading a book",
+    "playing sports",
+    "sightseeing"
   ],
   [activityTypes.TRAVEL]: [
-    "Going for a drive",
-    "Calling a taxi",
-    "Riding the bus",
-    "Riding my bike",
-    "Hitchhiking"
+    "going for a drive",
+    "calling a taxi",
+    "riding the bus",
+    "riding my bike",
+    "hitchhiking"
   ],
   [activityTypes.MINOR_CRIME]: [
-    "Jaywalking",
-    "Yelling at the employees",
-    "Parking in a no-parking zone",
-    "Littering",
-    "Trying to figure out if I ran a red light"
+    "jaywalking",
+    "yelling at the employees",
+    "parking in a no-parking zone",
+    "littering",
+    "running a red light"
   ],
   [activityTypes.MEDICAL]: [
-    "Getting a routine check-up",
-    "Picking up a prescription",
-    "Visiting a sick friend",
-    "Donating blood",
-    "Attending a first-aid course"
+    "getting a routine check-up",
+    "picking up a prescription",
+    "visiting a sick friend",
+    "donating blood",
+    "attending a first-aid course"
   ],
   [activityTypes.LEGAL]: [
-    "Meeting with a lawyer",
-    "Gathering witness statements",
-    "Filing paperwork",
-    "Mailing a cease and desist letter",
-    "Taking photos"
+    "meeting with a lawyer",
+    "gathering witness statements",
+    "filing paperwork",
+    "mailing a letter",
+    "taking photos"
   ],
   [activityTypes.EDUCATION]: [
-    "Attending a class",
-    "Studying for an exam",
-    "Participating in a workshop",
-    "Taking a driving test",
-    "Tutoring a student"
+    "attending a class",
+    "studying for an exam",
+    "participating in a workshop",
+    "taking a driving test",
+    "tutoring a student"
   ]
 };
 
