@@ -90,9 +90,31 @@
   padding: 5px;
 }
 
+#layers-panel input[type="checkbox"] {
+  appearance: auto;
+  -webkit-appearance: auto;
+  -moz-appearance: auto;
+  position: static;
+  opacity: 1;
+  margin: 3px 5px 3px 0;
+  width: 13px;
+  height: 13px;
+  border: 1px solid #000000;
+  background: #ffffff;
+  vertical-align: bottom;
+  position: relative;
+}
+
+#layers-panel input[type="checkbox"]:checked {
+  background: #ffffff url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAIklEQVQImWNgwA/+M2ARZMACmBiwALLY////GXEpwKcAACnLKeHVspMcAAAAAElFTkSuQmCC') no-repeat center center;
+}
+
 #layers-panel label {
-  display: block;
+  display: flex;
+  align-items: center;
   margin-bottom: 5px;
+  color: #000000;
+  font-size: 11px;
 }
 
 #zoom-controls {

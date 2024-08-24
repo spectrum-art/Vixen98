@@ -10,8 +10,14 @@ export function initialize(container) {
                 <div id="surface-pins" class="pin-layer"></div>
             </div>
             <div id="layers-panel">
-                <label><input type="checkbox" id="toggle-base-layer" checked> Base Layer</label>
-                <label><input type="checkbox" id="toggle-surface-layer"> Surface Layer</label>
+                <label>
+                    <input type="checkbox" id="toggle-base-layer" checked>
+                    <span>Base Layer</span>
+                </label>
+                <label>
+                    <input type="checkbox" id="toggle-surface-layer">
+                    <span>Surface Layer</span>
+                </label>
             </div>
             <div id="zoom-controls">
                 <button id="zoom-in" class="zoom-button">+</button>
