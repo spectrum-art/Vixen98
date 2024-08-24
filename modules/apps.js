@@ -24,7 +24,55 @@ export const apps = {
     showOnDesktop: true,
     jsFiles: ['trash.js'],
     cssFiles: ['trash.css'],
-    subApps: [],
+    subApps: ['you', 'haha', 'gottem'],
+    window: {
+      width: '45%',
+      height: '45%',
+      minWidth: '450px',
+      minHeight: '450px'
+    }
+  },
+  you: {
+    id: 'you',
+    name: 'You',
+    type: 'app',
+    icon: '☝️',
+    accessLevel: 1,
+    showOnDesktop: false,
+    jsFiles: [],
+    cssFiles: [],
+    window: {
+      width: '45%',
+      height: '45%',
+      minWidth: '450px',
+      minHeight: '450px'
+    }
+  },
+  haha: {
+    id: 'haha',
+    name: 'haha',
+    type: 'app',
+    icon: '😹',
+    accessLevel: 1,
+    showOnDesktop: false,
+    jsFiles: [],
+    cssFiles: [],
+    window: {
+      width: '45%',
+      height: '45%',
+      minWidth: '450px',
+      minHeight: '450px'
+    }
+  },
+  gottem: {
+    id: 'gottem',
+    name: 'gottem',
+    type: 'app',
+    icon: '💩',
+    accessLevel: 1,
+    showOnDesktop: false,
+    jsFiles: [],
+    cssFiles: [],
     window: {
       width: '45%',
       height: '45%',
